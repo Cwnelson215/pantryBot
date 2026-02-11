@@ -16,6 +16,12 @@ const desiredCount = parseInt(config.get("desiredCount") || "1");
 const containerPort = parseInt(config.get("containerPort") || "3000");
 const useFargateSpot = config.getBoolean("useFargateSpot") ?? true;
 
+// App secrets (set with: pulumi config set --secret <key> <value>)
+const sessionSecret = config.getSecret("sessionSecret");
+const spoonacularApiKey = config.getSecret("spoonacularApiKey");
+const anthropicApiKey = config.getSecret("anthropicApiKey");
+const usdaApiKey = config.getSecret("usdaApiKey");
+
 // =============================================================================
 // Import Platform Stack Outputs
 // =============================================================================
@@ -188,8 +194,14 @@ const taskDefinition = new aws.ecs.TaskDefinition(`${appName}-task`, {
   executionRoleArn: taskExecutionRoleArn,
   taskRoleArn: taskRoleArn,
   containerDefinitions: pulumi
-    .all([ecrRepo.repositoryUrl, logGroupName, region, dbEndpoint, dbPasswordSecretArn])
-    .apply(([repoUrl, logGroup, awsRegion, dbHost, dbSecretArn]) => {
+    .all([
+      ecrRepo.repositoryUrl, logGroupName, region, dbEndpoint, dbPasswordSecretArn,
+      sessionSecret, spoonacularApiKey, anthropicApiKey, usdaApiKey,
+    ])
+    .apply(([
+      repoUrl, logGroup, awsRegion, dbHost, dbSecretArn,
+      sessSecret, spoonKey, anthropicKey, usdaKey,
+    ]) => {
       const env = [...containerEnv];
       const secrets: { name: string; valueFrom: string }[] = [];
 
@@ -202,6 +214,20 @@ const taskDefinition = new aws.ecs.TaskDefinition(`${appName}-task`, {
       }
       if (dbSecretArn) {
         secrets.push({ name: "DB_PASSWORD", valueFrom: dbSecretArn });
+      }
+
+      // Add app secrets as environment variables
+      if (sessSecret) {
+        env.push({ name: "SESSION_SECRET", value: sessSecret });
+      }
+      if (spoonKey) {
+        env.push({ name: "SPOONACULAR_API_KEY", value: spoonKey });
+      }
+      if (anthropicKey) {
+        env.push({ name: "ANTHROPIC_API_KEY", value: anthropicKey });
+      }
+      if (usdaKey) {
+        env.push({ name: "USDA_API_KEY", value: usdaKey });
       }
 
       return JSON.stringify([

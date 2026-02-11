@@ -1,0 +1,134 @@
+<%- include('../../partials/header') %>
+
+<h1><%= recipe.title %></h1>
+
+<% if (recipe.image || recipe.imageUrl) { %>
+  <img src="<%= recipe.image || recipe.imageUrl %>" alt="<%= recipe.title %>" class="recipe-image mb-1" style="max-width: 600px;">
+<% } %>
+
+<div class="grid">
+  <% if (recipe.servings) { %>
+    <p><strong>Servings:</strong> <%= recipe.servings %></p>
+  <% } %>
+  <% if (recipe.readyInMinutes) { %>
+    <p><strong>Ready in:</strong> <%= recipe.readyInMinutes %> minutes</p>
+  <% } %>
+</div>
+
+<!-- Personalization -->
+<% if (typeof personalization !== 'undefined' && personalization) { %>
+  <article style="background: #f0f7ff; border-left: 4px solid var(--pico-primary-background); padding: 1rem;">
+    <h4>Personalized for You</h4>
+    <p><%- personalization.replace(/\n/g, '<br>') %></p>
+  </article>
+<% } %>
+
+<!-- Ingredients -->
+<section>
+  <h2>Ingredients</h2>
+  <ul>
+    <% if (recipe.extendedIngredients) { %>
+      <% recipe.extendedIngredients.forEach(function(ing) { %>
+        <li><%= ing.original || (ing.amount + ' ' + ing.unit + ' ' + ing.name) %></li>
+      <% }); %>
+    <% } else if (recipe.ingredients) { %>
+      <% recipe.ingredients.forEach(function(ing) { %>
+        <li><%= typeof ing === 'string' ? ing : (ing.original || ing.name) %></li>
+      <% }); %>
+    <% } %>
+  </ul>
+</section>
+
+<!-- Instructions -->
+<section>
+  <h2>Instructions</h2>
+  <% if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) { %>
+    <ol>
+      <% recipe.analyzedInstructions.forEach(function(group) { %>
+        <% if (group.steps) { %>
+          <% group.steps.forEach(function(step) { %>
+            <li><%= step.step %></li>
+          <% }); %>
+        <% } %>
+      <% }); %>
+    </ol>
+  <% } else if (recipe.instructions) { %>
+    <% if (Array.isArray(recipe.instructions)) { %>
+      <ol>
+        <% recipe.instructions.forEach(function(step) { %>
+          <li><%= typeof step === 'string' ? step : step.step %></li>
+        <% }); %>
+      </ol>
+    <% } else { %>
+      <p><%- recipe.instructions %></p>
+    <% } %>
+  <% } %>
+</section>
+
+<!-- Nutrition Info -->
+<% if (typeof nutrition !== 'undefined' && nutrition) { %>
+  <section>
+    <h2>Nutrition Information</h2>
+    <figure>
+      <table>
+        <tbody>
+          <% if (nutrition.calories) { %><tr><td>Calories</td><td><%= nutrition.calories %></td></tr><% } %>
+          <% if (nutrition.protein) { %><tr><td>Protein</td><td><%= nutrition.protein %></td></tr><% } %>
+          <% if (nutrition.carbs) { %><tr><td>Carbs</td><td><%= nutrition.carbs %></td></tr><% } %>
+          <% if (nutrition.fat) { %><tr><td>Fat</td><td><%= nutrition.fat %></td></tr><% } %>
+          <% if (nutrition.fiber) { %><tr><td>Fiber</td><td><%= nutrition.fiber %></td></tr><% } %>
+          <% if (nutrition.sugar) { %><tr><td>Sugar</td><td><%= nutrition.sugar %></td></tr><% } %>
+          <% if (nutrition.sodium) { %><tr><td>Sodium</td><td><%= nutrition.sodium %></td></tr><% } %>
+        </tbody>
+      </table>
+    </figure>
+  </section>
+<% } %>
+
+<!-- Action Buttons -->
+<section>
+  <div class="grid">
+    <!-- Save Recipe -->
+    <form method="POST" action="/recipes/save">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="title" value="<%= recipe.title %>">
+      <input type="hidden" name="spoonacularId" value="<%= recipe.id || '' %>">
+      <input type="hidden" name="source" value="<%= recipe.source || 'spoonacular' %>">
+      <input type="hidden" name="ingredientsJson" value="<%= JSON.stringify(recipe.extendedIngredients || recipe.ingredients || []) %>">
+      <input type="hidden" name="instructionsJson" value="<%= JSON.stringify(recipe.analyzedInstructions || recipe.instructions || []) %>">
+      <input type="hidden" name="personalization" value="<%= typeof personalization !== 'undefined' ? personalization : '' %>">
+      <input type="hidden" name="servings" value="<%= recipe.servings || '' %>">
+      <input type="hidden" name="readyInMinutes" value="<%= recipe.readyInMinutes || '' %>">
+      <input type="hidden" name="imageUrl" value="<%= recipe.image || recipe.imageUrl || '' %>">
+      <input type="hidden" name="nutritionJson" value="<%= typeof nutrition !== 'undefined' ? JSON.stringify(nutrition) : '{}' %>">
+      <button type="submit" style="width:100%;">Save Recipe</button>
+    </form>
+
+    <% if (recipe.source === 'spoonacular' || (!recipe.source && recipe.id)) { %>
+      <!-- Personalize -->
+      <form method="POST" action="/recipes/<%= recipe.id %>/personalize">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button type="submit" class="secondary" style="width:100%;">Personalize with AI</button>
+      </form>
+    <% } %>
+
+    <% if (typeof nutrition !== 'undefined' && nutrition && nutrition.calories) { %>
+      <!-- Log as Meal -->
+      <form method="POST" action="/nutrition/log">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <input type="hidden" name="foodName" value="<%= recipe.title %>">
+        <input type="hidden" name="calories" value="<%= nutrition.calories || 0 %>">
+        <input type="hidden" name="protein" value="<%= nutrition.protein || 0 %>">
+        <input type="hidden" name="carbs" value="<%= nutrition.carbs || 0 %>">
+        <input type="hidden" name="fat" value="<%= nutrition.fat || 0 %>">
+        <input type="hidden" name="fiber" value="<%= nutrition.fiber || 0 %>">
+        <input type="hidden" name="sugar" value="<%= nutrition.sugar || 0 %>">
+        <input type="hidden" name="sodium" value="<%= nutrition.sodium || 0 %>">
+        <input type="hidden" name="servings" value="1">
+        <button type="submit" class="contrast" style="width:100%;">Log as Meal</button>
+      </form>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../../partials/footer') %>

@@ -1,0 +1,152 @@
+<%- include('../../partials/header') %>
+
+<%
+  var displayDate = new Date(date + 'T12:00:00');
+  var prevDate = new Date(displayDate);
+  prevDate.setDate(prevDate.getDate() - 1);
+  var nextDate = new Date(displayDate);
+  nextDate.setDate(nextDate.getDate() + 1);
+  var prevStr = prevDate.toISOString().split('T')[0];
+  var nextStr = nextDate.toISOString().split('T')[0];
+
+  var calorieTarget = (typeof userPreferences !== 'undefined' && userPreferences && userPreferences.calorieTarget) ? userPreferences.calorieTarget : 2000;
+  var proteinTarget = (typeof userPreferences !== 'undefined' && userPreferences && userPreferences.proteinTarget) ? userPreferences.proteinTarget : 50;
+%>
+
+<div class="flex-between">
+  <a href="/nutrition/daily?date=<%= prevStr %>">&larr; Previous Day</a>
+  <h1>Nutrition - <%= displayDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></h1>
+  <a href="/nutrition/daily?date=<%= nextStr %>">Next Day &rarr;</a>
+</div>
+
+<!-- Daily Totals -->
+<section>
+  <h2>Daily Totals</h2>
+
+  <div class="grid">
+    <div>
+      <p class="mb-0"><strong>Calories:</strong> <%= totals.calories %> / <%= calorieTarget %></p>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: <%= Math.min((totals.calories / calorieTarget) * 100, 100) %>%;"><%= totals.calories %></div>
+      </div>
+    </div>
+    <div>
+      <p class="mb-0"><strong>Protein:</strong> <%= Number(totals.proteinG).toFixed(1) %>g / <%= proteinTarget %>g</p>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: <%= Math.min((totals.proteinG / proteinTarget) * 100, 100) %>%;"><%= Number(totals.proteinG).toFixed(1) %>g</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <p class="mb-0"><strong>Carbs:</strong> <%= Number(totals.carbsG).toFixed(1) %>g</p>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: <%= Math.min(totals.carbsG / 3, 100) %>%;"><%= Number(totals.carbsG).toFixed(1) %>g</div>
+      </div>
+    </div>
+    <div>
+      <p class="mb-0"><strong>Fat:</strong> <%= Number(totals.fatG).toFixed(1) %>g</p>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: <%= Math.min(totals.fatG / 0.65, 100) %>%;"><%= Number(totals.fatG).toFixed(1) %>g</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <p class="mb-0"><strong>Fiber:</strong> <%= Number(totals.fiberG).toFixed(1) %>g</p>
+    </div>
+    <div>
+      <p class="mb-0"><strong>Sugar:</strong> <%= Number(totals.sugarG).toFixed(1) %>g</p>
+    </div>
+    <div>
+      <p class="mb-0"><strong>Sodium:</strong> <%= Number(totals.sodiumMg).toFixed(1) %>mg</p>
+    </div>
+  </div>
+</section>
+
+<!-- Individual Entries -->
+<section>
+  <h2>Meal Log</h2>
+  <% if (typeof entries !== 'undefined' && entries.length > 0) { %>
+    <figure>
+      <table>
+        <thead>
+          <tr>
+            <th>Food</th>
+            <th>Servings</th>
+            <th>Calories</th>
+            <th>Protein</th>
+            <th>Carbs</th>
+            <th>Fat</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% entries.forEach(function(entry) { %>
+            <tr>
+              <td><%= entry.foodName %></td>
+              <td><%= entry.servings || 1 %></td>
+              <td><%= entry.calories || 0 %></td>
+              <td><%= entry.proteinG || 0 %>g</td>
+              <td><%= entry.carbsG || 0 %>g</td>
+              <td><%= entry.fatG || 0 %>g</td>
+              <td>
+                <form method="POST" action="/nutrition/log/<%= entry.id %>/delete" class="inline-form">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="outline" style="padding:0.25rem 0.5rem;margin:0;--pico-color:var(--pico-del-color);">Delete</button>
+                </form>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </figure>
+  <% } else { %>
+    <p class="text-muted">No meals logged for this day.</p>
+  <% } %>
+</section>
+
+<!-- Log a Meal -->
+<section>
+  <h2>Log a Meal</h2>
+  <form method="POST" action="/nutrition/log">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="logDate" value="<%= date %>">
+
+    <div class="grid">
+      <div>
+        <label for="foodName">Food Name</label>
+        <input type="text" id="foodName" name="foodName" placeholder="e.g. Grilled Chicken" required>
+      </div>
+      <div>
+        <label for="servings">Servings</label>
+        <input type="number" id="servings" name="servings" value="1" min="0.25" step="0.25">
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label for="calories">Calories</label>
+        <input type="number" id="calories" name="calories" min="0" step="1" placeholder="0">
+      </div>
+      <div>
+        <label for="proteinG">Protein (g)</label>
+        <input type="number" id="proteinG" name="proteinG" min="0" step="0.1" placeholder="0">
+      </div>
+      <div>
+        <label for="carbsG">Carbs (g)</label>
+        <input type="number" id="carbsG" name="carbsG" min="0" step="0.1" placeholder="0">
+      </div>
+      <div>
+        <label for="fatG">Fat (g)</label>
+        <input type="number" id="fatG" name="fatG" min="0" step="0.1" placeholder="0">
+      </div>
+    </div>
+
+    <button type="submit">Log Meal</button>
+  </form>
+</section>
+
+<%- include('../../partials/footer') %>

@@ -1,18 +1,18 @@
-import http from "http";
+import app from "./app";
+import { config } from "./config";
+import { initializeDatabase } from "./db/client";
 
-const port = parseInt(process.env.PORT || "3000");
+async function main() {
+  try {
+    await initializeDatabase();
 
-const server = http.createServer((req, res) => {
-  if (req.url === "/health" && req.method === "GET") {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("ok");
-    return;
+    app.listen(config.port, () => {
+      console.log(`pantry-bot listening on port ${config.port}`);
+    });
+  } catch (err) {
+    console.error("Failed to start:", err);
+    process.exit(1);
   }
+}
 
-  res.writeHead(200, { "Content-Type": "text/plain" });
-  res.end("Hello from pantry-bot!");
-});
-
-server.listen(port, () => {
-  console.log(`pantry-bot listening on port ${port}`);
-});
+main();

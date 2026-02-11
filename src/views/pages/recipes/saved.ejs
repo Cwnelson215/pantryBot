@@ -1,0 +1,93 @@
+<%- include('../../partials/header') %>
+
+<h1>Saved Recipes</h1>
+
+<% if (typeof recipes !== 'undefined' && recipes.length > 0) { %>
+  <div class="grid-cards">
+    <% recipes.forEach(function(recipe) { %>
+      <article>
+        <% if (recipe.imageUrl) { %>
+          <img src="<%= recipe.imageUrl %>" alt="<%= recipe.title %>" class="recipe-image">
+        <% } %>
+        <h4 class="mb-0"><%= recipe.title %></h4>
+        <p>
+          <span class="tag"><%= recipe.source || 'unknown' %></span>
+          <% if (recipe.servings) { %>
+            <small class="text-muted"> &middot; <%= recipe.servings %> servings</small>
+          <% } %>
+        </p>
+        <% if (recipe.createdAt) { %>
+          <p class="text-muted"><small>Saved on <%= new Date(recipe.createdAt).toLocaleDateString() %></small></p>
+        <% } %>
+
+        <details>
+          <summary>View Details</summary>
+
+          <% if (recipe.ingredients || recipe.ingredientsJson) { %>
+            <%
+              var ingredients = recipe.ingredients;
+              if (!ingredients && recipe.ingredientsJson) {
+                try { ingredients = JSON.parse(recipe.ingredientsJson); } catch(e) { ingredients = []; }
+              }
+            %>
+            <% if (ingredients && ingredients.length > 0) { %>
+              <h5>Ingredients</h5>
+              <ul>
+                <% ingredients.forEach(function(ing) { %>
+                  <li><%= typeof ing === 'string' ? ing : (ing.original || ing.name || JSON.stringify(ing)) %></li>
+                <% }); %>
+              </ul>
+            <% } %>
+          <% } %>
+
+          <% if (recipe.instructions || recipe.instructionsJson) { %>
+            <%
+              var instructions = recipe.instructions;
+              if (!instructions && recipe.instructionsJson) {
+                try { instructions = JSON.parse(recipe.instructionsJson); } catch(e) { instructions = []; }
+              }
+            %>
+            <% if (instructions) { %>
+              <h5>Instructions</h5>
+              <% if (Array.isArray(instructions)) { %>
+                <% if (instructions.length > 0 && instructions[0].steps) { %>
+                  <ol>
+                    <% instructions.forEach(function(group) { %>
+                      <% if (group.steps) { %>
+                        <% group.steps.forEach(function(step) { %>
+                          <li><%= step.step %></li>
+                        <% }); %>
+                      <% } %>
+                    <% }); %>
+                  </ol>
+                <% } else { %>
+                  <ol>
+                    <% instructions.forEach(function(step) { %>
+                      <li><%= typeof step === 'string' ? step : (step.step || JSON.stringify(step)) %></li>
+                    <% }); %>
+                  </ol>
+                <% } %>
+              <% } else { %>
+                <p><%- instructions %></p>
+              <% } %>
+            <% } %>
+          <% } %>
+
+          <% if (recipe.personalization) { %>
+            <article style="background: #f0f7ff; border-left: 4px solid var(--pico-primary-background); padding: 1rem;">
+              <h5>Personalization Notes</h5>
+              <p><%- recipe.personalization.replace(/\n/g, '<br>') %></p>
+            </article>
+          <% } %>
+        </details>
+      </article>
+    <% }); %>
+  </div>
+<% } else { %>
+  <section style="text-align: center; padding: 2rem 0;">
+    <p class="text-muted">No saved recipes yet.</p>
+    <a href="/recipes" role="button" class="outline">Find Recipes</a>
+  </section>
+<% } %>
+
+<%- include('../../partials/footer') %>

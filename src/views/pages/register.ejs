@@ -1,0 +1,46 @@
+<%- include('../partials/header') %>
+
+<section style="max-width: 450px; margin: 0 auto;">
+  <h1>Register</h1>
+
+  <form method="POST" action="/register" id="registerForm">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus>
+
+    <label for="displayName">Display Name</label>
+    <input type="text" id="displayName" name="displayName" placeholder="Your name" required>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="Choose a password" required minlength="8">
+
+    <label for="confirmPassword">Confirm Password</label>
+    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required minlength="8">
+
+    <p id="passwordError" style="color: var(--pico-del-color); display: none;">Passwords do not match.</p>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <p class="text-muted">Already have an account? <a href="/login">Login here</a></p>
+</section>
+
+<script>
+  document.getElementById('registerForm').addEventListener('submit', function(e) {
+    var password = document.getElementById('password').value;
+    var confirm = document.getElementById('confirmPassword').value;
+    var errorEl = document.getElementById('passwordError');
+
+    if (password !== confirm) {
+      e.preventDefault();
+      errorEl.style.display = 'block';
+      document.getElementById('confirmPassword').setAttribute('aria-invalid', 'true');
+    } else {
+      errorEl.style.display = 'none';
+      document.getElementById('confirmPassword').removeAttribute('aria-invalid');
+    }
+  });
+</script>
+
+<%- include('../partials/footer') %>

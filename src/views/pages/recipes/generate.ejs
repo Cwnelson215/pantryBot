@@ -1,0 +1,44 @@
+<%- include('../../partials/header') %>
+
+<h1>Generate Recipe with AI</h1>
+
+<% if (typeof pantryItems !== 'undefined' && pantryItems.length > 0) { %>
+  <form method="POST" action="/recipes/generate">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <p>Select the ingredients you'd like to use:</p>
+
+    <%
+      var categories = {};
+      pantryItems.forEach(function(item) {
+        var cat = item.category || 'Uncategorized';
+        if (!categories[cat]) categories[cat] = [];
+        categories[cat].push(item);
+      });
+    %>
+
+    <% Object.keys(categories).sort().forEach(function(category) { %>
+      <fieldset>
+        <legend><strong><%= category %></strong></legend>
+        <% categories[category].forEach(function(item) { %>
+          <label>
+            <input type="checkbox" name="ingredients" value="<%= item.name %>">
+            <%= item.name %>
+            <% if (item.quantity) { %>
+              <small class="text-muted">(<%= item.quantity %> <%= item.unit || '' %>)</small>
+            <% } %>
+          </label>
+        <% }); %>
+      </fieldset>
+    <% }); %>
+
+    <button type="submit">Generate Recipe</button>
+  </form>
+<% } else { %>
+  <section style="text-align: center; padding: 2rem 0;">
+    <p class="text-muted">You don't have any items in your pantry yet.</p>
+    <a href="/pantry/add" role="button">Add Pantry Items First</a>
+  </section>
+<% } %>
+
+<%- include('../../partials/footer') %>

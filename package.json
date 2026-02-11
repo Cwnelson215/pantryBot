@@ -1,20 +1,37 @@
 {
-  "name": "pantry-bot-infra",
+  "name": "pantry-bot",
   "version": "1.0.0",
-  "description": "Infrastructure for pantry-bot",
-  "main": "index.ts",
+  "description": "Pantry management, recipe generation, and nutrition tracking",
   "scripts": {
-    "build": "tsc",
+    "dev": "tsx watch --env-file=.env src/index.ts",
+    "build": "tsc -p tsconfig.app.json",
+    "postbuild": "cp -r src/views dist/views",
+    "start": "node dist/index.js",
     "preview": "pulumi preview",
     "up": "pulumi up",
     "destroy": "pulumi destroy"
   },
   "dependencies": {
-    "@pulumi/aws": "^6.0.0",
-    "@pulumi/pulumi": "^3.0.0"
+    "@anthropic-ai/sdk": "^0.32.0",
+    "bcrypt": "^6.0.0",
+    "connect-pg-simple": "^10.0.0",
+    "drizzle-orm": "^0.36.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "express-session": "^1.18.0",
+    "pg": "^8.13.0"
   },
   "devDependencies": {
+    "@pulumi/aws": "^6.0.0",
+    "@pulumi/pulumi": "^3.0.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/connect-pg-simple": "^7.0.0",
+    "@types/express": "^5.0.0",
+    "@types/express-session": "^1.18.0",
     "@types/node": "^20.0.0",
+    "@types/pg": "^8.11.0",
+    "drizzle-kit": "^0.31.9",
+    "tsx": "^4.0.0",
     "typescript": "^5.0.0"
   }
 }

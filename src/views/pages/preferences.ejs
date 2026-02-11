@@ -1,0 +1,78 @@
+<%- include('../partials/header') %>
+
+<h1>Dietary Preferences</h1>
+
+<%
+  var currentDietaryTags = (typeof preferences !== 'undefined' && preferences && preferences.dietaryTags) ? preferences.dietaryTags : [];
+  var currentAllergies = (typeof preferences !== 'undefined' && preferences && preferences.allergies) ? preferences.allergies : [];
+  var currentCuisines = (typeof preferences !== 'undefined' && preferences && preferences.cuisinePrefs) ? preferences.cuisinePrefs : [];
+  var currentServingSize = (typeof preferences !== 'undefined' && preferences && preferences.servingSize) ? preferences.servingSize : 2;
+  var currentCalorieTarget = (typeof preferences !== 'undefined' && preferences && preferences.calorieTarget) ? preferences.calorieTarget : '';
+  var currentProteinTarget = (typeof preferences !== 'undefined' && preferences && preferences.proteinTarget) ? preferences.proteinTarget : '';
+%>
+
+<form method="POST" action="/preferences">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <!-- Dietary Tags -->
+  <fieldset>
+    <legend><strong>Dietary Tags</strong></legend>
+    <% if (typeof dietaryOptions !== 'undefined') { %>
+      <% dietaryOptions.forEach(function(option) { %>
+        <label>
+          <input type="checkbox" name="dietaryTags" value="<%= option %>"
+            <%= currentDietaryTags.indexOf(option) !== -1 ? 'checked' : '' %>>
+          <%= option %>
+        </label>
+      <% }); %>
+    <% } %>
+  </fieldset>
+
+  <!-- Allergies -->
+  <fieldset>
+    <legend><strong>Allergies</strong></legend>
+    <% if (typeof allergyOptions !== 'undefined') { %>
+      <% allergyOptions.forEach(function(option) { %>
+        <label>
+          <input type="checkbox" name="allergies" value="<%= option %>"
+            <%= currentAllergies.indexOf(option) !== -1 ? 'checked' : '' %>>
+          <%= option %>
+        </label>
+      <% }); %>
+    <% } %>
+  </fieldset>
+
+  <!-- Cuisine Preferences -->
+  <fieldset>
+    <legend><strong>Cuisine Preferences</strong></legend>
+    <% if (typeof cuisineOptions !== 'undefined') { %>
+      <% cuisineOptions.forEach(function(option) { %>
+        <label>
+          <input type="checkbox" name="cuisinePrefs" value="<%= option %>"
+            <%= currentCuisines.indexOf(option) !== -1 ? 'checked' : '' %>>
+          <%= option %>
+        </label>
+      <% }); %>
+    <% } %>
+  </fieldset>
+
+  <!-- Numeric Targets -->
+  <div class="grid">
+    <div>
+      <label for="servingSize">Serving Size (people)</label>
+      <input type="number" id="servingSize" name="servingSize" min="1" max="20" value="<%= currentServingSize %>">
+    </div>
+    <div>
+      <label for="calorieTarget">Daily Calorie Target</label>
+      <input type="number" id="calorieTarget" name="calorieTarget" min="0" step="50" placeholder="e.g. 2000" value="<%= currentCalorieTarget %>">
+    </div>
+    <div>
+      <label for="proteinTarget">Daily Protein Target (g)</label>
+      <input type="number" id="proteinTarget" name="proteinTarget" min="0" step="1" placeholder="e.g. 50" value="<%= currentProteinTarget %>">
+    </div>
+  </div>
+
+  <button type="submit">Save Preferences</button>
+</form>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Pantry Bot</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <style>
+    .flash { padding: 1rem; border-radius: var(--pico-border-radius); margin-bottom: 1rem; }
+    .flash-success { background: var(--pico-ins-color); color: #155724; }
+    .flash-error { background: var(--pico-del-color); color: #721c24; }
+    .flash-info { background: #d1ecf1; color: #0c5460; }
+    .tag { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.8rem; margin: 0.1rem; background: var(--pico-primary-background); color: var(--pico-primary-inverse); }
+    .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .text-muted { color: var(--pico-muted-color); }
+    .text-right { text-align: right; }
+    .mb-0 { margin-bottom: 0; }
+    .mb-1 { margin-bottom: 1rem; }
+    .mt-1 { margin-top: 1rem; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .inline-form { display: inline; }
+    .danger { color: var(--pico-del-color); }
+    .warning { color: #856404; }
+    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: var(--pico-border-radius); font-size: 0.75rem; font-weight: bold; }
+    .badge-danger { background: var(--pico-del-color); color: white; }
+    .badge-warning { background: #ffc107; color: #212529; }
+    .badge-success { background: var(--pico-ins-color); color: #155724; }
+    .progress-bar { background: var(--pico-secondary-background); border-radius: var(--pico-border-radius); overflow: hidden; height: 1.5rem; margin-bottom: 0.5rem; }
+    .progress-fill { height: 100%; background: var(--pico-primary-background); transition: width 0.3s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: white; }
+    .recipe-image { width: 100%; height: 200px; object-fit: cover; border-radius: var(--pico-border-radius); }
+  </style>
+</head>
+<body>
+  <header class="container">
+    <nav>
+      <ul>
+        <li><strong><a href="/" class="contrast">Pantry Bot</a></strong></li>
+      </ul>
+      <ul>
+        <% if (typeof user !== 'undefined' && user) { %>
+          <li><a href="/">Dashboard</a></li>
+          <li><a href="/pantry">Pantry</a></li>
+          <li><a href="/recipes">Recipes</a></li>
+          <li><a href="/nutrition">Nutrition</a></li>
+          <li><a href="/preferences">Preferences</a></li>
+          <li>
+            <form method="POST" action="/logout" class="inline-form">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button type="submit" class="outline secondary" style="margin:0;padding:0.25rem 0.5rem;">Logout</button>
+            </form>
+          </li>
+        <% } else { %>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/register">Register</a></li>
+        <% } %>
+      </ul>
+    </nav>
+  </header>
+  <main class="container">
+    <% if (typeof flash !== 'undefined' && flash && flash.length > 0) { %>
+      <% flash.forEach(function(msg) { %>
+        <div class="flash flash-<%= msg.type %>"><%= msg.message %></div>
+      <% }); %>
+    <% } %>

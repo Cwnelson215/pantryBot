@@ -1,0 +1,25 @@
+<%- include('../../partials/header') %>
+
+<h1>Recipes</h1>
+
+<div class="grid-cards">
+  <article>
+    <h3>Search by Pantry</h3>
+    <p>Find recipes using ingredients you already have.</p>
+    <a href="/recipes/search" role="button" class="outline">Search Recipes</a>
+  </article>
+
+  <article>
+    <h3>Generate with AI</h3>
+    <p>Create a custom recipe from your pantry items.</p>
+    <a href="/recipes/generate" role="button" class="outline">Generate Recipe</a>
+  </article>
+
+  <article>
+    <h3>Saved Recipes</h3>
+    <p>View your saved recipe collection.</p>
+    <a href="/recipes/saved" role="button" class="outline">View Saved</a>
+  </article>
+</div>
+
+<%- include('../../partials/footer') %>

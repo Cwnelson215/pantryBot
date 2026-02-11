@@ -1,0 +1,93 @@
+<%- include('../partials/header') %>
+
+<h1>Welcome, <%= user.displayName %>!</h1>
+
+<!-- Stats Row -->
+<div class="grid">
+  <article>
+    <hgroup>
+      <h3><%= typeof pantryCount !== 'undefined' ? pantryCount : 0 %></h3>
+      <p>Pantry Items</p>
+    </hgroup>
+  </article>
+  <article>
+    <hgroup>
+      <h3><%= typeof savedRecipeCount !== 'undefined' ? savedRecipeCount : (typeof recentRecipes !== 'undefined' ? recentRecipes.length : 0) %></h3>
+      <p>Saved Recipes</p>
+    </hgroup>
+  </article>
+</div>
+
+<!-- Expiring Soon -->
+<section>
+  <h2>Expiring Soon</h2>
+  <% if (typeof expiringItems !== 'undefined' && expiringItems.length > 0) { %>
+    <figure>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Expiration Date</th>
+            <th>Quantity</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% expiringItems.forEach(function(item) {
+            var now = new Date();
+            var exp = new Date(item.expirationDate);
+            var diffDays = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+            var badgeClass = 'badge-success';
+            var badgeLabel = diffDays + ' days';
+            if (diffDays <= 2) {
+              badgeClass = 'badge-danger';
+              badgeLabel = diffDays <= 0 ? 'Expired' : diffDays + ' day' + (diffDays === 1 ? '' : 's');
+            } else if (diffDays <= 5) {
+              badgeClass = 'badge-warning';
+              badgeLabel = diffDays + ' days';
+            }
+          %>
+            <tr>
+              <td><%= item.name %></td>
+              <td><%= new Date(item.expirationDate).toLocaleDateString() %></td>
+              <td><%= item.quantity %> <%= item.unit %></td>
+              <td><span class="badge <%= badgeClass %>"><%= badgeLabel %></span></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </figure>
+  <% } else { %>
+    <p class="text-muted">No items expiring soon.</p>
+  <% } %>
+</section>
+
+<!-- Recent Saved Recipes -->
+<section>
+  <h2>Recent Saved Recipes</h2>
+  <% if (typeof recentRecipes !== 'undefined' && recentRecipes.length > 0) { %>
+    <div class="grid-cards">
+      <% recentRecipes.forEach(function(recipe) { %>
+        <article>
+          <h4 class="mb-0"><%= recipe.title %></h4>
+          <p class="text-muted"><small>Source: <%= recipe.source %></small></p>
+        </article>
+      <% }); %>
+    </div>
+    <p class="mt-1"><a href="/recipes/saved">View all saved recipes</a></p>
+  <% } else { %>
+    <p class="text-muted">No saved recipes yet. <a href="/recipes">Find some recipes!</a></p>
+  <% } %>
+</section>
+
+<!-- Quick Actions -->
+<section>
+  <h2>Quick Actions</h2>
+  <div class="grid">
+    <a href="/pantry/add" role="button">Add Pantry Item</a>
+    <a href="/recipes/search" role="button" class="secondary">Search Recipes</a>
+    <a href="/recipes/generate" role="button" class="contrast">Generate Recipe</a>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

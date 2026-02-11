@@ -2,9 +2,17 @@ config:
   aws:region: us-east-1
   pantry-bot:appName: pantry-bot
   pantry-bot:subdomain: pantrybot
-  pantry-bot:platformStack: cwnelson/portfolio-platform/dev
+  pantry-bot:platformStack: Cwnelson215-org/portfolio-platform/dev
   pantry-bot:cpu: "256"
   pantry-bot:memory: "512"
   pantry-bot:desiredCount: "1"
   pantry-bot:containerPort: "3000"
   pantry-bot:useFargateSpot: "true"
+  pantry-bot:spoonacularApiKey:
+    secure: AAABAIuQSQnte8vtSS4wYVgAfDVb7Iaoplxg+rX1GSu69lYFkBiw0AB6gl9V4SeKtX6WUnDvc6f3U490y7v2mg==
+  pantry-bot:anthropicApiKey:
+    secure: AAABAMN17QQypvXEBM283nePthCG7hIabcu0iWlt6hSsqolO/NbMdeabYBvhfSkkmAmE5TkAzre0D7kKMUVcOnXbFQYVX/QjLJV8U1FMBviJj4K/gtyUWR7qBLSGE7Pncvrf/McftojV4Y/0bLR/bWy8KRc774emm7XiBFkA+JQ9VsvVHvi6uiO/uME=
+  pantry-bot:sessionSecret:
+    secure: AAABAOf7UJy6/EA00mwUF7R6WWZUDczHzi8eGjaTJsQBbElXM7991JbPFb7LWhyH4mmjMisgIui6b/P97r3yRyql6bb3ruvAkEv/wiVNmX/xK7W7f/A0W2XeAbvuluPl
+  pantry-bot:usdaApiKey:
+    secure: AAABAAeJAJOpAVDChr/+wC9kRekA6BqH1UEuOijrGTZRmSM3JDRJQMS7m2oqFOjQHAFNzNZLglqBbUhOMeAe8d61I2SmMbgEeA==

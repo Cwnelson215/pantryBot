@@ -1,0 +1,51 @@
+<%- include('../../partials/header') %>
+
+<h1>Edit Pantry Item</h1>
+
+<form method="POST" action="/pantry/<%= item.id %>/edit">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <label for="name">Name <span class="danger">*</span></label>
+  <input type="text" id="name" name="name" value="<%= item.name %>" required autofocus>
+
+  <div class="grid">
+    <div>
+      <label for="quantity">Quantity</label>
+      <input type="number" id="quantity" name="quantity" step="0.01" min="0" value="<%= item.quantity || '' %>">
+    </div>
+    <div>
+      <label for="unit">Unit</label>
+      <select id="unit" name="unit">
+        <option value="">-- Select --</option>
+        <% if (typeof UNITS !== 'undefined') { %>
+          <% UNITS.forEach(function(u) { %>
+            <option value="<%= u %>" <%= item.unit === u ? 'selected' : '' %>><%= u %></option>
+          <% }); %>
+        <% } %>
+      </select>
+    </div>
+  </div>
+
+  <label for="category">Category</label>
+  <select id="category" name="category">
+    <option value="">-- Select --</option>
+    <% if (typeof CATEGORIES !== 'undefined') { %>
+      <% CATEGORIES.forEach(function(c) { %>
+        <option value="<%= c %>" <%= item.category === c ? 'selected' : '' %>><%= c %></option>
+      <% }); %>
+    <% } %>
+  </select>
+
+  <label for="expirationDate">Expiration Date</label>
+  <input type="date" id="expirationDate" name="expirationDate" value="<%= item.expirationDate ? new Date(item.expirationDate).toISOString().split('T')[0] : '' %>">
+
+  <label for="notes">Notes</label>
+  <textarea id="notes" name="notes"><%= item.notes || '' %></textarea>
+
+  <div class="grid">
+    <button type="submit">Save Changes</button>
+    <a href="/pantry" role="button" class="outline secondary" style="text-align:center;">Cancel</a>
+  </div>
+</form>
+
+<%- include('../../partials/footer') %>

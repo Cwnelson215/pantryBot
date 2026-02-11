@@ -1,0 +1,75 @@
+<%- include('../../partials/header') %>
+
+<div class="flex-between">
+  <h1>My Pantry</h1>
+  <a href="/pantry/add" role="button">Add Item</a>
+</div>
+
+<% if (typeof items !== 'undefined' && items.length > 0) { %>
+  <%
+    var categories = {};
+    items.forEach(function(item) {
+      var cat = item.category || 'Uncategorized';
+      if (!categories[cat]) categories[cat] = [];
+      categories[cat].push(item);
+    });
+  %>
+
+  <% Object.keys(categories).sort().forEach(function(category) { %>
+    <section>
+      <h2><%= category %></h2>
+      <figure>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Quantity</th>
+              <th>Expiration</th>
+              <th>Notes</th>
+              <th class="text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% categories[category].forEach(function(item) {
+              var expClass = '';
+              if (item.expirationDate) {
+                var now = new Date();
+                var exp = new Date(item.expirationDate);
+                var diffDays = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+                if (diffDays <= 2) expClass = 'danger';
+                else if (diffDays <= 5) expClass = 'warning';
+              }
+            %>
+              <tr>
+                <td><%= item.name %></td>
+                <td><%= item.quantity %> <%= item.unit %></td>
+                <td>
+                  <% if (item.expirationDate) { %>
+                    <span class="<%= expClass %>"><%= new Date(item.expirationDate).toLocaleDateString() %></span>
+                  <% } else { %>
+                    <span class="text-muted">--</span>
+                  <% } %>
+                </td>
+                <td><%= item.notes || '' %></td>
+                <td class="text-right">
+                  <a href="/pantry/<%= item.id %>/edit" role="button" class="outline secondary" style="padding:0.25rem 0.5rem;margin:0 0.25rem;">Edit</a>
+                  <form method="POST" action="/pantry/<%= item.id %>/delete" class="inline-form">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="outline" style="padding:0.25rem 0.5rem;margin:0;--pico-color:var(--pico-del-color);">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </figure>
+    </section>
+  <% }); %>
+<% } else { %>
+  <section style="text-align: center; padding: 2rem 0;">
+    <p class="text-muted">Your pantry is empty.</p>
+    <a href="/pantry/add" role="button">Add Your First Item</a>
+  </section>
+<% } %>
+
+<%- include('../../partials/footer') %>

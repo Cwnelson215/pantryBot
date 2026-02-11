@@ -1,0 +1,51 @@
+<%- include('../../partials/header') %>
+
+<h1>Add Pantry Item</h1>
+
+<form method="POST" action="/pantry/add">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <label for="name">Name <span class="danger">*</span></label>
+  <input type="text" id="name" name="name" placeholder="e.g. Chicken Breast" required autofocus>
+
+  <div class="grid">
+    <div>
+      <label for="quantity">Quantity</label>
+      <input type="number" id="quantity" name="quantity" step="0.01" min="0" placeholder="1">
+    </div>
+    <div>
+      <label for="unit">Unit</label>
+      <select id="unit" name="unit">
+        <option value="">-- Select --</option>
+        <% if (typeof UNITS !== 'undefined') { %>
+          <% UNITS.forEach(function(u) { %>
+            <option value="<%= u %>"><%= u %></option>
+          <% }); %>
+        <% } %>
+      </select>
+    </div>
+  </div>
+
+  <label for="category">Category</label>
+  <select id="category" name="category">
+    <option value="">-- Select --</option>
+    <% if (typeof CATEGORIES !== 'undefined') { %>
+      <% CATEGORIES.forEach(function(c) { %>
+        <option value="<%= c %>"><%= c %></option>
+      <% }); %>
+    <% } %>
+  </select>
+
+  <label for="expirationDate">Expiration Date</label>
+  <input type="date" id="expirationDate" name="expirationDate">
+
+  <label for="notes">Notes</label>
+  <textarea id="notes" name="notes" placeholder="Optional notes..."></textarea>
+
+  <div class="grid">
+    <button type="submit">Add Item</button>
+    <a href="/pantry" role="button" class="outline secondary" style="text-align:center;">Cancel</a>
+  </div>
+</form>
+
+<%- include('../../partials/footer') %>

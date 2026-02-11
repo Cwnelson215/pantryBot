@@ -1,0 +1,100 @@
+<%- include('../../partials/header') %>
+
+<h1>Nutrition Tracking</h1>
+
+<!-- Log a Meal -->
+<section>
+  <h2>Log a Meal</h2>
+  <form method="POST" action="/nutrition/log">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <div class="grid">
+      <div>
+        <label for="foodName">Food Name</label>
+        <input type="text" id="foodName" name="foodName" placeholder="e.g. Grilled Chicken" required>
+      </div>
+      <div>
+        <label for="servings">Servings</label>
+        <input type="number" id="servings" name="servings" value="1" min="0.25" step="0.25">
+      </div>
+      <div>
+        <label for="logDate">Date</label>
+        <input type="date" id="logDate" name="logDate" value="<%= new Date().toISOString().split('T')[0] %>">
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label for="calories">Calories</label>
+        <input type="number" id="calories" name="calories" min="0" step="1" placeholder="0">
+      </div>
+      <div>
+        <label for="proteinG">Protein (g)</label>
+        <input type="number" id="proteinG" name="proteinG" min="0" step="0.1" placeholder="0">
+      </div>
+      <div>
+        <label for="carbsG">Carbs (g)</label>
+        <input type="number" id="carbsG" name="carbsG" min="0" step="0.1" placeholder="0">
+      </div>
+      <div>
+        <label for="fatG">Fat (g)</label>
+        <input type="number" id="fatG" name="fatG" min="0" step="0.1" placeholder="0">
+      </div>
+    </div>
+
+    <button type="submit">Log Meal</button>
+  </form>
+</section>
+
+<!-- Weekly Summary -->
+<section>
+  <h2>Weekly Summary</h2>
+  <% if (typeof weeklySummary !== 'undefined' && weeklySummary.length > 0) { %>
+    <%
+      var calorieTarget = (typeof userPreferences !== 'undefined' && userPreferences && userPreferences.calorieTarget) ? userPreferences.calorieTarget : 2000;
+      var proteinTarget = (typeof userPreferences !== 'undefined' && userPreferences && userPreferences.proteinTarget) ? userPreferences.proteinTarget : 50;
+    %>
+    <figure>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Calories</th>
+            <th>Protein (g)</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% weeklySummary.forEach(function(day) { %>
+            <tr>
+              <td>
+                <a href="/nutrition/daily?date=<%= day.date %>"><%= new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %></a>
+              </td>
+              <td>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: <%= Math.min((day.totals.calories / calorieTarget) * 100, 100) %>%;">
+                    <%= day.totals.calories %>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: <%= Math.min((day.totals.proteinG / proteinTarget) * 100, 100) %>%;">
+                    <%= day.totals.proteinG %>g
+                  </div>
+                </div>
+              </td>
+              <td>
+                <a href="/nutrition/daily?date=<%= day.date %>">Details</a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </figure>
+  <% } else { %>
+    <p class="text-muted">No nutrition data logged this week. Start by logging a meal above!</p>
+  <% } %>
+</section>
+
+<%- include('../../partials/footer') %>

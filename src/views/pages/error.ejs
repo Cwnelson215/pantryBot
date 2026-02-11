@@ -1,0 +1,9 @@
+<%- include('../partials/header') %>
+
+<section style="text-align: center; padding: 2rem 0;">
+  <h1><%= typeof statusCode !== 'undefined' ? statusCode : 'Error' %></h1>
+  <p><%= typeof message !== 'undefined' ? message : 'An unexpected error occurred.' %></p>
+  <a href="/" role="button">Go Home</a>
+</section>
+
+<%- include('../partials/footer') %>
