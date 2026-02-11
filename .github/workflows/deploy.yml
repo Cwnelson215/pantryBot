@@ -59,7 +59,7 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         run: |
-          STACK="${{ steps.app-info.outputs.app-name }}-${{ github.event.inputs.environment || 'dev' }}"
+          STACK="${{ github.event.inputs.environment || 'dev' }}"
           ECR_URL=$(pulumi stack output ecrRepositoryUrl --stack "$STACK" 2>/dev/null || echo "")
           if [ -z "$ECR_URL" ]; then
             echo "ECR repository not found. Running pulumi up first..."
@@ -83,7 +83,7 @@ jobs:
         uses: pulumi/actions@v5
         with:
           command: up
-          stack-name: ${{ steps.app-info.outputs.app-name }}-${{ github.event.inputs.environment || 'dev' }}
+          stack-name: ${{ github.event.inputs.environment || 'dev' }}
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
@@ -101,7 +101,7 @@ jobs:
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
         run: |
-          STACK="${{ steps.app-info.outputs.app-name }}-${{ github.event.inputs.environment || 'dev' }}"
+          STACK="${{ github.event.inputs.environment || 'dev' }}"
           APP_URL=$(pulumi stack output appUrl --stack "$STACK")
           echo "### Deployment Complete! :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
