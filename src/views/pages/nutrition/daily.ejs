@@ -13,10 +13,12 @@
   var proteinTarget = (typeof userPreferences !== 'undefined' && userPreferences && userPreferences.proteinTarget) ? userPreferences.proteinTarget : 50;
 %>
 
-<div class="flex-between">
-  <a href="/nutrition/daily?date=<%= prevStr %>">&larr; Previous Day</a>
+<div class="flex-between day-nav">
   <h1>Nutrition - <%= displayDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></h1>
-  <a href="/nutrition/daily?date=<%= nextStr %>">Next Day &rarr;</a>
+  <div class="day-nav-links">
+    <a href="/nutrition/daily?date=<%= prevStr %>" role="button" class="outline">&larr; Previous Day</a>
+    <a href="/nutrition/daily?date=<%= nextStr %>" role="button" class="outline">Next Day &rarr;</a>
+  </div>
 </div>
 
 <!-- Daily Totals -->

@@ -30,6 +30,53 @@
     .recipe-image { width: 100%; height: 200px; object-fit: cover; border-radius: var(--pico-border-radius); }
     #reader { width: 100%; max-width: 500px; margin: 0 auto; }
     #reader video { width: 100% !important; border-radius: var(--pico-border-radius); }
+
+    /* Hamburger menu button — hidden on desktop */
+    .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.25rem; margin: 0; width: auto; }
+    .nav-toggle svg { display: block; }
+
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
+      /* Hamburger toggle visible on mobile */
+      .nav-toggle { display: inline-block; }
+
+      /* Hide nav links by default on mobile */
+      nav ul:last-child { display: none; flex-direction: column; width: 100%; padding: 0; }
+      nav ul:last-child.open { display: flex; }
+      nav ul:last-child li { width: 100%; text-align: left; padding: 0.25rem 0; }
+      nav { flex-wrap: wrap; }
+
+      /* Flex-between: stack vertically */
+      .flex-between { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+
+      /* Day navigation specific layout */
+      .day-nav { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+      .day-nav h1 { text-align: center; font-size: 1.3rem; order: -1; }
+      .day-nav-links { display: flex; justify-content: space-between; }
+
+      /* Headings: smaller on mobile */
+      h1 { font-size: 1.5rem; }
+
+      /* Tables: tighter fit */
+      table { font-size: 0.85rem; }
+      table th, table td { padding: 0.4rem 0.5rem; }
+
+      /* Table action buttons: stack */
+      td .inline-form { display: block; margin-bottom: 0.25rem; }
+
+      /* Recipe image: shorter on mobile */
+      .recipe-image { height: 150px; }
+
+      /* Action button grids: single column */
+      .action-buttons { grid-template-columns: 1fr !important; }
+    }
+
+    @media (max-width: 480px) {
+      /* Force single-column grid cards on very small screens */
+      .grid-cards { grid-template-columns: 1fr; }
+
+      h1 { font-size: 1.3rem; }
+    }
   </style>
 </head>
 <body>
@@ -37,8 +84,15 @@
     <nav>
       <ul>
         <li><strong><a href="/" class="contrast">Pantry Bot</a></strong></li>
+        <li>
+          <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.getElementById('nav-links').classList.toggle('open')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+        </li>
       </ul>
-      <ul>
+      <ul id="nav-links">
         <% if (typeof user !== 'undefined' && user) { %>
           <li><a href="/">Dashboard</a></li>
           <li><a href="/pantry">Pantry</a></li>
