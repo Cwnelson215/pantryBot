@@ -35,16 +35,36 @@
     .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.25rem; margin: 0; width: auto; }
     .nav-toggle svg { display: block; }
 
+    /* Prevent horizontal overflow on mobile */
+    html, body { overflow-x: hidden; }
+
     /* Mobile responsive styles */
     @media (max-width: 768px) {
+      /* Nav: wrap so links drop below the brand row */
+      nav { flex-wrap: wrap; }
+
+      /* Brand row: full width, brand left, hamburger right */
+      nav > ul:first-child {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-right: 0;
+      }
+
       /* Hamburger toggle visible on mobile */
       .nav-toggle { display: inline-block; }
 
-      /* Hide nav links by default on mobile */
-      nav ul:last-child { display: none; flex-direction: column; width: 100%; padding: 0; }
-      nav ul:last-child.open { display: flex; }
-      nav ul:last-child li { width: 100%; text-align: left; padding: 0.25rem 0; }
-      nav { flex-wrap: wrap; }
+      /* Nav links: hidden by default, full-width dropdown below brand */
+      #nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        margin-left: 0;
+        padding: 0.5rem 0 0 0;
+      }
+      #nav-links.open { display: flex; }
+      #nav-links li { width: 100%; text-align: left; padding: 0.25rem 0; }
 
       /* Flex-between: stack vertically */
       .flex-between { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
