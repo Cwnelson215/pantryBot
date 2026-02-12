@@ -19,6 +19,9 @@ const PgSession = connectPgSimple(session);
 
 const app = express();
 
+// Trust ALB proxy for correct X-Forwarded-Proto handling
+app.set("trust proxy", 1);
+
 // View engine
 app.set("view engine", "ejs");
 app.set("views", config.viewsPath);
@@ -62,6 +65,14 @@ app.use("/pantry", pantryRouter);
 app.use("/recipes", recipesRouter);
 app.use("/nutrition", nutritionRouter);
 app.use("/preferences", preferencesRouter);
+
+// 404 catch-all
+app.use((req, res) => {
+  res.status(404).render("pages/error", {
+    title: "Not Found",
+    message: "The page you're looking for doesn't exist.",
+  });
+});
 
 // Error handler
 app.use(errorHandler);
