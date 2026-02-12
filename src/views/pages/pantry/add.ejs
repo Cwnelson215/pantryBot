@@ -1,9 +1,15 @@
 <%- include('../../partials/header') %>
 
-<h1>Add Pantry Item</h1>
+<div class="flex-between">
+  <h1 class="mb-0">Add Pantry Item</h1>
+  <button type="button" id="scanBtn" class="outline" onclick="openScanner()">Scan Barcode</button>
+</div>
 
-<form method="POST" action="/pantry/add">
+<div id="scanResult" style="display:none; margin-top:1rem; padding:1rem; border-radius:var(--pico-border-radius);"></div>
+
+<form method="POST" action="/pantry/add" style="margin-top:1rem;">
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" id="barcode" name="barcode">
 
   <label for="name">Name <span class="danger">*</span></label>
   <input type="text" id="name" name="name" placeholder="e.g. Chicken Breast" required autofocus>
@@ -47,5 +53,135 @@
     <a href="/pantry" role="button" class="outline secondary" style="text-align:center;">Cancel</a>
   </div>
 </form>
+
+<dialog id="scannerDialog">
+  <article>
+    <header>
+      <button aria-label="Close" rel="prev" onclick="closeScanner()"></button>
+      <h3>Scan Barcode</h3>
+    </header>
+    <div id="scannerStatus" style="text-align:center; margin-bottom:1rem;"></div>
+    <div id="reader"></div>
+    <footer>
+      <button class="outline secondary" onclick="closeScanner()">Cancel</button>
+    </footer>
+  </article>
+</dialog>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+(function() {
+  var scanner = null;
+  var dialog = document.getElementById('scannerDialog');
+  var scanBtn = document.getElementById('scanBtn');
+  var statusEl = document.getElementById('scannerStatus');
+  var resultEl = document.getElementById('scanResult');
+
+  // Disable scan button if no camera API
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    scanBtn.textContent = 'Scanner Not Available';
+    scanBtn.disabled = true;
+  }
+
+  window.openScanner = function() {
+    dialog.setAttribute('open', '');
+    statusEl.textContent = 'Starting camera...';
+
+    scanner = new Html5Qrcode('reader');
+    scanner.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 250, height: 150 }, formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.CODE_128,
+      ]},
+      function(decodedText) {
+        onBarcodeScanned(decodedText);
+      },
+      function() {}
+    ).then(function() {
+      statusEl.textContent = 'Point camera at a barcode';
+    }).catch(function(err) {
+      statusEl.textContent = 'Camera error: ' + (err.message || err);
+    });
+  };
+
+  window.closeScanner = function() {
+    if (scanner) {
+      scanner.stop().catch(function() {});
+      scanner.clear();
+      scanner = null;
+    }
+    dialog.removeAttribute('open');
+  };
+
+  function onBarcodeScanned(barcode) {
+    if (scanner) {
+      scanner.stop().catch(function() {});
+    }
+    statusEl.innerHTML = '<span aria-busy="true">Looking up product...</span>';
+
+    fetch('/pantry/lookup-barcode/' + encodeURIComponent(barcode))
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        closeScanner();
+        if (data.found) {
+          prefillForm(data, barcode);
+        } else {
+          showResult('error', 'Product not found for barcode ' + barcode + '. Please enter details manually.');
+        }
+      })
+      .catch(function() {
+        closeScanner();
+        showResult('error', 'Failed to look up barcode. Please enter details manually.');
+      });
+  }
+
+  function prefillForm(data, barcode) {
+    document.getElementById('barcode').value = barcode;
+
+    if (data.name) {
+      document.getElementById('name').value = data.name;
+    }
+    if (data.quantity) {
+      document.getElementById('quantity').value = data.quantity;
+    }
+    if (data.unit) {
+      var unitSelect = document.getElementById('unit');
+      for (var i = 0; i < unitSelect.options.length; i++) {
+        if (unitSelect.options[i].value === data.unit) {
+          unitSelect.selectedIndex = i;
+          break;
+        }
+      }
+    }
+    if (data.category) {
+      var catSelect = document.getElementById('category');
+      for (var i = 0; i < catSelect.options.length; i++) {
+        if (catSelect.options[i].value === data.category) {
+          catSelect.selectedIndex = i;
+          break;
+        }
+      }
+    }
+
+    showResult('success', 'Found: <strong>' + escapeHtml(data.name || barcode) + '</strong>. Review the details below and click Add Item.');
+  }
+
+  function showResult(type, html) {
+    resultEl.style.display = 'block';
+    resultEl.className = 'flash flash-' + type;
+    resultEl.innerHTML = html;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+})();
+</script>
 
 <%- include('../../partials/footer') %>

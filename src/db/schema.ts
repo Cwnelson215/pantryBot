@@ -75,6 +75,7 @@ export const pantryItems = pgTable(
     category: varchar("category", { length: 100 }),
     expirationDate: date("expiration_date"),
     usdaFdcId: varchar("usda_fdc_id", { length: 50 }),
+    barcode: varchar("barcode", { length: 50 }),
     notes: text("notes"),
     addedAt: timestamp("added_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

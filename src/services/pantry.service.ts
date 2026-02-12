@@ -32,6 +32,7 @@ export async function addItem(
     category?: string;
     expirationDate?: string;
     notes?: string;
+    barcode?: string;
   }
 ) {
   const result = await db
@@ -44,6 +45,7 @@ export async function addItem(
       category: data.category || null,
       expirationDate: data.expirationDate || null,
       notes: data.notes || null,
+      barcode: data.barcode || null,
     })
     .returning();
 
@@ -60,6 +62,7 @@ export async function updateItem(
     category?: string;
     expirationDate?: string;
     notes?: string;
+    barcode?: string;
   }
 ) {
   // Verify ownership
@@ -79,6 +82,7 @@ export async function updateItem(
   if (data.expirationDate !== undefined)
     updateData.expirationDate = data.expirationDate;
   if (data.notes !== undefined) updateData.notes = data.notes;
+  if (data.barcode !== undefined) updateData.barcode = data.barcode;
 
   const result = await db
     .update(pantryItems)

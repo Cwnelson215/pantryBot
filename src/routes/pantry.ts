@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireAuth } from "../middleware/auth";
 import { setFlash } from "../middleware/flash";
 import * as pantryService from "../services/pantry.service";
+import * as openfoodfacts from "../services/openfoodfacts.service";
 
 const CATEGORIES = [
   "Produce",
@@ -60,9 +61,24 @@ router.get("/add", (_req, res) => {
   });
 });
 
+router.get("/lookup-barcode/:barcode", async (req, res) => {
+  const barcode = req.params.barcode;
+
+  if (!/^\d{8,14}$/.test(barcode)) {
+    return res.status(400).json({ error: "Invalid barcode format. Must be 8-14 digits." });
+  }
+
+  try {
+    const result = await openfoodfacts.lookupBarcode(barcode);
+    res.json(result);
+  } catch {
+    res.status(500).json({ error: "Failed to look up barcode" });
+  }
+});
+
 router.post("/add", async (req, res) => {
   const userId = req.session.userId!;
-  const { name, quantity, unit, category, expirationDate, notes } = req.body;
+  const { name, quantity, unit, category, expirationDate, notes, barcode } = req.body;
 
   if (!name) {
     setFlash(req, "error", "Item name is required");
@@ -76,6 +92,7 @@ router.post("/add", async (req, res) => {
     category,
     expirationDate,
     notes,
+    barcode,
   });
 
   setFlash(req, "success", "Item added to pantry");

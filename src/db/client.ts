@@ -55,11 +55,14 @@ export async function initializeDatabase() {
         category VARCHAR(100),
         expiration_date DATE,
         usda_fdc_id VARCHAR(50),
+        barcode VARCHAR(50),
         notes TEXT,
         added_at TIMESTAMP DEFAULT NOW() NOT NULL,
         updated_at TIMESTAMP DEFAULT NOW() NOT NULL
       );
       CREATE INDEX IF NOT EXISTS pantry_items_user_id_idx ON pantry_items(user_id);
+
+      ALTER TABLE pantry_items ADD COLUMN IF NOT EXISTS barcode VARCHAR(50);
 
       CREATE TABLE IF NOT EXISTS saved_recipes (
         id SERIAL PRIMARY KEY,
