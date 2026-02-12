@@ -32,7 +32,7 @@
     #reader video { width: 100% !important; border-radius: var(--pico-border-radius); }
 
     /* Hamburger menu button — hidden on desktop */
-    .nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0.25rem; margin: 0; width: auto; }
+    .nav-toggle { display: none !important; background: none; border: none; cursor: pointer; padding: 0.5rem; margin: 0; width: auto; line-height: 1; }
     .nav-toggle svg { display: block; }
 
     /* Prevent horizontal overflow on mobile */
@@ -43,27 +43,19 @@
       /* Nav: wrap so links drop below the brand row */
       nav { flex-wrap: wrap; }
 
-      /* Brand row: full width, brand left, hamburger right */
-      nav > ul:first-child {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-right: 0;
-      }
-
-      /* Hamburger toggle visible on mobile */
-      .nav-toggle { display: inline-block; }
+      /* Hamburger toggle visible on mobile, positioned right */
+      .nav-toggle { display: block !important; order: 2; }
 
       /* Nav links: hidden by default, full-width dropdown below brand */
       #nav-links {
-        display: none;
+        display: none !important;
         flex-direction: column;
         width: 100%;
-        margin-left: 0;
+        order: 3;
+        margin: 0;
         padding: 0.5rem 0 0 0;
       }
-      #nav-links.open { display: flex; }
+      #nav-links.open { display: flex !important; }
       #nav-links li { width: 100%; text-align: left; padding: 0.25rem 0; }
 
       /* Flex-between: stack vertically */
@@ -104,14 +96,12 @@
     <nav>
       <ul>
         <li><strong><a href="/" class="contrast">Pantry Bot</a></strong></li>
-        <li>
-          <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.getElementById('nav-links').classList.toggle('open')">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-            </svg>
-          </button>
-        </li>
       </ul>
+      <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.getElementById('nav-links').classList.toggle('open')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
       <ul id="nav-links">
         <% if (typeof user !== 'undefined' && user) { %>
           <li><a href="/">Dashboard</a></li>
