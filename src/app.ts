@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
@@ -28,6 +29,9 @@ app.set("views", config.viewsPath);
 
 // Health check (before session/auth middleware to avoid DB dependency for ALB)
 app.use("/health", healthRouter);
+
+// Static files
+app.use(express.static(path.join(__dirname, "..", "public")));
 
 // Body parsing
 app.use(express.urlencoded({ extended: true }));
