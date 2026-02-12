@@ -5,9 +5,9 @@
   <button type="button" id="scanBtn" class="outline" onclick="openScanner()">Scan Barcode</button>
 </div>
 
-<div id="scanResult" style="display:none; margin-top:1rem; padding:1rem; border-radius:var(--pico-border-radius);"></div>
+<div id="scanResult" style="display:none;" class="mt-1"></div>
 
-<form method="POST" action="/pantry/add" style="margin-top:1rem;">
+<form method="POST" action="/pantry/add" class="mt-1">
   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
   <input type="hidden" id="barcode" name="barcode">
 
@@ -50,7 +50,7 @@
 
   <div class="grid">
     <button type="submit">Add Item</button>
-    <a href="/pantry" role="button" class="outline secondary" style="text-align:center;">Cancel</a>
+    <a href="/pantry" role="button" class="outline secondary full-width">Cancel</a>
   </div>
 </form>
 
@@ -60,7 +60,7 @@
       <button aria-label="Close" rel="prev" onclick="closeScanner()"></button>
       <h3>Scan Barcode</h3>
     </header>
-    <div id="scannerStatus" style="text-align:center; margin-bottom:1rem;"></div>
+    <div id="scannerStatus" class="text-center mb-1"></div>
     <div id="reader"></div>
     <footer>
       <button class="outline secondary" onclick="closeScanner()">Cancel</button>

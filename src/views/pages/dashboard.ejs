@@ -4,13 +4,13 @@
 
 <!-- Stats Row -->
 <div class="grid">
-  <article>
+  <article class="stat-card">
     <hgroup>
       <h3><%= typeof pantryCount !== 'undefined' ? pantryCount : 0 %></h3>
       <p>Pantry Items</p>
     </hgroup>
   </article>
-  <article>
+  <article class="stat-card">
     <hgroup>
       <h3><%= typeof savedRecipeCount !== 'undefined' ? savedRecipeCount : (typeof recentRecipes !== 'undefined' ? recentRecipes.length : 0) %></h3>
       <p>Saved Recipes</p>

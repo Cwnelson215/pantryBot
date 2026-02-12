@@ -71,14 +71,14 @@
                 <a href="/nutrition/daily?date=<%= day.date %>"><%= new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %></a>
               </td>
               <td>
-                <div class="progress-bar">
+                <div class="progress-bar progress-calories">
                   <div class="progress-fill" style="width: <%= Math.min((day.totals.calories / calorieTarget) * 100, 100) %>%;">
                     <%= day.totals.calories %>
                   </div>
                 </div>
               </td>
               <td>
-                <div class="progress-bar">
+                <div class="progress-bar progress-protein">
                   <div class="progress-fill" style="width: <%= Math.min((day.totals.proteinG / proteinTarget) * 100, 100) %>%;">
                     <%= day.totals.proteinG %>g
                   </div>

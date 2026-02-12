@@ -1,6 +1,6 @@
 <%- include('../partials/header') %>
 
-<section style="max-width: 450px; margin: 0 auto;">
+<section class="auth-card">
   <h1>Register</h1>
 
   <form method="POST" action="/register" id="registerForm">
@@ -18,7 +18,7 @@
     <label for="confirmPassword">Confirm Password</label>
     <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required minlength="8">
 
-    <p id="passwordError" style="color: var(--pico-del-color); display: none;">Passwords do not match.</p>
+    <p id="passwordError" class="danger" style="display: none;">Passwords do not match.</p>
 
     <button type="submit">Register</button>
   </form>

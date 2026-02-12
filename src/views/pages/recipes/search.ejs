@@ -14,25 +14,27 @@
 <% if (typeof recipes !== 'undefined' && recipes.length > 0) { %>
   <div class="grid-cards">
     <% recipes.forEach(function(recipe) { %>
-      <article>
+      <article class="recipe-card">
         <% if (recipe.image) { %>
           <img src="<%= recipe.image %>" alt="<%= recipe.title %>" class="recipe-image">
         <% } %>
-        <h4><a href="/recipes/<%= recipe.id %>"><%= recipe.title %></a></h4>
-        <p>
-          <% if (typeof recipe.usedIngredientCount !== 'undefined') { %>
-            <span class="badge badge-success"><%= recipe.usedIngredientCount %> used</span>
-          <% } %>
-          <% if (typeof recipe.missedIngredientCount !== 'undefined') { %>
-            <span class="badge badge-warning"><%= recipe.missedIngredientCount %> missing</span>
-          <% } %>
-        </p>
-        <a href="/recipes/<%= recipe.id %>" role="button" class="outline" style="width:100%;text-align:center;">View Details</a>
+        <div class="recipe-card-body">
+          <h4><a href="/recipes/<%= recipe.id %>"><%= recipe.title %></a></h4>
+          <p>
+            <% if (typeof recipe.usedIngredientCount !== 'undefined') { %>
+              <span class="badge badge-success"><%= recipe.usedIngredientCount %> used</span>
+            <% } %>
+            <% if (typeof recipe.missedIngredientCount !== 'undefined') { %>
+              <span class="badge badge-warning"><%= recipe.missedIngredientCount %> missing</span>
+            <% } %>
+          </p>
+          <a href="/recipes/<%= recipe.id %>" role="button" class="outline full-width">View Details</a>
+        </div>
       </article>
     <% }); %>
   </div>
 <% } else { %>
-  <section style="text-align: center; padding: 2rem 0;">
+  <section class="text-center" style="padding: 2rem 0;">
     <p class="text-muted">No recipes found.</p>
     <a href="/pantry" role="button" class="outline">Check your pantry items</a>
   </section>

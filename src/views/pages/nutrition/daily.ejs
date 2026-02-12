@@ -28,13 +28,13 @@
   <div class="grid">
     <div>
       <p class="mb-0"><strong>Calories:</strong> <%= totals.calories %> / <%= calorieTarget %></p>
-      <div class="progress-bar">
+      <div class="progress-bar progress-calories">
         <div class="progress-fill" style="width: <%= Math.min((totals.calories / calorieTarget) * 100, 100) %>%;"><%= totals.calories %></div>
       </div>
     </div>
     <div>
       <p class="mb-0"><strong>Protein:</strong> <%= Number(totals.proteinG).toFixed(1) %>g / <%= proteinTarget %>g</p>
-      <div class="progress-bar">
+      <div class="progress-bar progress-protein">
         <div class="progress-fill" style="width: <%= Math.min((totals.proteinG / proteinTarget) * 100, 100) %>%;"><%= Number(totals.proteinG).toFixed(1) %>g</div>
       </div>
     </div>
@@ -43,13 +43,13 @@
   <div class="grid">
     <div>
       <p class="mb-0"><strong>Carbs:</strong> <%= Number(totals.carbsG).toFixed(1) %>g</p>
-      <div class="progress-bar">
+      <div class="progress-bar progress-carbs">
         <div class="progress-fill" style="width: <%= Math.min(totals.carbsG / 3, 100) %>%;"><%= Number(totals.carbsG).toFixed(1) %>g</div>
       </div>
     </div>
     <div>
       <p class="mb-0"><strong>Fat:</strong> <%= Number(totals.fatG).toFixed(1) %>g</p>
-      <div class="progress-bar">
+      <div class="progress-bar progress-fat">
         <div class="progress-fill" style="width: <%= Math.min(totals.fatG / 0.65, 100) %>%;"><%= Number(totals.fatG).toFixed(1) %>g</div>
       </div>
     </div>
@@ -97,7 +97,7 @@
               <td>
                 <form method="POST" action="/nutrition/log/<%= entry.id %>/delete" class="inline-form">
                   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                  <button type="submit" class="outline" style="padding:0.25rem 0.5rem;margin:0;--pico-color:var(--pico-del-color);">Delete</button>
+                  <button type="submit" class="outline btn-delete">Delete</button>
                 </form>
               </td>
             </tr>

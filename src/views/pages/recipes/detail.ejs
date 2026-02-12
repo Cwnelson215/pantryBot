@@ -17,7 +17,7 @@
 
 <!-- Personalization -->
 <% if (typeof personalization !== 'undefined' && personalization) { %>
-  <article style="background: #f0f7ff; border-left: 4px solid var(--pico-primary-background); padding: 1rem;">
+  <article class="ai-callout">
     <h4>Personalized for You</h4>
     <p><%- personalization.replace(/\n/g, '<br>') %></p>
   </article>
@@ -101,14 +101,14 @@
       <input type="hidden" name="readyInMinutes" value="<%= recipe.readyInMinutes || '' %>">
       <input type="hidden" name="imageUrl" value="<%= recipe.image || recipe.imageUrl || '' %>">
       <input type="hidden" name="nutritionJson" value="<%= typeof nutrition !== 'undefined' ? JSON.stringify(nutrition) : '{}' %>">
-      <button type="submit" style="width:100%;">Save Recipe</button>
+      <button type="submit" class="full-width">Save Recipe</button>
     </form>
 
     <% if (recipe.source === 'spoonacular' || (!recipe.source && recipe.id)) { %>
       <!-- Personalize -->
       <form method="POST" action="/recipes/<%= recipe.id %>/personalize">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <button type="submit" class="secondary" style="width:100%;">Personalize with AI</button>
+        <button type="submit" class="secondary full-width">Personalize with AI</button>
       </form>
     <% } %>
 
@@ -125,7 +125,7 @@
         <input type="hidden" name="sugar" value="<%= nutrition.sugar || 0 %>">
         <input type="hidden" name="sodium" value="<%= nutrition.sodium || 0 %>">
         <input type="hidden" name="servings" value="1">
-        <button type="submit" class="contrast" style="width:100%;">Log as Meal</button>
+        <button type="submit" class="contrast full-width">Log as Meal</button>
       </form>
     <% } %>
   </div>

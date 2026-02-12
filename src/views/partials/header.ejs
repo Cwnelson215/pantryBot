@@ -5,48 +5,222 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Pantry Bot</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@700&display=swap" rel="stylesheet">
   <style>
-    .flash { padding: 1rem; border-radius: var(--pico-border-radius); margin-bottom: 1rem; }
-    .flash-success { background: var(--pico-ins-color); color: #155724; }
-    .flash-error { background: var(--pico-del-color); color: #721c24; }
-    .flash-info { background: #d1ecf1; color: #0c5460; }
-    .tag { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 1rem; font-size: 0.8rem; margin: 0.1rem; background: var(--pico-primary-background); color: var(--pico-primary-inverse); }
+    /* ── Mediterranean Kitchen Theme ── */
+    :root, [data-theme="light"] {
+      --pico-font-family: "Inter", system-ui, sans-serif;
+      --pico-font-size: 100%;
+      --pico-background-color: #FBF7F0;
+      --pico-color: #3D3428;
+      --pico-muted-color: #8C7E6D;
+      --pico-primary: #C0653A;
+      --pico-primary-hover: #A85430;
+      --pico-primary-focus: rgba(192, 101, 58, 0.2);
+      --pico-primary-background: #C0653A;
+      --pico-primary-hover-background: #A85430;
+      --pico-primary-inverse: #FFFFFF;
+      --pico-secondary: #6B7F5E;
+      --pico-secondary-hover: #576A4C;
+      --pico-secondary-focus: rgba(107, 127, 94, 0.2);
+      --pico-secondary-background: #6B7F5E;
+      --pico-secondary-hover-background: #576A4C;
+      --pico-secondary-inverse: #FFFFFF;
+      --pico-contrast: #2C2418;
+      --pico-contrast-hover: #3D3428;
+      --pico-contrast-focus: rgba(44, 36, 24, 0.2);
+      --pico-contrast-inverse: #FFFFFF;
+      --pico-h1-color: #2C2418;
+      --pico-h2-color: #2C2418;
+      --pico-h3-color: #2C2418;
+      --pico-h4-color: #2C2418;
+      --pico-h5-color: #2C2418;
+      --pico-h6-color: #2C2418;
+      --pico-border-radius: 0.5rem;
+      --pico-card-background-color: #FFFFFF;
+      --pico-card-border-color: #E8DFD0;
+      --pico-card-sectioning-background-color: #F5EFE4;
+      --pico-table-border-color: #E0D5C4;
+      --pico-form-element-border-color: #E0D5C4;
+      --pico-form-element-focus-color: #C0653A;
+      --pico-ins-color: #E8F3E5;
+      --pico-del-color: #FDE8E7;
+      --pico-switch-checked-background-color: #6B7F5E;
+    }
+
+    /* ── Typography ── */
+    h1, h2, h3, h4, h5, h6 { font-family: "Nunito", system-ui, sans-serif; }
+
+    /* ── Navigation ── */
+    header.container > nav {
+      border-bottom: 2px solid #E0D5C4;
+      padding-bottom: 0.75rem;
+    }
+    header.container > nav a:not([role="button"]) {
+      color: #3D3428;
+      text-decoration: none;
+      position: relative;
+      transition: color 0.2s;
+    }
+    header.container > nav a:not([role="button"]):hover {
+      color: #C0653A;
+    }
+    header.container > nav a:not([role="button"])::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #C0653A;
+      transition: width 0.2s;
+    }
+    header.container > nav a:not([role="button"]):hover::after {
+      width: 100%;
+    }
+    .brand { font-family: "Nunito", system-ui, sans-serif; font-size: 1.25rem; letter-spacing: -0.01em; }
+
+    /* ── Flash Messages ── */
+    .flash { padding: 1rem; border-radius: var(--pico-border-radius); margin-bottom: 1rem; border-left: 4px solid; }
+    .flash-success { background: #E8F3E5; color: #2D5A27; border-left-color: #2D5A27; }
+    .flash-error { background: #FDE8E7; color: #8B2E2B; border-left-color: #8B2E2B; }
+    .flash-info { background: #E6EFF5; color: #2A4A5C; border-left-color: #2A4A5C; }
+    .flash-warning { background: #FFF3D6; color: #7A5E1A; border-left-color: #7A5E1A; }
+
+    /* ── Tags & Badges ── */
+    .tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.8rem; margin: 0.1rem; background: #F5EFE4; color: #3D3428; border: 1px solid #E0D5C4; }
+    .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600; }
+    .badge-danger { background: #FDE8E7; color: #8B2E2B; }
+    .badge-warning { background: #FFF3D6; color: #7A5E1A; }
+    .badge-success { background: #E8F3E5; color: #2D5A27; }
+
+    /* ── Cards ── */
+    article {
+      border: 1px solid #E8DFD0;
+      box-shadow: 0 1px 3px rgba(44, 36, 24, 0.06);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    article:hover { box-shadow: 0 4px 12px rgba(44, 36, 24, 0.1); }
+
+    /* Stat cards on dashboard */
+    .stat-card { border-top: 3px solid #C0653A; text-align: center; }
+    .stat-card hgroup h3 { color: #C0653A; font-size: 2rem; margin-bottom: 0; }
+    .stat-card hgroup p { color: #8C7E6D; }
+
+    /* Recipe hub cards */
+    .recipe-hub-card { text-align: center; padding: 1.5rem; }
+    .recipe-hub-card:hover { transform: translateY(-2px); }
+    .recipe-hub-card .hub-icon { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+    .recipe-hub-card:nth-child(1) { border-top: 3px solid #C0653A; }
+    .recipe-hub-card:nth-child(2) { border-top: 3px solid #6B7F5E; }
+    .recipe-hub-card:nth-child(3) { border-top: 3px solid #D4961A; }
+
+    /* Recipe search cards */
+    .recipe-card { display: flex; flex-direction: column; }
+    .recipe-card .recipe-card-body { flex: 1; display: flex; flex-direction: column; }
+    .recipe-card .recipe-card-body > a[role="button"]:last-child { margin-top: auto; }
+
+    /* ── Grid Cards ── */
     .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-    .text-muted { color: var(--pico-muted-color); }
+
+    /* ── Tables ── */
+    figure > table { margin-bottom: 0; }
+    thead th { background: #F5EFE4; color: #2C2418; font-weight: 600; font-family: "Nunito", system-ui, sans-serif; }
+    tbody tr:nth-child(even) { background: #FBF7F0; }
+
+    /* ── Forms ── */
+    label { font-weight: 500; color: #3D3428; }
+    input:focus, select:focus, textarea:focus {
+      box-shadow: 0 0 0 3px rgba(192, 101, 58, 0.15);
+    }
+
+    /* ── Buttons ── */
+    button, [role="button"], input[type="submit"] {
+      font-family: "Nunito", system-ui, sans-serif;
+      font-weight: 700;
+      transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
+    button:active, [role="button"]:active { transform: scale(0.98); }
+
+    .btn-sm {
+      padding: 0.25rem 0.5rem !important;
+      margin: 0 0.25rem !important;
+      font-size: 0.85rem;
+    }
+    .btn-delete {
+      --pico-color: #8B2E2B;
+      --pico-border-color: #8B2E2B;
+      padding: 0.25rem 0.5rem !important;
+      margin: 0 !important;
+    }
+    .btn-delete:hover {
+      background: #FDE8E7;
+    }
+
+    /* ── Progress Bars ── */
+    .progress-bar { background: #F5EFE4; border-radius: var(--pico-border-radius); overflow: hidden; height: 1.5rem; margin-bottom: 0.5rem; }
+    .progress-fill { height: 100%; background: #C0653A; transition: width 0.3s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: white; font-weight: 600; border-radius: var(--pico-border-radius); }
+    .progress-calories .progress-fill { background: #C0653A; }
+    .progress-protein .progress-fill { background: #6B7F5E; }
+    .progress-carbs .progress-fill { background: #D4961A; }
+    .progress-fat .progress-fill { background: #B86E6A; }
+
+    /* ── AI Callout ── */
+    .ai-callout {
+      background: #E8F3E5;
+      border-left: 4px solid #6B7F5E;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .ai-callout h4, .ai-callout h5 { color: #576A4C; margin-bottom: 0.5rem; }
+
+    /* ── Auth Pages ── */
+    .auth-card { max-width: 450px; margin: 0 auto; }
+
+    /* ── Day Navigation ── */
+    .day-nav { background: #F5EFE4; border-radius: var(--pico-border-radius); padding: 1rem 1.5rem; margin-bottom: 1.5rem; }
+
+    /* ── Recipe Image ── */
+    .recipe-image { width: 100%; height: 200px; object-fit: cover; border-radius: var(--pico-border-radius); }
+
+    /* ── Pantry Category ── */
+    .pantry-category { margin-bottom: 2rem; }
+    .pantry-category h2 { border-bottom: 2px solid #E0D5C4; padding-bottom: 0.5rem; }
+
+    /* ── Utility Classes ── */
+    .text-muted { color: #8C7E6D; }
     .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    .full-width { width: 100%; text-align: center; }
     .mb-0 { margin-bottom: 0; }
     .mb-1 { margin-bottom: 1rem; }
     .mt-1 { margin-top: 1rem; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .inline-form { display: inline; }
-    .danger { color: var(--pico-del-color); }
-    .warning { color: #856404; }
-    .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: var(--pico-border-radius); font-size: 0.75rem; font-weight: bold; }
-    .badge-danger { background: var(--pico-del-color); color: white; }
-    .badge-warning { background: #ffc107; color: #212529; }
-    .badge-success { background: var(--pico-ins-color); color: #155724; }
-    .progress-bar { background: var(--pico-secondary-background); border-radius: var(--pico-border-radius); overflow: hidden; height: 1.5rem; margin-bottom: 0.5rem; }
-    .progress-fill { height: 100%; background: var(--pico-primary-background); transition: width 0.3s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: white; }
-    .recipe-image { width: 100%; height: 200px; object-fit: cover; border-radius: var(--pico-border-radius); }
+    .danger { color: #8B2E2B; }
+    .warning { color: #7A5E1A; }
+
+    /* ── Footer ── */
+    footer.container { border-top: 2px solid #E0D5C4; padding-top: 1rem; margin-top: 2rem; }
+
+    /* ── Barcode Scanner ── */
     #reader { width: 100%; max-width: 500px; margin: 0 auto; }
     #reader video { width: 100% !important; border-radius: var(--pico-border-radius); }
 
-    /* Hamburger menu button — hidden on desktop */
+    /* ── Hamburger Menu ── */
     .nav-toggle { display: none !important; background: none; border: none; cursor: pointer; padding: 0.5rem; margin: 0; width: auto; line-height: 1; color: var(--pico-contrast); }
     .nav-toggle svg { display: block; }
+    .nav-toggle:hover { color: #C0653A; }
 
-    /* Prevent horizontal overflow on mobile */
+    /* Prevent horizontal overflow */
     html, body { overflow-x: hidden; }
 
-    /* Mobile responsive styles */
+    /* ── Mobile: 768px ── */
     @media (max-width: 768px) {
-      /* Nav: wrap so links drop below the brand row */
       nav { flex-wrap: wrap; }
-
-      /* Hamburger toggle visible on mobile, positioned right */
       .nav-toggle { display: block !important; order: 2; }
-
-      /* Nav links: hidden by default, full-width dropdown below brand */
       #nav-links {
         display: none !important;
         flex-direction: column;
@@ -57,36 +231,21 @@
       }
       #nav-links.open { display: flex !important; }
       #nav-links li { width: 100%; text-align: left; padding: 0.25rem 0; }
-
-      /* Flex-between: stack vertically */
       .flex-between { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-
-      /* Day navigation specific layout */
-      .day-nav { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+      .day-nav { flex-direction: column; align-items: stretch; gap: 0.5rem; padding: 0.75rem 1rem; }
       .day-nav h1 { text-align: center; font-size: 1.3rem; order: -1; }
       .day-nav-links { display: flex; justify-content: space-between; }
-
-      /* Headings: smaller on mobile */
       h1 { font-size: 1.5rem; }
-
-      /* Tables: tighter fit */
       table { font-size: 0.85rem; }
       table th, table td { padding: 0.4rem 0.5rem; }
-
-      /* Table action buttons: stack */
       td .inline-form { display: block; margin-bottom: 0.25rem; }
-
-      /* Recipe image: shorter on mobile */
       .recipe-image { height: 150px; }
-
-      /* Action button grids: single column */
       .action-buttons { grid-template-columns: 1fr !important; }
     }
 
+    /* ── Mobile: 480px ── */
     @media (max-width: 480px) {
-      /* Force single-column grid cards on very small screens */
       .grid-cards { grid-template-columns: 1fr; }
-
       h1 { font-size: 1.3rem; }
     }
   </style>
@@ -95,7 +254,7 @@
   <header class="container">
     <nav>
       <ul>
-        <li><strong><a href="/" class="contrast">Pantry Bot</a></strong></li>
+        <li><strong><a href="/" class="contrast brand">&#x1F373; Pantry Bot</a></strong></li>
       </ul>
       <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.getElementById('nav-links').classList.toggle('open')">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -112,7 +271,7 @@
           <li>
             <form method="POST" action="/logout" class="inline-form">
               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <button type="submit" class="outline secondary" style="margin:0;padding:0.25rem 0.5rem;">Logout</button>
+              <button type="submit" class="outline secondary btn-sm">Logout</button>
             </form>
           </li>
         <% } else { %>
