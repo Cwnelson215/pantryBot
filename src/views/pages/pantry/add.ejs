@@ -111,9 +111,10 @@
 
   window.closeScanner = function() {
     if (scanner) {
-      scanner.stop().catch(function() {});
-      scanner.clear();
+      var s = scanner;
       scanner = null;
+      try { s.stop().catch(function() {}); } catch(e) {}
+      s.clear();
     }
     dialog.removeAttribute('open');
   };
