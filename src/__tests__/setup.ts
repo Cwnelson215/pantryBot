@@ -1,0 +1,11 @@
+process.env.NODE_ENV = "test";
+process.env.PORT = "3000";
+process.env.DB_HOST = "localhost";
+process.env.DB_PORT = "5432";
+process.env.DB_NAME = "pantry_bot_test";
+process.env.DB_USER = "postgres";
+process.env.DB_PASSWORD = "postgres";
+process.env.SESSION_SECRET = "test-secret";
+process.env.SPOONACULAR_API_KEY = "test-spoonacular-key";
+process.env.ANTHROPIC_API_KEY = "test-anthropic-key";
+process.env.USDA_API_KEY = "test-usda-key";

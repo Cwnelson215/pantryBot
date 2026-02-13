@@ -66,7 +66,7 @@ interface DayTotals {
   vitaminCMg: number;
 }
 
-function computeTotals(
+export function computeTotals(
   entries: (typeof nutritionLogs.$inferSelect)[]
 ): DayTotals {
   const totals: DayTotals = {
