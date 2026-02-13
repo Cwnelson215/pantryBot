@@ -98,6 +98,25 @@ export async function initializeDatabase() {
         source_data JSON
       );
       CREATE INDEX IF NOT EXISTS nutrition_logs_user_date_idx ON nutrition_logs(user_id, log_date);
+
+      -- New goal columns in user_preferences
+      ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS fat_target INTEGER;
+      ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS carbs_target INTEGER;
+      ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS fiber_target INTEGER;
+      ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS sugar_target INTEGER;
+      ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS sodium_target INTEGER;
+      ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS iron_target INTEGER;
+      ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS calcium_target INTEGER;
+      ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS vitamin_d_target INTEGER;
+      ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS potassium_target INTEGER;
+      ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS vitamin_c_target INTEGER;
+
+      -- New nutrient columns in nutrition_logs
+      ALTER TABLE nutrition_logs ADD COLUMN IF NOT EXISTS iron_mg DECIMAL(8,2);
+      ALTER TABLE nutrition_logs ADD COLUMN IF NOT EXISTS calcium_mg DECIMAL(8,2);
+      ALTER TABLE nutrition_logs ADD COLUMN IF NOT EXISTS vitamin_d_mcg DECIMAL(8,2);
+      ALTER TABLE nutrition_logs ADD COLUMN IF NOT EXISTS potassium_mg DECIMAL(8,2);
+      ALTER TABLE nutrition_logs ADD COLUMN IF NOT EXISTS vitamin_c_mg DECIMAL(8,2);
     `);
     console.log("Database tables initialized");
   } finally {

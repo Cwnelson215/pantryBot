@@ -7,8 +7,6 @@
   var currentAllergies = (typeof preferences !== 'undefined' && preferences && preferences.allergies) ? preferences.allergies : [];
   var currentCuisines = (typeof preferences !== 'undefined' && preferences && preferences.cuisinePrefs) ? preferences.cuisinePrefs : [];
   var currentServingSize = (typeof preferences !== 'undefined' && preferences && preferences.servingSize) ? preferences.servingSize : 2;
-  var currentCalorieTarget = (typeof preferences !== 'undefined' && preferences && preferences.calorieTarget) ? preferences.calorieTarget : '';
-  var currentProteinTarget = (typeof preferences !== 'undefined' && preferences && preferences.proteinTarget) ? preferences.proteinTarget : '';
 %>
 
 <form method="POST" action="/preferences">
@@ -62,15 +60,9 @@
       <label for="servingSize">Serving Size (people)</label>
       <input type="number" id="servingSize" name="servingSize" min="1" max="20" value="<%= currentServingSize %>">
     </div>
-    <div>
-      <label for="calorieTarget">Daily Calorie Target</label>
-      <input type="number" id="calorieTarget" name="calorieTarget" min="0" step="50" placeholder="e.g. 2000" value="<%= currentCalorieTarget %>">
-    </div>
-    <div>
-      <label for="proteinTarget">Daily Protein Target (g)</label>
-      <input type="number" id="proteinTarget" name="proteinTarget" min="0" step="1" placeholder="e.g. 50" value="<%= currentProteinTarget %>">
-    </div>
   </div>
+
+  <p class="text-muted">Set nutrition targets (calories, protein, etc.) on the <a href="/nutrition">Nutrition</a> page.</p>
 
   <button type="submit">Save Preferences</button>
 </form>

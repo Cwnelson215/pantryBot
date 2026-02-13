@@ -15,6 +15,11 @@ export async function logMeal(
     fiberG?: string;
     sugarG?: string;
     sodiumMg?: string;
+    ironMg?: string;
+    calciumMg?: string;
+    vitaminDMcg?: string;
+    potassiumMg?: string;
+    vitaminCMg?: string;
     recipeId?: number;
     sourceData?: unknown;
   }
@@ -33,6 +38,11 @@ export async function logMeal(
       fiberG: data.fiberG || null,
       sugarG: data.sugarG || null,
       sodiumMg: data.sodiumMg || null,
+      ironMg: data.ironMg || null,
+      calciumMg: data.calciumMg || null,
+      vitaminDMcg: data.vitaminDMcg || null,
+      potassiumMg: data.potassiumMg || null,
+      vitaminCMg: data.vitaminCMg || null,
       recipeId: data.recipeId || null,
       sourceData: data.sourceData || null,
     })
@@ -49,6 +59,11 @@ interface DayTotals {
   fiberG: number;
   sugarG: number;
   sodiumMg: number;
+  ironMg: number;
+  calciumMg: number;
+  vitaminDMcg: number;
+  potassiumMg: number;
+  vitaminCMg: number;
 }
 
 function computeTotals(
@@ -62,6 +77,11 @@ function computeTotals(
     fiberG: 0,
     sugarG: 0,
     sodiumMg: 0,
+    ironMg: 0,
+    calciumMg: 0,
+    vitaminDMcg: 0,
+    potassiumMg: 0,
+    vitaminCMg: 0,
   };
 
   for (const entry of entries) {
@@ -72,6 +92,11 @@ function computeTotals(
     if (entry.fiberG) totals.fiberG += parseFloat(entry.fiberG);
     if (entry.sugarG) totals.sugarG += parseFloat(entry.sugarG);
     if (entry.sodiumMg) totals.sodiumMg += parseFloat(entry.sodiumMg);
+    if (entry.ironMg) totals.ironMg += parseFloat(entry.ironMg);
+    if (entry.calciumMg) totals.calciumMg += parseFloat(entry.calciumMg);
+    if (entry.vitaminDMcg) totals.vitaminDMcg += parseFloat(entry.vitaminDMcg);
+    if (entry.potassiumMg) totals.potassiumMg += parseFloat(entry.potassiumMg);
+    if (entry.vitaminCMg) totals.vitaminCMg += parseFloat(entry.vitaminCMg);
   }
 
   return totals;

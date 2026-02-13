@@ -48,6 +48,16 @@ export const userPreferences = pgTable("user_preferences", {
   servingSize: integer("serving_size").default(2),
   calorieTarget: integer("calorie_target"),
   proteinTarget: integer("protein_target"),
+  fatTarget: integer("fat_target"),
+  carbsTarget: integer("carbs_target"),
+  fiberTarget: integer("fiber_target"),
+  sugarTarget: integer("sugar_target"),
+  sodiumTarget: integer("sodium_target"),
+  ironTarget: integer("iron_target"),
+  calciumTarget: integer("calcium_target"),
+  vitaminDTarget: integer("vitamin_d_target"),
+  potassiumTarget: integer("potassium_target"),
+  vitaminCTarget: integer("vitamin_c_target"),
 });
 
 export const userPreferencesRelations = relations(
@@ -148,6 +158,11 @@ export const nutritionLogs = pgTable(
     fiberG: decimal("fiber_g", { precision: 8, scale: 2 }),
     sugarG: decimal("sugar_g", { precision: 8, scale: 2 }),
     sodiumMg: decimal("sodium_mg", { precision: 8, scale: 2 }),
+    ironMg: decimal("iron_mg", { precision: 8, scale: 2 }),
+    calciumMg: decimal("calcium_mg", { precision: 8, scale: 2 }),
+    vitaminDMcg: decimal("vitamin_d_mcg", { precision: 8, scale: 2 }),
+    potassiumMg: decimal("potassium_mg", { precision: 8, scale: 2 }),
+    vitaminCMg: decimal("vitamin_c_mg", { precision: 8, scale: 2 }),
     sourceData: json("source_data"),
   },
   (table) => ({

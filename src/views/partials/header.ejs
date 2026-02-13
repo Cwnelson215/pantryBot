@@ -167,6 +167,35 @@
     .progress-protein .progress-fill { background: #6B7F5E; }
     .progress-carbs .progress-fill { background: #D4961A; }
     .progress-fat .progress-fill { background: #B86E6A; }
+    .progress-fiber .progress-fill { background: #8B7355; }
+    .progress-sugar .progress-fill { background: #E07B9A; }
+    .progress-sodium .progress-fill { background: #7A8FA6; }
+    .progress-iron .progress-fill { background: #9E6B55; }
+    .progress-calcium .progress-fill { background: #A0A0A0; }
+    .progress-vitaminD .progress-fill { background: #E8B84B; }
+    .progress-potassium .progress-fill { background: #6BA388; }
+    .progress-vitaminC .progress-fill { background: #E8943A; }
+
+    /* ── Modal ── */
+    dialog { border: 1px solid #E0D5C4; border-radius: var(--pico-border-radius); padding: 0; max-width: 600px; width: 90%; }
+    dialog::backdrop { background: rgba(44, 36, 24, 0.5); }
+    dialog .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid #E0D5C4; background: #F5EFE4; }
+    dialog .modal-header h3 { margin: 0; }
+    dialog .modal-body { padding: 1.5rem; max-height: 70vh; overflow-y: auto; }
+    dialog .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 0; margin: 0; width: auto; color: #8C7E6D; }
+    .modal-tabs { display: flex; border-bottom: 2px solid #E0D5C4; margin-bottom: 1rem; }
+    .modal-tab { padding: 0.5rem 1rem; cursor: pointer; border: none; background: none; font-weight: 600; color: #8C7E6D; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .modal-tab.active { color: #C0653A; border-bottom-color: #C0653A; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .search-results { list-style: none; padding: 0; margin: 0.5rem 0; max-height: 200px; overflow-y: auto; }
+    .search-result { padding: 0.5rem 0.75rem; cursor: pointer; border-bottom: 1px solid #E0D5C4; }
+    .search-result:hover { background: #F5EFE4; }
+    .search-result .food-name { font-weight: 600; }
+    .search-result .food-nutrients { font-size: 0.8rem; color: #8C7E6D; }
+    .nutrition-preview { background: #F5EFE4; padding: 0.75rem; border-radius: var(--pico-border-radius); margin-top: 0.75rem; }
+    .nutrition-preview .preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem; font-size: 0.85rem; }
+    .nutrition-preview .preview-grid span { white-space: nowrap; }
 
     /* ── AI Callout ── */
     .ai-callout {

@@ -74,8 +74,6 @@ router.post("/", async (req, res) => {
     allergies,
     cuisinePrefs,
     servingSize,
-    calorieTarget,
-    proteinTarget,
   } = req.body;
 
   const parsedDietaryTags = Array.isArray(dietaryTags)
@@ -97,8 +95,6 @@ router.post("/", async (req, res) => {
       : [];
 
   const parsedServingSize = servingSize ? parseInt(servingSize) : null;
-  const parsedCalorieTarget = calorieTarget ? parseInt(calorieTarget) : null;
-  const parsedProteinTarget = proteinTarget ? parseInt(proteinTarget) : null;
 
   const existing = await db
     .select()
@@ -113,8 +109,6 @@ router.post("/", async (req, res) => {
         allergies: parsedAllergies,
         cuisinePrefs: parsedCuisinePrefs,
         servingSize: parsedServingSize,
-        calorieTarget: parsedCalorieTarget,
-        proteinTarget: parsedProteinTarget,
       })
       .where(eq(userPreferences.userId, userId));
   } else {
@@ -124,8 +118,6 @@ router.post("/", async (req, res) => {
       allergies: parsedAllergies,
       cuisinePrefs: parsedCuisinePrefs,
       servingSize: parsedServingSize,
-      calorieTarget: parsedCalorieTarget,
-      proteinTarget: parsedProteinTarget,
     });
   }
 

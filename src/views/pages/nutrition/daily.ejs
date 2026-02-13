@@ -9,8 +9,27 @@
   var prevStr = prevDate.toISOString().split('T')[0];
   var nextStr = nextDate.toISOString().split('T')[0];
 
-  var calorieTarget = (typeof userPreferences !== 'undefined' && userPreferences && userPreferences.calorieTarget) ? userPreferences.calorieTarget : 2000;
-  var proteinTarget = (typeof userPreferences !== 'undefined' && userPreferences && userPreferences.proteinTarget) ? userPreferences.proteinTarget : 50;
+  var p = (typeof userPreferences !== 'undefined' && userPreferences) ? userPreferences : {};
+
+  var goals = [];
+  if (p.calorieTarget) goals.push({ key: 'calories', label: 'Calories', unit: '', target: p.calorieTarget, css: 'calories' });
+  if (p.proteinTarget) goals.push({ key: 'proteinG', label: 'Protein', unit: 'g', target: p.proteinTarget, css: 'protein' });
+  if (p.fatTarget) goals.push({ key: 'fatG', label: 'Fat', unit: 'g', target: p.fatTarget, css: 'fat' });
+  if (p.carbsTarget) goals.push({ key: 'carbsG', label: 'Carbs', unit: 'g', target: p.carbsTarget, css: 'carbs' });
+  if (p.fiberTarget) goals.push({ key: 'fiberG', label: 'Fiber', unit: 'g', target: p.fiberTarget, css: 'fiber' });
+  if (p.sugarTarget) goals.push({ key: 'sugarG', label: 'Sugar', unit: 'g', target: p.sugarTarget, css: 'sugar' });
+  if (p.sodiumTarget) goals.push({ key: 'sodiumMg', label: 'Sodium', unit: 'mg', target: p.sodiumTarget, css: 'sodium' });
+  if (p.ironTarget) goals.push({ key: 'ironMg', label: 'Iron', unit: 'mg', target: p.ironTarget, css: 'iron' });
+  if (p.calciumTarget) goals.push({ key: 'calciumMg', label: 'Calcium', unit: 'mg', target: p.calciumTarget, css: 'calcium' });
+  if (p.vitaminDTarget) goals.push({ key: 'vitaminDMcg', label: 'Vitamin D', unit: 'mcg', target: p.vitaminDTarget, css: 'vitaminD' });
+  if (p.potassiumTarget) goals.push({ key: 'potassiumMg', label: 'Potassium', unit: 'mg', target: p.potassiumTarget, css: 'potassium' });
+  if (p.vitaminCTarget) goals.push({ key: 'vitaminCMg', label: 'Vitamin C', unit: 'mg', target: p.vitaminCTarget, css: 'vitaminC' });
+
+  // Fallback
+  if (goals.length === 0) {
+    goals.push({ key: 'calories', label: 'Calories', unit: '', target: 2000, css: 'calories' });
+    goals.push({ key: 'proteinG', label: 'Protein', unit: 'g', target: 50, css: 'protein' });
+  }
 %>
 
 <div class="flex-between day-nav">
@@ -24,53 +43,48 @@
 <!-- Daily Totals -->
 <section>
   <h2>Daily Totals</h2>
-
   <div class="grid">
-    <div>
-      <p class="mb-0"><strong>Calories:</strong> <%= totals.calories %> / <%= calorieTarget %></p>
-      <div class="progress-bar progress-calories">
-        <div class="progress-fill" style="width: <%= Math.min((totals.calories / calorieTarget) * 100, 100) %>%;"><%= totals.calories %></div>
+    <% goals.slice(0, 2).forEach(function(g) { %>
+      <div>
+        <p class="mb-0"><strong><%= g.label %>:</strong> <%= g.unit ? Number(totals[g.key]).toFixed(1) + g.unit : Math.round(totals[g.key]) %> / <%= g.target %><%= g.unit %></p>
+        <div class="progress-bar progress-<%= g.css %>">
+          <div class="progress-fill" style="width: <%= Math.min((totals[g.key] / g.target) * 100, 100) %>%;"><%= g.unit ? Number(totals[g.key]).toFixed(1) + g.unit : Math.round(totals[g.key]) %></div>
+        </div>
       </div>
-    </div>
-    <div>
-      <p class="mb-0"><strong>Protein:</strong> <%= Number(totals.proteinG).toFixed(1) %>g / <%= proteinTarget %>g</p>
-      <div class="progress-bar progress-protein">
-        <div class="progress-fill" style="width: <%= Math.min((totals.proteinG / proteinTarget) * 100, 100) %>%;"><%= Number(totals.proteinG).toFixed(1) %>g</div>
-      </div>
-    </div>
+    <% }); %>
   </div>
-
-  <div class="grid">
-    <div>
-      <p class="mb-0"><strong>Carbs:</strong> <%= Number(totals.carbsG).toFixed(1) %>g</p>
-      <div class="progress-bar progress-carbs">
-        <div class="progress-fill" style="width: <%= Math.min(totals.carbsG / 3, 100) %>%;"><%= Number(totals.carbsG).toFixed(1) %>g</div>
-      </div>
+  <% if (goals.length > 2) { %>
+    <div class="grid">
+      <% goals.slice(2, 4).forEach(function(g) { %>
+        <div>
+          <p class="mb-0"><strong><%= g.label %>:</strong> <%= Number(totals[g.key]).toFixed(1) %><%= g.unit %> / <%= g.target %><%= g.unit %></p>
+          <div class="progress-bar progress-<%= g.css %>">
+            <div class="progress-fill" style="width: <%= Math.min((totals[g.key] / g.target) * 100, 100) %>%;"><%= Number(totals[g.key]).toFixed(1) %><%= g.unit %></div>
+          </div>
+        </div>
+      <% }); %>
     </div>
-    <div>
-      <p class="mb-0"><strong>Fat:</strong> <%= Number(totals.fatG).toFixed(1) %>g</p>
-      <div class="progress-bar progress-fat">
-        <div class="progress-fill" style="width: <%= Math.min(totals.fatG / 0.65, 100) %>%;"><%= Number(totals.fatG).toFixed(1) %>g</div>
-      </div>
+  <% } %>
+  <% if (goals.length > 4) { %>
+    <div class="grid">
+      <% goals.slice(4).forEach(function(g) { %>
+        <div>
+          <p class="mb-0"><strong><%= g.label %>:</strong> <%= Number(totals[g.key]).toFixed(1) %><%= g.unit %> / <%= g.target %><%= g.unit %></p>
+          <div class="progress-bar progress-<%= g.css %>">
+            <div class="progress-fill" style="width: <%= Math.min((totals[g.key] / g.target) * 100, 100) %>%;"><%= Number(totals[g.key]).toFixed(1) %><%= g.unit %></div>
+          </div>
+        </div>
+      <% }); %>
     </div>
-  </div>
-
-  <div class="grid">
-    <div>
-      <p class="mb-0"><strong>Fiber:</strong> <%= Number(totals.fiberG).toFixed(1) %>g</p>
-    </div>
-    <div>
-      <p class="mb-0"><strong>Sugar:</strong> <%= Number(totals.sugarG).toFixed(1) %>g</p>
-    </div>
-    <div>
-      <p class="mb-0"><strong>Sodium:</strong> <%= Number(totals.sodiumMg).toFixed(1) %>mg</p>
-    </div>
-  </div>
+  <% } %>
 </section>
 
 <!-- Individual Entries -->
 <section>
-  <h2>Meal Log</h2>
+  <div class="flex-between mb-1">
+    <h2 style="margin-bottom:0">Meal Log</h2>
+    <button onclick="document.getElementById('mealModal').showModal()" class="outline">Log a Meal</button>
+  </div>
   <% if (typeof entries !== 'undefined' && entries.length > 0) { %>
     <figure>
       <table>
@@ -110,45 +124,299 @@
   <% } %>
 </section>
 
-<!-- Log a Meal -->
-<section>
-  <h2>Log a Meal</h2>
-  <form method="POST" action="/nutrition/log">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-    <input type="hidden" name="logDate" value="<%= date %>">
+<!-- Log a Meal Modal -->
+<dialog id="mealModal">
+  <div class="modal-header">
+    <h3>Log a Meal</h3>
+    <button class="modal-close" onclick="document.getElementById('mealModal').close()">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="search" onclick="switchTab('search')">Search Food</button>
+      <button class="modal-tab" data-tab="recipe" onclick="switchTab('recipe')">From Saved Recipe</button>
+    </div>
 
-    <div class="grid">
-      <div>
-        <label for="foodName">Food Name</label>
-        <input type="text" id="foodName" name="foodName" placeholder="e.g. Grilled Chicken" required>
-      </div>
-      <div>
-        <label for="servings">Servings</label>
-        <input type="number" id="servings" name="servings" value="1" min="0.25" step="0.25">
+    <!-- Tab: Search Food -->
+    <div id="tab-search" class="tab-content active">
+      <label for="usdaSearch">Search USDA Database</label>
+      <input type="text" id="usdaSearch" placeholder="e.g. chicken breast" autocomplete="off">
+      <ul class="search-results" id="searchResults"></ul>
+
+      <div id="searchSelected" style="display:none;">
+        <p><strong id="selectedFoodName"></strong></p>
+        <label for="gramsInput">Amount (grams)</label>
+        <input type="number" id="gramsInput" value="100" min="1" step="1">
+        <div class="nutrition-preview" id="searchPreview">
+          <strong>Nutrition:</strong>
+          <div class="preview-grid" id="searchPreviewGrid"></div>
+        </div>
       </div>
     </div>
 
-    <div class="grid">
-      <div>
-        <label for="calories">Calories</label>
-        <input type="number" id="calories" name="calories" min="0" step="1" placeholder="0">
-      </div>
-      <div>
-        <label for="proteinG">Protein (g)</label>
-        <input type="number" id="proteinG" name="proteinG" min="0" step="0.1" placeholder="0">
-      </div>
-      <div>
-        <label for="carbsG">Carbs (g)</label>
-        <input type="number" id="carbsG" name="carbsG" min="0" step="0.1" placeholder="0">
-      </div>
-      <div>
-        <label for="fatG">Fat (g)</label>
-        <input type="number" id="fatG" name="fatG" min="0" step="0.1" placeholder="0">
+    <!-- Tab: From Saved Recipe -->
+    <div id="tab-recipe" class="tab-content">
+      <label for="recipeSelect">Select a Saved Recipe</label>
+      <select id="recipeSelect">
+        <option value="">-- Choose a recipe --</option>
+      </select>
+
+      <div id="recipeSelected" style="display:none;">
+        <label for="recipeServingsInput">Servings Eaten</label>
+        <input type="number" id="recipeServingsInput" value="1" min="0.25" step="0.25">
+        <div class="nutrition-preview" id="recipePreview">
+          <strong>Nutrition:</strong>
+          <div class="preview-grid" id="recipePreviewGrid"></div>
+        </div>
       </div>
     </div>
 
-    <button type="submit">Log Meal</button>
-  </form>
-</section>
+    <!-- Hidden Form -->
+    <form method="POST" action="/nutrition/log" id="mealForm" style="margin-top:1rem;">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="logDate" value="<%= date %>">
+      <input type="hidden" name="foodName" id="hFoodName">
+      <input type="hidden" name="servings" id="hServings" value="1">
+      <input type="hidden" name="calories" id="hCalories">
+      <input type="hidden" name="proteinG" id="hProteinG">
+      <input type="hidden" name="carbsG" id="hCarbsG">
+      <input type="hidden" name="fatG" id="hFatG">
+      <input type="hidden" name="fiberG" id="hFiberG">
+      <input type="hidden" name="sugarG" id="hSugarG">
+      <input type="hidden" name="sodiumMg" id="hSodiumMg">
+      <input type="hidden" name="ironMg" id="hIronMg">
+      <input type="hidden" name="calciumMg" id="hCalciumMg">
+      <input type="hidden" name="vitaminDMcg" id="hVitaminDMcg">
+      <input type="hidden" name="potassiumMg" id="hPotassiumMg">
+      <input type="hidden" name="vitaminCMg" id="hVitaminCMg">
+      <input type="hidden" name="recipeId" id="hRecipeId">
+      <button type="submit" id="submitMeal" disabled>Log Meal</button>
+    </form>
+  </div>
+</dialog>
+
+<script>
+(function() {
+  // Tab switching
+  window.switchTab = function(tab) {
+    document.querySelectorAll('.modal-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    // Reset submit state
+    document.getElementById('submitMeal').disabled = true;
+    document.getElementById('hRecipeId').value = '';
+  };
+
+  // USDA Search
+  var searchTimer = null;
+  var selectedFood = null;
+
+  document.getElementById('usdaSearch').addEventListener('input', function() {
+    clearTimeout(searchTimer);
+    var q = this.value.trim();
+    if (q.length < 2) {
+      document.getElementById('searchResults').innerHTML = '';
+      return;
+    }
+    searchTimer = setTimeout(function() {
+      fetch('/nutrition/api/usda-search?q=' + encodeURIComponent(q))
+        .then(function(r) { return r.json(); })
+        .then(function(foods) {
+          var html = '';
+          foods.forEach(function(f) {
+            var cal = f.nutrients.calories !== null ? Math.round(f.nutrients.calories) : '?';
+            var pro = f.nutrients.proteinG !== null ? Number(f.nutrients.proteinG).toFixed(1) : '?';
+            html += '<li class="search-result" data-food=\'' + JSON.stringify(f).replace(/'/g, '&#39;') + '\'>';
+            html += '<div class="food-name">' + escapeHtml(f.description) + '</div>';
+            html += '<div class="food-nutrients">' + cal + ' cal, ' + pro + 'g protein (per 100g)</div>';
+            html += '</li>';
+          });
+          if (foods.length === 0) html = '<li style="padding:0.5rem;color:#8C7E6D;">No results found</li>';
+          document.getElementById('searchResults').innerHTML = html;
+
+          document.querySelectorAll('.search-result[data-food]').forEach(function(el) {
+            el.addEventListener('click', function() {
+              selectedFood = JSON.parse(this.getAttribute('data-food'));
+              document.getElementById('selectedFoodName').textContent = selectedFood.description;
+              document.getElementById('searchSelected').style.display = 'block';
+              document.getElementById('searchResults').innerHTML = '';
+              document.getElementById('usdaSearch').value = selectedFood.description;
+              document.getElementById('gramsInput').value = 100;
+              updateSearchPreview();
+            });
+          });
+        });
+    }, 300);
+  });
+
+  document.getElementById('gramsInput').addEventListener('input', updateSearchPreview);
+
+  function updateSearchPreview() {
+    if (!selectedFood) return;
+    var grams = parseFloat(document.getElementById('gramsInput').value) || 0;
+    var n = selectedFood.nutrients;
+    var calc = function(val) { return val !== null ? (val * grams / 100) : null; };
+
+    var values = {
+      calories: calc(n.calories),
+      proteinG: calc(n.proteinG),
+      carbsG: calc(n.carbsG),
+      fatG: calc(n.fatG),
+      fiberG: calc(n.fiberG),
+      sugarG: calc(n.sugarG),
+      sodiumMg: calc(n.sodiumMg),
+      ironMg: calc(n.ironMg),
+      calciumMg: calc(n.calciumMg),
+      vitaminDMcg: calc(n.vitaminDMcg),
+      potassiumMg: calc(n.potassiumMg),
+      vitaminCMg: calc(n.vitaminCMg)
+    };
+
+    var previewHtml = '';
+    var labels = { calories: 'Cal', proteinG: 'Protein', carbsG: 'Carbs', fatG: 'Fat', fiberG: 'Fiber', sugarG: 'Sugar', sodiumMg: 'Sodium', ironMg: 'Iron', calciumMg: 'Calcium', vitaminDMcg: 'Vit D', potassiumMg: 'Potassium', vitaminCMg: 'Vit C' };
+    var units = { calories: '', proteinG: 'g', carbsG: 'g', fatG: 'g', fiberG: 'g', sugarG: 'g', sodiumMg: 'mg', ironMg: 'mg', calciumMg: 'mg', vitaminDMcg: 'mcg', potassiumMg: 'mg', vitaminCMg: 'mg' };
+
+    for (var key in labels) {
+      if (values[key] !== null) {
+        previewHtml += '<span><strong>' + labels[key] + ':</strong> ' + (key === 'calories' ? Math.round(values[key]) : Number(values[key]).toFixed(1)) + units[key] + '</span>';
+      }
+    }
+    document.getElementById('searchPreviewGrid').innerHTML = previewHtml;
+
+    // Populate hidden fields
+    document.getElementById('hFoodName').value = selectedFood.description;
+    document.getElementById('hServings').value = '1';
+    setHidden(values);
+    document.getElementById('hRecipeId').value = '';
+    document.getElementById('submitMeal').disabled = false;
+  }
+
+  // Saved Recipes
+  var recipesData = [];
+
+  // Load recipes when tab is switched
+  document.querySelector('[data-tab="recipe"]').addEventListener('click', function() {
+    if (recipesData.length > 0) return;
+    fetch('/nutrition/api/saved-recipes')
+      .then(function(r) { return r.json(); })
+      .then(function(recipes) {
+        recipesData = recipes;
+        var sel = document.getElementById('recipeSelect');
+        recipes.forEach(function(r) {
+          var opt = document.createElement('option');
+          opt.value = r.id;
+          opt.textContent = r.title + (r.servings ? ' (' + r.servings + ' servings)' : '');
+          sel.appendChild(opt);
+        });
+      });
+  });
+
+  document.getElementById('recipeSelect').addEventListener('change', function() {
+    var id = this.value;
+    if (!id) {
+      document.getElementById('recipeSelected').style.display = 'none';
+      document.getElementById('submitMeal').disabled = true;
+      return;
+    }
+    document.getElementById('recipeSelected').style.display = 'block';
+    document.getElementById('recipeServingsInput').value = 1;
+    updateRecipePreview();
+  });
+
+  document.getElementById('recipeServingsInput').addEventListener('input', updateRecipePreview);
+
+  function updateRecipePreview() {
+    var id = document.getElementById('recipeSelect').value;
+    var recipe = recipesData.find(function(r) { return String(r.id) === id; });
+    if (!recipe) return;
+
+    var servingsEaten = parseFloat(document.getElementById('recipeServingsInput').value) || 0;
+    var totalServings = recipe.servings || 1;
+    var nj = recipe.nutritionJson || {};
+
+    // nutritionJson may have nutrients array (Spoonacular format) or flat values
+    var totalNutrients = {};
+    if (nj.nutrients && Array.isArray(nj.nutrients)) {
+      nj.nutrients.forEach(function(n) {
+        var name = (n.name || '').toLowerCase();
+        if (name === 'calories') totalNutrients.calories = n.amount;
+        else if (name === 'protein') totalNutrients.proteinG = n.amount;
+        else if (name === 'carbohydrates') totalNutrients.carbsG = n.amount;
+        else if (name === 'fat') totalNutrients.fatG = n.amount;
+        else if (name === 'fiber') totalNutrients.fiberG = n.amount;
+        else if (name === 'sugar') totalNutrients.sugarG = n.amount;
+        else if (name === 'sodium') totalNutrients.sodiumMg = n.amount;
+        else if (name === 'iron') totalNutrients.ironMg = n.amount;
+        else if (name === 'calcium') totalNutrients.calciumMg = n.amount;
+        else if (name === 'vitamin d') totalNutrients.vitaminDMcg = n.amount;
+        else if (name === 'potassium') totalNutrients.potassiumMg = n.amount;
+        else if (name === 'vitamin c') totalNutrients.vitaminCMg = n.amount;
+      });
+    } else {
+      totalNutrients = nj;
+    }
+
+    var calc = function(val) {
+      if (val === undefined || val === null) return null;
+      return (val / totalServings) * servingsEaten;
+    };
+
+    var values = {
+      calories: calc(totalNutrients.calories),
+      proteinG: calc(totalNutrients.proteinG),
+      carbsG: calc(totalNutrients.carbsG),
+      fatG: calc(totalNutrients.fatG),
+      fiberG: calc(totalNutrients.fiberG),
+      sugarG: calc(totalNutrients.sugarG),
+      sodiumMg: calc(totalNutrients.sodiumMg),
+      ironMg: calc(totalNutrients.ironMg),
+      calciumMg: calc(totalNutrients.calciumMg),
+      vitaminDMcg: calc(totalNutrients.vitaminDMcg),
+      potassiumMg: calc(totalNutrients.potassiumMg),
+      vitaminCMg: calc(totalNutrients.vitaminCMg)
+    };
+
+    var previewHtml = '';
+    var labels = { calories: 'Cal', proteinG: 'Protein', carbsG: 'Carbs', fatG: 'Fat', fiberG: 'Fiber', sugarG: 'Sugar', sodiumMg: 'Sodium', ironMg: 'Iron', calciumMg: 'Calcium', vitaminDMcg: 'Vit D', potassiumMg: 'Potassium', vitaminCMg: 'Vit C' };
+    var units = { calories: '', proteinG: 'g', carbsG: 'g', fatG: 'g', fiberG: 'g', sugarG: 'g', sodiumMg: 'mg', ironMg: 'mg', calciumMg: 'mg', vitaminDMcg: 'mcg', potassiumMg: 'mg', vitaminCMg: 'mg' };
+
+    for (var key in labels) {
+      if (values[key] !== null) {
+        previewHtml += '<span><strong>' + labels[key] + ':</strong> ' + (key === 'calories' ? Math.round(values[key]) : Number(values[key]).toFixed(1)) + units[key] + '</span>';
+      }
+    }
+    document.getElementById('recipePreviewGrid').innerHTML = previewHtml;
+
+    // Populate hidden fields
+    document.getElementById('hFoodName').value = recipe.title;
+    document.getElementById('hServings').value = servingsEaten;
+    setHidden(values);
+    document.getElementById('hRecipeId').value = recipe.id;
+    document.getElementById('submitMeal').disabled = false;
+  }
+
+  function setHidden(values) {
+    var fmt = function(v) { return v !== null ? Number(v).toFixed(2) : ''; };
+    document.getElementById('hCalories').value = fmt(values.calories);
+    document.getElementById('hProteinG').value = fmt(values.proteinG);
+    document.getElementById('hCarbsG').value = fmt(values.carbsG);
+    document.getElementById('hFatG').value = fmt(values.fatG);
+    document.getElementById('hFiberG').value = fmt(values.fiberG);
+    document.getElementById('hSugarG').value = fmt(values.sugarG);
+    document.getElementById('hSodiumMg').value = fmt(values.sodiumMg);
+    document.getElementById('hIronMg').value = fmt(values.ironMg);
+    document.getElementById('hCalciumMg').value = fmt(values.calciumMg);
+    document.getElementById('hVitaminDMcg').value = fmt(values.vitaminDMcg);
+    document.getElementById('hPotassiumMg').value = fmt(values.potassiumMg);
+    document.getElementById('hVitaminCMg').value = fmt(values.vitaminCMg);
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+})();
+</script>
 
 <%- include('../../partials/footer') %>
