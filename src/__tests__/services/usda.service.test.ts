@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { extractNutrientsFromSearchResult } from "../../services/usda.service";
+import { config } from "../../config";
 
 // Mock config before importing functions that use fetch
 vi.mock("../../config", () => ({
@@ -156,6 +157,112 @@ describe("usda.service", () => {
 
       const url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
       expect(url).toContain("/food/123");
+      expect(result).toEqual(mockFood);
+    });
+  });
+
+  describe("lookupByBarcode", () => {
+    beforeEach(() => {
+      vi.stubGlobal("fetch", vi.fn());
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("returns matching food when exact UPC match found", async () => {
+      const mockFood = {
+        fdcId: 456,
+        description: "All Purpose Flour",
+        brandOwner: "Great Value",
+        gtinUpc: "0078742370781",
+      };
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ foods: [mockFood, { fdcId: 789, gtinUpc: "9999999999" }] }),
+      });
+
+      const { lookupByBarcode } = await import("../../services/usda.service");
+      const result = await lookupByBarcode("0078742370781", 5000);
+
+      expect(result).toEqual(mockFood);
+      expect(global.fetch).toHaveBeenCalledOnce();
+      const [url, options] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
+      expect(url).toContain("/foods/search");
+      expect(options.method).toBe("POST");
+      const body = JSON.parse(options.body);
+      expect(body.query).toBe("0078742370781");
+      expect(body.dataType).toEqual(["Branded"]);
+    });
+
+    it("returns null when no exact UPC match in results", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ foods: [{ fdcId: 123, gtinUpc: "9999999999" }] }),
+      });
+
+      const { lookupByBarcode } = await import("../../services/usda.service");
+      const result = await lookupByBarcode("0078742370781", 5000);
+      expect(result).toBeNull();
+    });
+
+    it("returns null when foods array is empty", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ foods: [] }),
+      });
+
+      const { lookupByBarcode } = await import("../../services/usda.service");
+      const result = await lookupByBarcode("0078742370781", 5000);
+      expect(result).toBeNull();
+    });
+
+    it("returns null when API key is missing", async () => {
+      const original = config.usda.apiKey;
+      (config.usda as any).apiKey = "";
+
+      try {
+        const { lookupByBarcode } = await import("../../services/usda.service");
+        const result = await lookupByBarcode("0078742370781", 5000);
+        expect(result).toBeNull();
+        expect(global.fetch).not.toHaveBeenCalled();
+      } finally {
+        (config.usda as any).apiKey = original;
+      }
+    });
+
+    it("returns null on fetch error", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(new Error("network error"));
+
+      const { lookupByBarcode } = await import("../../services/usda.service");
+      const result = await lookupByBarcode("0078742370781", 5000);
+      expect(result).toBeNull();
+    });
+
+    it("returns null on non-ok response", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: false,
+        status: 500,
+      });
+
+      const { lookupByBarcode } = await import("../../services/usda.service");
+      const result = await lookupByBarcode("0078742370781", 5000);
+      expect(result).toBeNull();
+    });
+
+    it("matches UPC with leading zeros stripped", async () => {
+      const mockFood = {
+        fdcId: 456,
+        description: "Flour",
+        gtinUpc: "78742370781",
+      };
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ foods: [mockFood] }),
+      });
+
+      const { lookupByBarcode } = await import("../../services/usda.service");
+      const result = await lookupByBarcode("0078742370781", 5000);
       expect(result).toEqual(mockFood);
     });
   });

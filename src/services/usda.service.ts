@@ -107,6 +107,56 @@ export async function getNutrients(fdcId: string): Promise<NutrientInfo> {
   return nutrients;
 }
 
+export interface USDABrandedFood {
+  fdcId: number;
+  description: string;
+  brandOwner?: string;
+  brandName?: string;
+  gtinUpc?: string;
+  servingSize?: number;
+  servingSizeUnit?: string;
+  householdServingFullText?: string;
+  brandedFoodCategory?: string;
+}
+
+export async function lookupByBarcode(
+  barcode: string,
+  timeoutMs: number
+): Promise<USDABrandedFood | null> {
+  if (!config.usda.apiKey) {
+    return null;
+  }
+
+  try {
+    const url = `${config.usda.baseUrl}/foods/search?api_key=${config.usda.apiKey}`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: barcode,
+        dataType: ["Branded"],
+        pageSize: 5,
+      }),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    const foods: USDABrandedFood[] = data.foods || [];
+
+    // The search is fuzzy, so filter for exact UPC match
+    const match = foods.find(
+      (f) => f.gtinUpc === barcode || f.gtinUpc === barcode.replace(/^0+/, "")
+    );
+    return match || null;
+  } catch {
+    return null;
+  }
+}
+
 export function extractNutrientsFromSearchResult(food: any): NutrientInfo {
   const nutrients: NutrientInfo = {
     calories: null,

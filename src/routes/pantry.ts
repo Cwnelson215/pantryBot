@@ -2,7 +2,7 @@ import { Router } from "express";
 import { requireAuth } from "../middleware/auth";
 import { setFlash } from "../middleware/flash";
 import * as pantryService from "../services/pantry.service";
-import * as openfoodfacts from "../services/openfoodfacts.service";
+import * as barcodeLookup from "../services/barcode-lookup.service";
 
 const CATEGORIES = [
   "Produce",
@@ -75,7 +75,7 @@ router.get("/lookup-barcode/:barcode", async (req, res) => {
   }, 12000);
 
   try {
-    const result = await openfoodfacts.lookupBarcode(barcode);
+    const result = await barcodeLookup.lookupBarcode(barcode);
     if (!res.headersSent) {
       res.json(result);
     }

@@ -57,14 +57,14 @@ vi.mock("../../services/pantry.service", () => ({
   getItemsByCategory: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock("../../services/openfoodfacts.service", () => ({
+vi.mock("../../services/barcode-lookup.service", () => ({
   lookupBarcode: vi.fn(),
 }));
 
 import app from "../../app";
 import * as authService from "../../services/auth.service";
 import * as pantryService from "../../services/pantry.service";
-import * as openfoodfacts from "../../services/openfoodfacts.service";
+import * as barcodeLookup from "../../services/barcode-lookup.service";
 
 async function loginAgent() {
   const agent = request.agent(app);
@@ -210,7 +210,7 @@ describe("pantry routes", () => {
     it("GET /pantry/lookup-barcode returns product data", async () => {
       const { agent } = await loginAgent();
 
-      (openfoodfacts.lookupBarcode as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      (barcodeLookup.lookupBarcode as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         found: true,
         name: "Organic Milk",
         brand: "Organic Valley",
@@ -236,7 +236,7 @@ describe("pantry routes", () => {
     it("GET /pantry/lookup-barcode handles service error", async () => {
       const { agent } = await loginAgent();
 
-      (openfoodfacts.lookupBarcode as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      (barcodeLookup.lookupBarcode as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
         new Error("timeout")
       );
 
@@ -248,7 +248,7 @@ describe("pantry routes", () => {
     it("GET /pantry/lookup-barcode returns 504 when service never resolves", async () => {
       const { agent } = await loginAgent();
 
-      (openfoodfacts.lookupBarcode as ReturnType<typeof vi.fn>).mockReturnValueOnce(
+      (barcodeLookup.lookupBarcode as ReturnType<typeof vi.fn>).mockReturnValueOnce(
         new Promise(() => {}) // never resolves
       );
 
