@@ -85,6 +85,7 @@
   }
 
   window.openScanner = function() {
+    scanning = false;
     dialog.setAttribute('open', '');
     statusEl.textContent = 'Starting camera...';
 
@@ -110,11 +111,11 @@
   };
 
   window.closeScanner = function() {
-    if (scanner) {
-      var s = scanner;
-      scanner = null;
+    var s = scanner;
+    scanner = null;
+    if (s) {
       try { s.stop().catch(function() {}); } catch(e) {}
-      s.clear();
+      try { s.clear(); } catch(e) {}
     }
     dialog.removeAttribute('open');
   };
@@ -123,9 +124,6 @@
     if (scanning) return;
     scanning = true;
 
-    if (scanner) {
-      scanner.pause(true);
-    }
     statusEl.innerHTML = '<span aria-busy="true">Looking up product...</span>';
 
     var controller = new AbortController();
