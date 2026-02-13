@@ -72,6 +72,7 @@
 <script>
 (function() {
   var scanner = null;
+  var scanning = false;
   var dialog = document.getElementById('scannerDialog');
   var scanBtn = document.getElementById('scanBtn');
   var statusEl = document.getElementById('scannerStatus');
@@ -118,14 +119,22 @@
   };
 
   function onBarcodeScanned(barcode) {
+    if (scanning) return;
+    scanning = true;
+
     if (scanner) {
-      scanner.stop().catch(function() {});
+      scanner.pause(true);
     }
     statusEl.innerHTML = '<span aria-busy="true">Looking up product...</span>';
 
-    fetch('/pantry/lookup-barcode/' + encodeURIComponent(barcode))
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function() { controller.abort(); }, 15000);
+
+    fetch('/pantry/lookup-barcode/' + encodeURIComponent(barcode), { signal: controller.signal })
       .then(function(res) { return res.json(); })
       .then(function(data) {
+        clearTimeout(timeoutId);
+        scanning = false;
         closeScanner();
         if (data.found) {
           prefillForm(data, barcode);
@@ -133,9 +142,15 @@
           showResult('error', 'Product not found for barcode ' + barcode + '. Please enter details manually.');
         }
       })
-      .catch(function() {
+      .catch(function(err) {
+        clearTimeout(timeoutId);
+        scanning = false;
         closeScanner();
-        showResult('error', 'Failed to look up barcode. Please enter details manually.');
+        if (err.name === 'AbortError') {
+          showResult('error', 'Barcode lookup timed out. Please enter details manually.');
+        } else {
+          showResult('error', 'Failed to look up barcode. Please enter details manually.');
+        }
       });
   }
 
