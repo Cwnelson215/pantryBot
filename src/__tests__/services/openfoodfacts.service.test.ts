@@ -166,5 +166,32 @@ describe("openfoodfacts.service", () => {
       const result = await lookupBarcode("0000000000");
       expect(result).toEqual({ found: false });
     });
+
+    it("returns not found when fetch never resolves (hard deadline)", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockReturnValue(
+        new Promise(() => {}) // never resolves
+      );
+
+      const start = Date.now();
+      const result = await lookupBarcode("0000000000");
+      const elapsed = Date.now() - start;
+
+      expect(result).toEqual({ found: false });
+      expect(elapsed).toBeLessThan(15000);
+    }, 20000);
+
+    it("returns not found when response.json() never resolves", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => new Promise(() => {}), // body read never completes
+      });
+
+      const start = Date.now();
+      const result = await lookupBarcode("0000000000");
+      const elapsed = Date.now() - start;
+
+      expect(result).toEqual({ found: false });
+      expect(elapsed).toBeLessThan(15000);
+    }, 20000);
   });
 });

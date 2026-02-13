@@ -98,50 +98,59 @@ const UNIT_ALIASES: Record<string, string> = {
   fl: "oz",
 };
 
-export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+async function doLookup(barcode: string, timeoutMs: number): Promise<BarcodeResult> {
+  const url = `${BASE_URL}/${barcode}?fields=product_name,brands,quantity,categories_tags,nutriments,image_url`;
+  const response = await fetch(url, {
+    signal: AbortSignal.timeout(timeoutMs),
+    headers: {
+      "User-Agent": "PantryBot/1.0 (https://pantrybot.cwnel.com)",
+    },
+  });
 
-  try {
-    const url = `${BASE_URL}/${barcode}?fields=product_name,brands,quantity,categories_tags,nutriments,image_url`;
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent": "PantryBot/1.0 (https://pantrybot.cwnel.com)",
-      },
-    });
-
-    if (!response.ok) {
-      return { found: false };
-    }
-
-    const data = await response.json();
-    if (data.status !== 1 || !data.product) {
-      return { found: false };
-    }
-
-    const product: OFFProduct = data.product;
-    const parsed = parseQuantity(product.quantity || "");
-    const category = mapToAppCategory(product.categories_tags || []);
-
-    let name = product.product_name || "";
-    if (product.brands && name && !name.toLowerCase().includes(product.brands.toLowerCase())) {
-      name = `${product.brands} ${name}`;
-    }
-
-    return {
-      found: true,
-      name: name || undefined,
-      brand: product.brands || undefined,
-      quantity: parsed.quantity,
-      unit: parsed.unit,
-      category,
-      imageUrl: product.image_url || undefined,
-    };
-  } catch {
+  if (!response.ok) {
     return { found: false };
-  } finally {
-    clearTimeout(timeout);
+  }
+
+  const data = await response.json();
+  if (data.status !== 1 || !data.product) {
+    return { found: false };
+  }
+
+  const product: OFFProduct = data.product;
+  const parsed = parseQuantity(product.quantity || "");
+  const category = mapToAppCategory(product.categories_tags || []);
+
+  let name = product.product_name || "";
+  if (product.brands && name && !name.toLowerCase().includes(product.brands.toLowerCase())) {
+    name = `${product.brands} ${name}`;
+  }
+
+  return {
+    found: true,
+    name: name || undefined,
+    brand: product.brands || undefined,
+    quantity: parsed.quantity,
+    unit: parsed.unit,
+    category,
+    imageUrl: product.image_url || undefined,
+  };
+}
+
+const FETCH_TIMEOUT_MS = 8000;
+const HARD_DEADLINE_MS = 10000;
+
+export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
+  try {
+    const result = await Promise.race([
+      doLookup(barcode, FETCH_TIMEOUT_MS),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Hard deadline exceeded")), HARD_DEADLINE_MS)
+      ),
+    ]);
+    return result;
+  } catch (err) {
+    console.error("Barcode lookup failed:", err);
+    return { found: false };
   }
 }
 

@@ -244,5 +244,17 @@ describe("pantry routes", () => {
       expect(res.status).toBe(500);
       expect(res.body.error).toContain("Failed to look up barcode");
     });
+
+    it("GET /pantry/lookup-barcode returns 504 when service never resolves", async () => {
+      const { agent } = await loginAgent();
+
+      (openfoodfacts.lookupBarcode as ReturnType<typeof vi.fn>).mockReturnValueOnce(
+        new Promise(() => {}) // never resolves
+      );
+
+      const res = await agent.get("/pantry/lookup-barcode/3270190207924");
+      expect(res.status).toBe(504);
+      expect(res.body.error).toContain("timed out");
+    }, 20000);
   });
 });

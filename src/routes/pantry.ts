@@ -68,11 +68,23 @@ router.get("/lookup-barcode/:barcode", async (req, res) => {
     return res.status(400).json({ error: "Invalid barcode format. Must be 8-14 digits." });
   }
 
+  const routeTimeout = setTimeout(() => {
+    if (!res.headersSent) {
+      res.status(504).json({ error: "Barcode lookup timed out" });
+    }
+  }, 12000);
+
   try {
     const result = await openfoodfacts.lookupBarcode(barcode);
-    res.json(result);
+    if (!res.headersSent) {
+      res.json(result);
+    }
   } catch {
-    res.status(500).json({ error: "Failed to look up barcode" });
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Failed to look up barcode" });
+    }
+  } finally {
+    clearTimeout(routeTimeout);
   }
 });
 
