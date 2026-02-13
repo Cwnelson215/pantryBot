@@ -140,6 +140,7 @@ const FETCH_TIMEOUT_MS = 8000;
 const HARD_DEADLINE_MS = 10000;
 
 export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
+<<<<<<< HEAD
   let hardDeadlineTimer: ReturnType<typeof setTimeout> | undefined;
   try {
     const result = await Promise.race([
@@ -147,13 +148,24 @@ export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
       new Promise<never>((_, reject) => {
         hardDeadlineTimer = setTimeout(() => reject(new Error("Hard deadline exceeded")), HARD_DEADLINE_MS);
       }),
+=======
+  try {
+    const result = await Promise.race([
+      doLookup(barcode, FETCH_TIMEOUT_MS),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Hard deadline exceeded")), HARD_DEADLINE_MS)
+      ),
+>>>>>>> 6f694f5e46b57a73c228754eb7f7a3dd2864a56e
     ]);
     return result;
   } catch (err) {
     console.error("Barcode lookup failed:", err);
     return { found: false };
+<<<<<<< HEAD
   } finally {
     clearTimeout(hardDeadlineTimer);
+=======
+>>>>>>> 6f694f5e46b57a73c228754eb7f7a3dd2864a56e
   }
 }
 
