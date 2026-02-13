@@ -134,10 +134,7 @@
       .then(function(res) { return res.json(); })
       .then(function(data) {
         clearTimeout(timeoutId);
-<<<<<<< HEAD
         scanning = false;
-=======
->>>>>>> 6f694f5e46b57a73c228754eb7f7a3dd2864a56e
         closeScanner();
         if (data.found) {
           prefillForm(data, barcode);
@@ -147,10 +144,7 @@
       })
       .catch(function(err) {
         clearTimeout(timeoutId);
-<<<<<<< HEAD
         scanning = false;
-=======
->>>>>>> 6f694f5e46b57a73c228754eb7f7a3dd2864a56e
         closeScanner();
         if (err.name === 'AbortError') {
           showResult('error', 'Barcode lookup timed out. Please enter details manually.');
