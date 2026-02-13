@@ -45,11 +45,11 @@ router.use(requireAuth);
 
 router.get("/", async (req, res) => {
   const userId = req.session.userId!;
-  const categories = await pantryService.getItemsByCategory(userId);
+  const items = await pantryService.getItems(userId);
 
   res.render("pages/pantry/index", {
     title: "My Pantry",
-    categories,
+    items,
   });
 });
 

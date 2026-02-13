@@ -1,7 +1,7 @@
 <%- include('../../partials/header') %>
 
 <div class="flex-between">
-  <h1>My Pantry</h1>
+  <h1>My Pantry<% if (typeof items !== 'undefined' && items.length > 0) { %> <span class="text-muted" style="font-size:0.5em;">(<%= items.length %> item<%= items.length !== 1 ? 's' : '' %>)</span><% } %></h1>
   <a href="/pantry/add" role="button">Add Item</a>
 </div>
 

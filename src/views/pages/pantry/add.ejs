@@ -23,8 +23,8 @@
       <label for="unit">Unit</label>
       <select id="unit" name="unit">
         <option value="">-- Select --</option>
-        <% if (typeof UNITS !== 'undefined') { %>
-          <% UNITS.forEach(function(u) { %>
+        <% if (typeof units !== 'undefined') { %>
+          <% units.forEach(function(u) { %>
             <option value="<%= u %>"><%= u %></option>
           <% }); %>
         <% } %>
@@ -35,8 +35,8 @@
   <label for="category">Category</label>
   <select id="category" name="category">
     <option value="">-- Select --</option>
-    <% if (typeof CATEGORIES !== 'undefined') { %>
-      <% CATEGORIES.forEach(function(c) { %>
+    <% if (typeof categories !== 'undefined') { %>
+      <% categories.forEach(function(c) { %>
         <option value="<%= c %>"><%= c %></option>
       <% }); %>
     <% } %>
