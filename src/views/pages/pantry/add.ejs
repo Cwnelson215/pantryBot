@@ -60,6 +60,11 @@
       <textarea id="notes" name="notes" placeholder="Optional notes..." rows="3" class="form-input"></textarea>
     </div>
 
+    <div class="flex items-center gap-2">
+      <input type="checkbox" id="isStaple" name="isStaple" value="1" class="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary">
+      <label for="isStaple" class="text-sm text-gray-700 dark:text-gray-300">Mark as staple (auto-replenish when low)</label>
+    </div>
+
     <div class="flex flex-col sm:flex-row gap-3 pt-2">
       <button type="submit" class="btn-primary flex-1">Add Item</button>
       <a href="/pantry" class="btn-secondary flex-1 text-center">Cancel</a>

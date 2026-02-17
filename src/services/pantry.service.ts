@@ -1,6 +1,6 @@
 import { db } from "../db/client";
 import { pantryItems } from "../db/schema";
-import { eq, and, asc, sql, gte, lte } from "drizzle-orm";
+import { eq, and, asc, sql } from "drizzle-orm";
 
 export async function getItems(userId: number) {
   return db
@@ -23,6 +23,19 @@ export async function getItem(id: number, userId: number) {
   return result[0];
 }
 
+const DEFAULT_STAPLE_NAMES = [
+  "eggs", "milk", "flour", "sugar", "butter", "salt", "pepper",
+  "olive oil", "vegetable oil", "garlic", "onion", "rice", "bread",
+  "cheese", "pasta", "baking powder", "baking soda",
+];
+
+function isDefaultStaple(name: string): boolean {
+  const lower = name.toLowerCase().trim();
+  return DEFAULT_STAPLE_NAMES.some(
+    (s) => lower === s || lower.includes(s) || s.includes(lower)
+  );
+}
+
 export async function addItem(
   userId: number,
   data: {
@@ -33,8 +46,14 @@ export async function addItem(
     expirationDate?: string;
     notes?: string;
     barcode?: string;
+    isStaple?: string | number;
   }
 ) {
+  const staple =
+    data.isStaple !== undefined && data.isStaple !== ""
+      ? Number(data.isStaple) ? 1 : 0
+      : isDefaultStaple(data.name) ? 1 : 0;
+
   const result = await db
     .insert(pantryItems)
     .values({
@@ -46,6 +65,8 @@ export async function addItem(
       expirationDate: data.expirationDate || null,
       notes: data.notes || null,
       barcode: data.barcode || null,
+      originalQuantity: data.quantity || null,
+      isStaple: staple,
     })
     .returning();
 
@@ -63,6 +84,7 @@ export async function updateItem(
     expirationDate?: string;
     notes?: string;
     barcode?: string;
+    isStaple?: string | number;
   }
 ) {
   // Verify ownership
@@ -76,13 +98,23 @@ export async function updateItem(
   };
 
   if (data.name !== undefined) updateData.name = data.name;
-  if (data.quantity !== undefined) updateData.quantity = data.quantity;
+  if (data.quantity !== undefined) {
+    updateData.quantity = data.quantity;
+    // If quantity increases (restock), update originalQuantity
+    const newQty = parseFloat(data.quantity);
+    const oldQty = existing.quantity ? parseFloat(existing.quantity) : 0;
+    if (newQty > oldQty) {
+      updateData.originalQuantity = data.quantity;
+    }
+  }
   if (data.unit !== undefined) updateData.unit = data.unit;
   if (data.category !== undefined) updateData.category = data.category;
   if (data.expirationDate !== undefined)
     updateData.expirationDate = data.expirationDate;
   if (data.notes !== undefined) updateData.notes = data.notes;
   if (data.barcode !== undefined) updateData.barcode = data.barcode;
+  if (data.isStaple !== undefined && data.isStaple !== "")
+    updateData.isStaple = Number(data.isStaple) ? 1 : 0;
 
   const result = await db
     .update(pantryItems)
@@ -120,6 +152,41 @@ export async function getExpiringItems(userId: number, days: number = 7) {
       )
     )
     .orderBy(asc(pantryItems.expirationDate));
+}
+
+export async function deductQuantity(
+  id: number,
+  userId: number,
+  amount: number
+) {
+  const item = await getItem(id, userId);
+  if (!item) return null;
+
+  const oldQuantity = item.quantity ? parseFloat(item.quantity) : 0;
+  const newQuantity = Math.max(0, oldQuantity - amount);
+
+  // If originalQuantity was never set, snapshot current quantity before deduction
+  const updateData: Record<string, unknown> = {
+    quantity: newQuantity.toString(),
+    updatedAt: sql`NOW()`,
+  };
+  if (!item.originalQuantity) {
+    updateData.originalQuantity = oldQuantity.toString();
+  }
+
+  await db
+    .update(pantryItems)
+    .set(updateData)
+    .where(and(eq(pantryItems.id, id), eq(pantryItems.userId, userId)));
+
+  return {
+    item,
+    oldQuantity,
+    newQuantity,
+    originalQuantity: item.originalQuantity
+      ? parseFloat(item.originalQuantity)
+      : oldQuantity,
+  };
 }
 
 export async function getItemsByCategory(userId: number) {

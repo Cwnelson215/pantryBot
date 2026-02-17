@@ -99,6 +99,26 @@ export function deduplicateItems(
   return Array.from(seen.values());
 }
 
+// ── Auto-Replenish ──────────────────────────────────────────────────────────
+
+export async function getOrCreateAutoReplenishList(userId: number) {
+  const lists = await db
+    .select()
+    .from(groceryLists)
+    .where(
+      and(eq(groceryLists.userId, userId), eq(groceryLists.name, "Auto-Replenish"))
+    );
+
+  if (lists.length > 0) return lists[0];
+
+  const result = await db
+    .insert(groceryLists)
+    .values({ userId, name: "Auto-Replenish" })
+    .returning();
+
+  return result[0];
+}
+
 // ── CRUD Operations ──────────────────────────────────────────────────────────
 
 export async function createList(userId: number, name: string) {

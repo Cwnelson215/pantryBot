@@ -90,7 +90,7 @@ router.get("/lookup-barcode/:barcode", async (req, res) => {
 
 router.post("/add", async (req, res) => {
   const userId = req.session.userId!;
-  const { name, quantity, unit, category, expirationDate, notes, barcode } = req.body;
+  const { name, quantity, unit, category, expirationDate, notes, barcode, isStaple } = req.body;
 
   if (!name) {
     setFlash(req, "error", "Item name is required");
@@ -105,6 +105,7 @@ router.post("/add", async (req, res) => {
     expirationDate,
     notes,
     barcode,
+    isStaple: isStaple ? 1 : 0,
   });
 
   setFlash(req, "success", "Item added to pantry");
@@ -133,7 +134,7 @@ router.get("/:id/edit", async (req, res) => {
 router.post("/:id/edit", async (req, res) => {
   const userId = req.session.userId!;
   const id = parseInt(req.params.id);
-  const { name, quantity, unit, category, expirationDate, notes } = req.body;
+  const { name, quantity, unit, category, expirationDate, notes, isStaple } = req.body;
 
   await pantryService.updateItem(id, userId, {
     name,
@@ -142,6 +143,7 @@ router.post("/:id/edit", async (req, res) => {
     category,
     expirationDate,
     notes,
+    isStaple: isStaple ? 1 : 0,
   });
 
   setFlash(req, "success", "Item updated");

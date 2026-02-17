@@ -88,6 +88,8 @@ export const pantryItems = pgTable(
     usdaFdcId: varchar("usda_fdc_id", { length: 50 }),
     barcode: varchar("barcode", { length: 50 }),
     notes: text("notes"),
+    originalQuantity: decimal("original_quantity", { precision: 10, scale: 2 }),
+    isStaple: integer("is_staple").default(0),
     addedAt: timestamp("added_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },

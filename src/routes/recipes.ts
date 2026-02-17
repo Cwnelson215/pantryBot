@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import * as pantryService from "../services/pantry.service";
 import * as spoonacularService from "../services/spoonacular.service";
 import * as claudeService from "../services/claude.service";
+import * as cookingService from "../services/cooking.service";
 
 const router = Router();
 
@@ -185,6 +186,60 @@ router.post("/save", async (req: Request, res: Response) => {
 
   setFlash(req, "success", "Recipe saved!");
   res.redirect("/recipes/saved");
+});
+
+// ── Cook Recipe ─────────────────────────────────────────────────────────────
+
+router.post("/saved/:id/cook", async (req: Request, res: Response) => {
+  const userId = req.session.userId!;
+  const id = parseInt(req.params.id as string);
+  if (isNaN(id)) return res.redirect("/recipes/saved");
+
+  const servings = req.body.servings ? parseInt(req.body.servings) : undefined;
+
+  try {
+    const preview = await cookingService.previewCook(userId, id, servings);
+    if (!preview) {
+      setFlash(req, "error", "Recipe not found");
+      return res.redirect("/recipes/saved");
+    }
+
+    res.render("pages/recipes/cook-preview", {
+      title: `Cook: ${preview.recipe.title}`,
+      preview,
+    });
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to preview cook";
+    setFlash(req, "error", message);
+    res.redirect("/recipes/saved");
+  }
+});
+
+router.post("/saved/:id/cook/confirm", async (req: Request, res: Response) => {
+  const userId = req.session.userId!;
+  const id = parseInt(req.params.id as string);
+  if (isNaN(id)) return res.redirect("/recipes/saved");
+
+  const servings = req.body.servings ? parseInt(req.body.servings) : undefined;
+
+  try {
+    const result = await cookingService.confirmCook(userId, id, servings);
+    if (!result) {
+      setFlash(req, "error", "Recipe not found");
+      return res.redirect("/recipes/saved");
+    }
+
+    res.render("pages/recipes/cook-result", {
+      title: `Cooked: ${result.recipe.title}`,
+      result,
+    });
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to cook recipe";
+    setFlash(req, "error", message);
+    res.redirect("/recipes/saved");
+  }
 });
 
 export default router;

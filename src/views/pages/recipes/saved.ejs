@@ -21,6 +21,15 @@
             <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Saved on <%= new Date(recipe.createdAt).toLocaleDateString() %></p>
           <% } %>
 
+          <form method="POST" action="/recipes/saved/<%= recipe.id %>/cook" class="flex items-end gap-2 mb-3">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <div class="flex-1">
+              <label class="text-xs text-gray-500 dark:text-gray-400">Servings</label>
+              <input type="number" name="servings" min="1" value="<%= recipe.servings || 1 %>" class="form-input text-sm py-1">
+            </div>
+            <button type="submit" class="btn-primary text-sm py-1 px-3">Cook</button>
+          </form>
+
           <details class="mt-auto">
             <summary class="cursor-pointer text-sm font-medium text-primary dark:text-primary-light hover:underline py-1">View Details</summary>
             <div class="mt-3 space-y-3 text-sm">

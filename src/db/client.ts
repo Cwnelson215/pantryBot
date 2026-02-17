@@ -63,6 +63,8 @@ export async function initializeDatabase() {
       CREATE INDEX IF NOT EXISTS pantry_items_user_id_idx ON pantry_items(user_id);
 
       ALTER TABLE pantry_items ADD COLUMN IF NOT EXISTS barcode VARCHAR(50);
+      ALTER TABLE pantry_items ADD COLUMN IF NOT EXISTS original_quantity DECIMAL(10,2);
+      ALTER TABLE pantry_items ADD COLUMN IF NOT EXISTS is_staple INTEGER DEFAULT 0;
 
       CREATE TABLE IF NOT EXISTS saved_recipes (
         id SERIAL PRIMARY KEY,
