@@ -32,6 +32,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   pantryItems: many(pantryItems),
   savedRecipes: many(savedRecipes),
   nutritionLogs: many(nutritionLogs),
+  groceryLists: many(groceryLists),
 }));
 
 // ── User Preferences ────────────────────────────────────────────────────────────
@@ -181,5 +182,61 @@ export const nutritionLogsRelations = relations(nutritionLogs, ({ one }) => ({
   recipe: one(savedRecipes, {
     fields: [nutritionLogs.recipeId],
     references: [savedRecipes.id],
+  }),
+}));
+
+// ── Grocery Lists ──────────────────────────────────────────────────────────────
+
+export const groceryLists = pgTable(
+  "grocery_lists",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: varchar("name", { length: 255 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdIdx: index("grocery_lists_user_id_idx").on(table.userId),
+  })
+);
+
+export const groceryListsRelations = relations(groceryLists, ({ one, many }) => ({
+  user: one(users, {
+    fields: [groceryLists.userId],
+    references: [users.id],
+  }),
+  items: many(groceryListItems),
+}));
+
+// ── Grocery List Items ─────────────────────────────────────────────────────────
+
+export const groceryListItems = pgTable(
+  "grocery_list_items",
+  {
+    id: serial("id").primaryKey(),
+    listId: integer("list_id")
+      .notNull()
+      .references(() => groceryLists.id, { onDelete: "cascade" }),
+    name: varchar("name", { length: 255 }).notNull(),
+    amount: varchar("amount", { length: 100 }),
+    unit: varchar("unit", { length: 50 }),
+    category: varchar("category", { length: 100 }),
+    checked: integer("checked").default(0).notNull(),
+    sourceRecipeTitle: varchar("source_recipe_title", { length: 500 }),
+    isCustom: integer("is_custom").default(0).notNull(),
+    addedAt: timestamp("added_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    listIdIdx: index("grocery_list_items_list_id_idx").on(table.listId),
+  })
+);
+
+export const groceryListItemsRelations = relations(groceryListItems, ({ one }) => ({
+  list: one(groceryLists, {
+    fields: [groceryListItems.listId],
+    references: [groceryLists.id],
   }),
 }));

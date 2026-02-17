@@ -117,6 +117,31 @@ export async function initializeDatabase() {
       ALTER TABLE nutrition_logs ADD COLUMN IF NOT EXISTS vitamin_d_mcg DECIMAL(8,2);
       ALTER TABLE nutrition_logs ADD COLUMN IF NOT EXISTS potassium_mg DECIMAL(8,2);
       ALTER TABLE nutrition_logs ADD COLUMN IF NOT EXISTS vitamin_c_mg DECIMAL(8,2);
+
+      -- Grocery lists
+      CREATE TABLE IF NOT EXISTS grocery_lists (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        name VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW() NOT NULL,
+        updated_at TIMESTAMP DEFAULT NOW() NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS grocery_lists_user_id_idx ON grocery_lists(user_id);
+
+      -- Grocery list items
+      CREATE TABLE IF NOT EXISTS grocery_list_items (
+        id SERIAL PRIMARY KEY,
+        list_id INTEGER NOT NULL REFERENCES grocery_lists(id) ON DELETE CASCADE,
+        name VARCHAR(255) NOT NULL,
+        amount VARCHAR(100),
+        unit VARCHAR(50),
+        category VARCHAR(100),
+        checked INTEGER DEFAULT 0 NOT NULL,
+        source_recipe_title VARCHAR(500),
+        is_custom INTEGER DEFAULT 0 NOT NULL,
+        added_at TIMESTAMP DEFAULT NOW() NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS grocery_list_items_list_id_idx ON grocery_list_items(list_id);
     `);
     console.log("Database tables initialized");
   } finally {
