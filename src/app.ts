@@ -14,6 +14,7 @@ import dashboardRouter from "./routes/dashboard";
 import pantryRouter from "./routes/pantry";
 import recipesRouter from "./routes/recipes";
 import nutritionRouter from "./routes/nutrition";
+import groceryRouter from "./routes/grocery";
 import preferencesRouter from "./routes/preferences";
 
 const PgSession = connectPgSimple(session);
@@ -67,7 +68,7 @@ app.use("/", authRouter);
 app.use("/", dashboardRouter);
 app.use("/pantry", pantryRouter);
 app.use("/recipes", recipesRouter);
-// app.use("/grocery", groceryRouter); // TODO: wire up after deploy
+app.use("/grocery", groceryRouter);
 app.use("/nutrition", nutritionRouter);
 app.use("/preferences", preferencesRouter);
 

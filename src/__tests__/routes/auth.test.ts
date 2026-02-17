@@ -30,6 +30,20 @@ vi.mock("../../services/auth.service", () => ({
   getUserById: vi.fn(),
 }));
 
+vi.mock("../../services/grocery.service", () => ({
+  getLists: vi.fn().mockResolvedValue([]),
+  getList: vi.fn(),
+  getListItems: vi.fn().mockResolvedValue([]),
+  createList: vi.fn(),
+  addItems: vi.fn(),
+  addCustomItem: vi.fn(),
+  toggleItem: vi.fn(),
+  removeItem: vi.fn(),
+  deleteList: vi.fn(),
+  classifyIngredients: vi.fn().mockReturnValue({ missing: [], partial: [], matched: [] }),
+  deduplicateItems: vi.fn().mockImplementation((items: any[]) => items),
+}));
+
 import app from "../../app";
 import * as authService from "../../services/auth.service";
 
