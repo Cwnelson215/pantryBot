@@ -24,19 +24,10 @@ vi.mock("../../db/client", () => ({
   pool: { connect: vi.fn(), end: vi.fn(), on: vi.fn() },
 }));
 
-vi.mock("../../services/grocery.service", () => ({
-  classifyIngredients: vi.fn(),
-  deduplicateItems: vi.fn(),
-  createList: vi.fn(),
-  getLists: vi.fn().mockResolvedValue([]),
-  getList: vi.fn(),
-  getListItems: vi.fn().mockResolvedValue([]),
-  addItems: vi.fn(),
-  addCustomItem: vi.fn(),
-  toggleItem: vi.fn(),
-  removeItem: vi.fn(),
-  deleteList: vi.fn(),
-}));
+vi.mock("../../routes/grocery", () => {
+  const { Router } = require("express");
+  return { default: Router() };
+});
 
 import app from "../../app";
 
