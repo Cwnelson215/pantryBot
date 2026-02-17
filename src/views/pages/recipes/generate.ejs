@@ -1,44 +1,53 @@
 <%- include('../../partials/header') %>
 
-<h1>Generate Recipe with AI</h1>
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Generate Recipe with AI</h1>
 
 <% if (typeof pantryItems !== 'undefined' && pantryItems.length > 0) { %>
-  <form method="POST" action="/recipes/generate">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+    <form method="POST" action="/recipes/generate">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-    <p>Select the ingredients you'd like to use:</p>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Select the ingredients you'd like to use:</p>
 
-    <%
-      var categories = {};
-      pantryItems.forEach(function(item) {
-        var cat = item.category || 'Uncategorized';
-        if (!categories[cat]) categories[cat] = [];
-        categories[cat].push(item);
-      });
-    %>
+      <%
+        var categories = {};
+        pantryItems.forEach(function(item) {
+          var cat = item.category || 'Uncategorized';
+          if (!categories[cat]) categories[cat] = [];
+          categories[cat].push(item);
+        });
+      %>
 
-    <% Object.keys(categories).sort().forEach(function(category) { %>
-      <fieldset>
-        <legend><strong><%= category %></strong></legend>
-        <% categories[category].forEach(function(item) { %>
-          <label>
-            <input type="checkbox" name="ingredients" value="<%= item.name %>">
-            <%= item.name %>
-            <% if (item.quantity) { %>
-              <small class="text-muted">(<%= item.quantity %> <%= item.unit || '' %>)</small>
-            <% } %>
-          </label>
+      <div class="space-y-4 mb-6">
+        <% Object.keys(categories).sort().forEach(function(category) { %>
+          <fieldset class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <legend class="text-sm font-semibold text-gray-700 dark:text-gray-300 px-2"><%= category %></legend>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              <% categories[category].forEach(function(item) { %>
+                <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-2 py-1.5 transition-colors">
+                  <input type="checkbox" name="ingredients" value="<%= item.name %>" class="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary dark:bg-gray-700">
+                  <span><%= item.name %></span>
+                  <% if (item.quantity) { %>
+                    <span class="text-xs text-gray-400 dark:text-gray-500">(<%= item.quantity %> <%= item.unit || '' %>)</span>
+                  <% } %>
+                </label>
+              <% }); %>
+            </div>
+          </fieldset>
         <% }); %>
-      </fieldset>
-    <% }); %>
+      </div>
 
-    <button type="submit">Generate Recipe</button>
-  </form>
+      <button type="submit" class="btn-primary">
+        <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        Generate Recipe
+      </button>
+    </form>
+  </div>
 <% } else { %>
-  <section style="text-align: center; padding: 2rem 0;">
-    <p class="text-muted">You don't have any items in your pantry yet.</p>
-    <a href="/pantry/add" role="button">Add Pantry Items First</a>
-  </section>
+  <div class="text-center py-12">
+    <p class="text-gray-500 dark:text-gray-400 mb-4">You don't have any items in your pantry yet.</p>
+    <a href="/pantry/add" class="btn-primary">Add Pantry Items First</a>
+  </div>
 <% } %>
 
 <%- include('../../partials/footer') %>

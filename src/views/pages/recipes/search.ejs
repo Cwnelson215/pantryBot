@@ -1,43 +1,47 @@
 <%- include('../../partials/header') %>
 
-<h1>Recipe Search</h1>
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Recipe Search</h1>
 
 <% if (typeof pantryItems !== 'undefined' && pantryItems.length > 0) { %>
-  <p class="text-muted">
-    Searching with pantry items:
-    <% pantryItems.forEach(function(item) { %>
-      <span class="tag"><%= typeof item === 'string' ? item : item.name %></span>
-    <% }); %>
-  </p>
+  <div class="mb-6">
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Searching with pantry items:</p>
+    <div class="flex flex-wrap gap-1.5">
+      <% pantryItems.forEach(function(item) { %>
+        <span class="tag"><%= typeof item === 'string' ? item : item.name %></span>
+      <% }); %>
+    </div>
+  </div>
 <% } %>
 
 <% if (typeof recipes !== 'undefined' && recipes.length > 0) { %>
-  <div class="grid-cards">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
     <% recipes.forEach(function(recipe) { %>
-      <article class="recipe-card">
+      <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
         <% if (recipe.image) { %>
-          <img src="<%= recipe.image %>" alt="<%= recipe.title %>" class="recipe-image">
+          <img src="<%= recipe.image %>" alt="<%= recipe.title %>" class="w-full h-48 object-cover">
         <% } %>
-        <div class="recipe-card-body">
-          <h4><a href="/recipes/<%= recipe.id %>"><%= recipe.title %></a></h4>
-          <p>
+        <div class="p-5 flex-1 flex flex-col">
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-2">
+            <a href="/recipes/<%= recipe.id %>" class="hover:text-primary dark:hover:text-primary-light transition-colors"><%= recipe.title %></a>
+          </h4>
+          <div class="flex flex-wrap gap-1.5 mb-4">
             <% if (typeof recipe.usedIngredientCount !== 'undefined') { %>
               <span class="badge badge-success"><%= recipe.usedIngredientCount %> used</span>
             <% } %>
             <% if (typeof recipe.missedIngredientCount !== 'undefined') { %>
               <span class="badge badge-warning"><%= recipe.missedIngredientCount %> missing</span>
             <% } %>
-          </p>
-          <a href="/recipes/<%= recipe.id %>" role="button" class="outline full-width">View Details</a>
+          </div>
+          <a href="/recipes/<%= recipe.id %>" class="btn-secondary text-sm w-full mt-auto text-center">View Details</a>
         </div>
-      </article>
+      </div>
     <% }); %>
   </div>
 <% } else { %>
-  <section class="text-center" style="padding: 2rem 0;">
-    <p class="text-muted">No recipes found.</p>
-    <a href="/pantry" role="button" class="outline">Check your pantry items</a>
-  </section>
+  <div class="text-center py-12">
+    <p class="text-gray-500 dark:text-gray-400 mb-4">No recipes found.</p>
+    <a href="/pantry" class="btn-secondary">Check your pantry items</a>
+  </div>
 <% } %>
 
 <%- include('../../partials/footer') %>

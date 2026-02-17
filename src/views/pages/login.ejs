@@ -1,21 +1,29 @@
 <%- include('../partials/header') %>
 
-<section class="auth-card">
-  <h1>Login</h1>
+<div class="flex items-center justify-center min-h-[60vh]">
+  <div class="w-full max-w-md">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Login</h1>
 
-  <form method="POST" action="/login">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <form method="POST" action="/login" class="space-y-4">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus>
+        <div>
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus class="form-input">
+        </div>
 
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" placeholder="Your password" required>
+        <div>
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" name="password" placeholder="Your password" required class="form-input">
+        </div>
 
-    <button type="submit">Login</button>
-  </form>
+        <button type="submit" class="btn-primary w-full">Login</button>
+      </form>
 
-  <p class="text-muted">Don't have an account? <a href="/register">Register here</a></p>
-</section>
+      <p class="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">Don't have an account? <a href="/register" class="text-primary dark:text-primary-light hover:underline">Register here</a></p>
+    </div>
+  </div>
+</div>
 
 <%- include('../partials/footer') %>

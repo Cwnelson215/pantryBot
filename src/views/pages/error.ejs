@@ -1,9 +1,11 @@
 <%- include('../partials/header') %>
 
-<section style="text-align: center; padding: 2rem 0;">
-  <h1><%= typeof statusCode !== 'undefined' ? statusCode : 'Error' %></h1>
-  <p><%= typeof message !== 'undefined' ? message : 'An unexpected error occurred.' %></p>
-  <a href="/" role="button">Go Home</a>
-</section>
+<div class="flex items-center justify-center min-h-[60vh]">
+  <div class="text-center">
+    <h1 class="text-7xl font-bold text-gray-300 dark:text-gray-600 mb-2"><%= typeof statusCode !== 'undefined' ? statusCode : 'Error' %></h1>
+    <p class="text-lg text-gray-600 dark:text-gray-400 mb-6"><%= typeof message !== 'undefined' ? message : 'An unexpected error occurred.' %></p>
+    <a href="/" class="btn-primary">Go Home</a>
+  </div>
+</div>
 
 <%- include('../partials/footer') %>

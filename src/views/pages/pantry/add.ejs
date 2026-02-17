@@ -1,71 +1,85 @@
 <%- include('../../partials/header') %>
 
-<div class="flex-between">
-  <h1 class="mb-0">Add Pantry Item</h1>
-  <button type="button" id="scanBtn" class="outline" onclick="openScanner()">Scan Barcode</button>
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+  <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Add Pantry Item</h1>
+  <button type="button" id="scanBtn" onclick="openScanner()" class="btn-secondary">
+    <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9V5a2 2 0 012-2h4M3 15v4a2 2 0 002 2h4m8-18h4a2 2 0 012 2v4m0 6v4a2 2 0 01-2 2h-4"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+    Scan Barcode
+  </button>
 </div>
 
-<div id="scanResult" style="display:none;" class="mt-1"></div>
+<div id="scanResult" style="display:none;" class="mb-4"></div>
 
-<form method="POST" action="/pantry/add" class="mt-1">
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-  <input type="hidden" id="barcode" name="barcode">
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+  <form method="POST" action="/pantry/add" class="space-y-4">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" id="barcode" name="barcode">
 
-  <label for="name">Name <span class="danger">*</span></label>
-  <input type="text" id="name" name="name" placeholder="e.g. Chicken Breast" required autofocus>
-
-  <div class="grid">
     <div>
-      <label for="quantity">Quantity</label>
-      <input type="number" id="quantity" name="quantity" step="0.01" min="0" placeholder="1">
+      <label for="name" class="form-label">Name <span class="text-red-500">*</span></label>
+      <input type="text" id="name" name="name" placeholder="e.g. Chicken Breast" required autofocus class="form-input">
     </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label for="quantity" class="form-label">Quantity</label>
+        <input type="number" id="quantity" name="quantity" step="0.01" min="0" placeholder="1" class="form-input">
+      </div>
+      <div>
+        <label for="unit" class="form-label">Unit</label>
+        <select id="unit" name="unit" class="form-input">
+          <option value="">-- Select --</option>
+          <% if (typeof units !== 'undefined') { %>
+            <% units.forEach(function(u) { %>
+              <option value="<%= u %>"><%= u %></option>
+            <% }); %>
+          <% } %>
+        </select>
+      </div>
+    </div>
+
     <div>
-      <label for="unit">Unit</label>
-      <select id="unit" name="unit">
+      <label for="category" class="form-label">Category</label>
+      <select id="category" name="category" class="form-input">
         <option value="">-- Select --</option>
-        <% if (typeof units !== 'undefined') { %>
-          <% units.forEach(function(u) { %>
-            <option value="<%= u %>"><%= u %></option>
+        <% if (typeof categories !== 'undefined') { %>
+          <% categories.forEach(function(c) { %>
+            <option value="<%= c %>"><%= c %></option>
           <% }); %>
         <% } %>
       </select>
     </div>
+
+    <div>
+      <label for="expirationDate" class="form-label">Expiration Date</label>
+      <input type="date" id="expirationDate" name="expirationDate" class="form-input">
+    </div>
+
+    <div>
+      <label for="notes" class="form-label">Notes</label>
+      <textarea id="notes" name="notes" placeholder="Optional notes..." rows="3" class="form-input"></textarea>
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-3 pt-2">
+      <button type="submit" class="btn-primary flex-1">Add Item</button>
+      <a href="/pantry" class="btn-secondary flex-1 text-center">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<!-- Barcode Scanner Dialog -->
+<dialog id="scannerDialog" class="rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl p-0 max-w-lg w-[90%] bg-white dark:bg-gray-800 backdrop:bg-gray-900/50">
+  <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Scan Barcode</h3>
+    <button onclick="closeScanner()" class="p-1 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">&times;</button>
   </div>
-
-  <label for="category">Category</label>
-  <select id="category" name="category">
-    <option value="">-- Select --</option>
-    <% if (typeof categories !== 'undefined') { %>
-      <% categories.forEach(function(c) { %>
-        <option value="<%= c %>"><%= c %></option>
-      <% }); %>
-    <% } %>
-  </select>
-
-  <label for="expirationDate">Expiration Date</label>
-  <input type="date" id="expirationDate" name="expirationDate">
-
-  <label for="notes">Notes</label>
-  <textarea id="notes" name="notes" placeholder="Optional notes..."></textarea>
-
-  <div class="grid">
-    <button type="submit">Add Item</button>
-    <a href="/pantry" role="button" class="outline secondary full-width">Cancel</a>
-  </div>
-</form>
-
-<dialog id="scannerDialog">
-  <article>
-    <header>
-      <button aria-label="Close" rel="prev" onclick="closeScanner()"></button>
-      <h3>Scan Barcode</h3>
-    </header>
-    <div id="scannerStatus" class="text-center mb-1"></div>
+  <div class="p-4">
+    <div id="scannerStatus" class="text-center text-sm text-gray-500 dark:text-gray-400 mb-3"></div>
     <div id="reader"></div>
-    <footer>
-      <button class="outline secondary" onclick="closeScanner()">Cancel</button>
-    </footer>
-  </article>
+  </div>
+  <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+    <button class="btn-secondary w-full" onclick="closeScanner()">Cancel</button>
+  </div>
 </dialog>
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -86,7 +100,7 @@
 
   window.openScanner = function() {
     scanning = false;
-    dialog.setAttribute('open', '');
+    dialog.showModal();
     statusEl.textContent = 'Starting camera...';
 
     scanner = new Html5Qrcode('reader');
@@ -117,14 +131,14 @@
       try { s.stop().catch(function() {}); } catch(e) {}
       try { s.clear(); } catch(e) {}
     }
-    dialog.removeAttribute('open');
+    dialog.close();
   };
 
   function onBarcodeScanned(barcode) {
     if (scanning) return;
     scanning = true;
 
-    statusEl.innerHTML = '<span aria-busy="true">Looking up product...</span>';
+    statusEl.innerHTML = '<span class="inline-flex items-center gap-2"><svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>Looking up product...</span>';
 
     var controller = new AbortController();
     var timeoutId = setTimeout(function() { controller.abort(); }, 15000);

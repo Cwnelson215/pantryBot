@@ -1,317 +1,207 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" class="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Pantry Bot</title>
   <link rel="icon" type="image/png" href="/pantrybot.png">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@700&display=swap" rel="stylesheet">
-  <style>
-    /* ── Mediterranean Kitchen Theme ── */
-    :root, [data-theme="light"] {
-      --pico-font-family: "Inter", system-ui, sans-serif;
-      --pico-font-size: 100%;
-      --pico-background-color: #FBF7F0;
-      --pico-color: #3D3428;
-      --pico-muted-color: #8C7E6D;
-      --pico-primary: #C0653A;
-      --pico-primary-hover: #A85430;
-      --pico-primary-focus: rgba(192, 101, 58, 0.2);
-      --pico-primary-background: #C0653A;
-      --pico-primary-hover-background: #A85430;
-      --pico-primary-inverse: #FFFFFF;
-      --pico-secondary: #6B7F5E;
-      --pico-secondary-hover: #576A4C;
-      --pico-secondary-focus: rgba(107, 127, 94, 0.2);
-      --pico-secondary-background: #6B7F5E;
-      --pico-secondary-hover-background: #576A4C;
-      --pico-secondary-inverse: #FFFFFF;
-      --pico-contrast: #2C2418;
-      --pico-contrast-hover: #3D3428;
-      --pico-contrast-focus: rgba(44, 36, 24, 0.2);
-      --pico-contrast-inverse: #FFFFFF;
-      --pico-h1-color: #2C2418;
-      --pico-h2-color: #2C2418;
-      --pico-h3-color: #2C2418;
-      --pico-h4-color: #2C2418;
-      --pico-h5-color: #2C2418;
-      --pico-h6-color: #2C2418;
-      --pico-border-radius: 0.5rem;
-      --pico-card-background-color: #FEFCF9;
-      --pico-card-border-color: #E8DFD0;
-      --pico-card-sectioning-background-color: #F5EFE4;
-      --pico-table-border-color: #E0D5C4;
-      --pico-form-element-border-color: #E0D5C4;
-      --pico-form-element-focus-color: #C0653A;
-      --pico-ins-color: #E8F3E5;
-      --pico-del-color: #FDE8E7;
-      --pico-switch-checked-background-color: #6B7F5E;
-    }
-
-    /* ── Typography ── */
-    h1, h2, h3, h4, h5, h6 { font-family: "Nunito", system-ui, sans-serif; }
-
-    /* ── Navigation ── */
-    header.container > nav {
-      border-bottom: 2px solid #E0D5C4;
-      padding-bottom: 0.75rem;
-    }
-    header.container > nav a:not([role="button"]) {
-      color: #3D3428;
-      text-decoration: none;
-      position: relative;
-      transition: color 0.2s;
-    }
-    header.container > nav a:not([role="button"]):hover {
-      color: #C0653A;
-    }
-    header.container > nav a:not([role="button"])::after {
-      content: "";
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: #C0653A;
-      transition: width 0.2s;
-    }
-    header.container > nav a:not([role="button"]):hover::after {
-      width: 100%;
-    }
-    .brand { font-family: "Nunito", system-ui, sans-serif; font-size: 1.25rem; letter-spacing: -0.01em; }
-
-    /* ── Flash Messages ── */
-    .flash { padding: 1rem; border-radius: var(--pico-border-radius); margin-bottom: 1rem; border-left: 4px solid; }
-    .flash-success { background: #E8F3E5; color: #2D5A27; border-left-color: #2D5A27; }
-    .flash-error { background: #FDE8E7; color: #8B2E2B; border-left-color: #8B2E2B; }
-    .flash-info { background: #E6EFF5; color: #2A4A5C; border-left-color: #2A4A5C; }
-    .flash-warning { background: #FFF3D6; color: #7A5E1A; border-left-color: #7A5E1A; }
-
-    /* ── Tags & Badges ── */
-    .tag { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.8rem; margin: 0.1rem; background: #F5EFE4; color: #3D3428; border: 1px solid #E0D5C4; }
-    .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600; }
-    .badge-danger { background: #FDE8E7; color: #8B2E2B; }
-    .badge-warning { background: #FFF3D6; color: #7A5E1A; }
-    .badge-success { background: #E8F3E5; color: #2D5A27; }
-
-    /* ── Cards ── */
-    article {
-      border: 1px solid #E8DFD0;
-      box-shadow: 0 1px 3px rgba(44, 36, 24, 0.06);
-      transition: box-shadow 0.2s, transform 0.2s;
-    }
-    article:hover { box-shadow: 0 4px 12px rgba(44, 36, 24, 0.1); }
-
-    /* Stat cards on dashboard */
-    .stat-card { border-top: 3px solid #C0653A; text-align: center; }
-    .stat-card hgroup h3 { color: #C0653A; font-size: 2rem; margin-bottom: 0; }
-    .stat-card hgroup p { color: #8C7E6D; }
-
-    /* Recipe hub cards */
-    .recipe-hub-card { text-align: center; padding: 1.5rem; }
-    .recipe-hub-card:hover { transform: translateY(-2px); }
-    .recipe-hub-card .hub-icon { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
-    .recipe-hub-card:nth-child(1) { border-top: 3px solid #C0653A; }
-    .recipe-hub-card:nth-child(2) { border-top: 3px solid #6B7F5E; }
-    .recipe-hub-card:nth-child(3) { border-top: 3px solid #D4961A; }
-
-    /* Recipe search cards */
-    .recipe-card { display: flex; flex-direction: column; }
-    .recipe-card .recipe-card-body { flex: 1; display: flex; flex-direction: column; }
-    .recipe-card .recipe-card-body > a[role="button"]:last-child { margin-top: auto; }
-
-    /* ── Grid Cards ── */
-    .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-
-    /* ── Tables ── */
-    figure > table { margin-bottom: 0; }
-    thead th { background: #F5EFE4; color: #2C2418; font-weight: 600; font-family: "Nunito", system-ui, sans-serif; }
-    tbody tr:nth-child(even) { background: #FBF7F0; }
-
-    /* ── Forms ── */
-    label { font-weight: 500; color: #3D3428; }
-    input:focus, select:focus, textarea:focus {
-      box-shadow: 0 0 0 3px rgba(192, 101, 58, 0.15);
-    }
-
-    /* ── Buttons ── */
-    button, [role="button"], input[type="submit"] {
-      font-family: "Nunito", system-ui, sans-serif;
-      font-weight: 700;
-      transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
-    }
-    button:active, [role="button"]:active { transform: scale(0.98); }
-
-    .btn-sm {
-      padding: 0.25rem 0.5rem !important;
-      margin: 0 0.25rem !important;
-      font-size: 0.85rem;
-    }
-    .btn-delete {
-      --pico-color: #8B2E2B;
-      --pico-border-color: #8B2E2B;
-      padding: 0.25rem 0.5rem !important;
-      margin: 0 !important;
-    }
-    .btn-delete:hover {
-      background: #FDE8E7;
-    }
-
-    /* ── Progress Bars ── */
-    .progress-bar { background: #F5EFE4; border-radius: var(--pico-border-radius); overflow: hidden; height: 1.5rem; margin-bottom: 0.5rem; }
-    .progress-fill { height: 100%; background: #C0653A; transition: width 0.3s; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: white; font-weight: 600; border-radius: var(--pico-border-radius); }
-    .progress-calories .progress-fill { background: #C0653A; }
-    .progress-protein .progress-fill { background: #6B7F5E; }
-    .progress-carbs .progress-fill { background: #D4961A; }
-    .progress-fat .progress-fill { background: #B86E6A; }
-    .progress-fiber .progress-fill { background: #8B7355; }
-    .progress-sugar .progress-fill { background: #E07B9A; }
-    .progress-sodium .progress-fill { background: #7A8FA6; }
-    .progress-iron .progress-fill { background: #9E6B55; }
-    .progress-calcium .progress-fill { background: #A0A0A0; }
-    .progress-vitaminD .progress-fill { background: #E8B84B; }
-    .progress-potassium .progress-fill { background: #6BA388; }
-    .progress-vitaminC .progress-fill { background: #E8943A; }
-
-    /* ── Modal ── */
-    dialog { border: 1px solid #E0D5C4; border-radius: var(--pico-border-radius); padding: 0; max-width: 600px; width: 90%; }
-    dialog::backdrop { background: rgba(44, 36, 24, 0.5); }
-    dialog .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid #E0D5C4; background: #F5EFE4; }
-    dialog .modal-header h3 { margin: 0; }
-    dialog .modal-body { padding: 1.5rem; max-height: 70vh; overflow-y: auto; }
-    dialog .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; padding: 0; margin: 0; width: auto; color: #8C7E6D; }
-    .modal-tabs { display: flex; border-bottom: 2px solid #E0D5C4; margin-bottom: 1rem; }
-    .modal-tab { padding: 0.5rem 1rem; cursor: pointer; border: none; background: none; font-weight: 600; color: #8C7E6D; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-    .modal-tab.active { color: #C0653A; border-bottom-color: #C0653A; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-    .search-results { list-style: none; padding: 0; margin: 0.5rem 0; max-height: 200px; overflow-y: auto; }
-    .search-result { padding: 0.5rem 0.75rem; cursor: pointer; border-bottom: 1px solid #E0D5C4; }
-    .search-result:hover { background: #F5EFE4; }
-    .search-result .food-name { font-weight: 600; }
-    .search-result .food-nutrients { font-size: 0.8rem; color: #8C7E6D; }
-    .nutrition-preview { background: #F5EFE4; padding: 0.75rem; border-radius: var(--pico-border-radius); margin-top: 0.75rem; }
-    .nutrition-preview .preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.25rem; font-size: 0.85rem; }
-    .nutrition-preview .preview-grid span { white-space: nowrap; }
-
-    /* ── AI Callout ── */
-    .ai-callout {
-      background: #E8F3E5;
-      border-left: 4px solid #6B7F5E;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    .ai-callout h4, .ai-callout h5 { color: #576A4C; margin-bottom: 0.5rem; }
-
-    /* ── Auth Pages ── */
-    .auth-card { max-width: 450px; margin: 0 auto; }
-
-    /* ── Day Navigation ── */
-    .day-nav { background: #F5EFE4; border-radius: var(--pico-border-radius); padding: 1rem 1.5rem; margin-bottom: 1.5rem; }
-
-    /* ── Recipe Image ── */
-    .recipe-image { width: 100%; height: 200px; object-fit: cover; border-radius: var(--pico-border-radius); }
-
-    /* ── Pantry Category ── */
-    .pantry-category { margin-bottom: 2rem; }
-    .pantry-category h2 { border-bottom: 2px solid #E0D5C4; padding-bottom: 0.5rem; }
-
-    /* ── Utility Classes ── */
-    .text-muted { color: #8C7E6D; }
-    .text-right { text-align: right; }
-    .text-center { text-align: center; }
-    .full-width { width: 100%; text-align: center; }
-    .mb-0 { margin-bottom: 0; }
-    .mb-1 { margin-bottom: 1rem; }
-    .mt-1 { margin-top: 1rem; }
-    .flex-between { display: flex; justify-content: space-between; align-items: center; }
-    .inline-form { display: inline; }
-    .danger { color: #8B2E2B; }
-    .warning { color: #7A5E1A; }
-
-    /* ── Footer ── */
-    footer.container { border-top: 2px solid #E0D5C4; padding-top: 1rem; margin-top: 2rem; }
-
-    /* ── Barcode Scanner ── */
-    #reader { width: 100%; max-width: 500px; margin: 0 auto; }
-    #reader video { width: 100% !important; border-radius: var(--pico-border-radius); }
-
-    /* ── Hamburger Menu ── */
-    .nav-toggle { display: none !important; background: none; border: none; cursor: pointer; padding: 0.5rem; margin: 0; width: auto; line-height: 1; color: var(--pico-contrast); }
-    .nav-toggle svg { display: block; }
-    .nav-toggle:hover { color: #C0653A; }
-
-    /* Prevent horizontal overflow */
-    html, body { overflow-x: hidden; }
-
-    /* ── Mobile: 768px ── */
-    @media (max-width: 768px) {
-      nav { flex-wrap: wrap; }
-      .nav-toggle { display: block !important; order: 2; }
-      #nav-links {
-        display: none !important;
-        flex-direction: column;
-        width: 100%;
-        order: 3;
-        margin: 0;
-        padding: 0.5rem 0 0 0;
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            primary: { DEFAULT: '#6366F1', hover: '#4F46E5', light: '#818CF8', 50: '#EEF2FF' },
+            surface: { light: '#FFFFFF', dark: '#1F2937' },
+          }
+        }
       }
-      #nav-links.open { display: flex !important; }
-      #nav-links li { width: 100%; text-align: left; padding: 0.25rem 0; }
-      .flex-between { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-      .day-nav { flex-direction: column; align-items: stretch; gap: 0.5rem; padding: 0.75rem 1rem; }
-      .day-nav h1 { text-align: center; font-size: 1.3rem; order: -1; }
-      .day-nav-links { display: flex; justify-content: space-between; }
-      h1 { font-size: 1.5rem; }
-      table { font-size: 0.85rem; }
-      table th, table td { padding: 0.4rem 0.5rem; }
-      td .inline-form { display: block; margin-bottom: 0.25rem; }
-      .recipe-image { height: 150px; }
-      .action-buttons { grid-template-columns: 1fr !important; }
     }
+  </script>
+  <style type="text/tailwindcss">
+    @layer components {
+      /* Flash Messages */
+      .flash { @apply p-4 rounded-lg mb-4 border-l-4 text-sm; }
+      .flash-success { @apply bg-emerald-50 text-emerald-800 border-emerald-500 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-400; }
+      .flash-error { @apply bg-red-50 text-red-800 border-red-500 dark:bg-red-900/30 dark:text-red-300 dark:border-red-400; }
+      .flash-info { @apply bg-blue-50 text-blue-800 border-blue-500 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-400; }
+      .flash-warning { @apply bg-amber-50 text-amber-800 border-amber-500 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-400; }
 
-    /* ── Mobile: 480px ── */
-    @media (max-width: 480px) {
-      .grid-cards { grid-template-columns: 1fr; }
-      h1 { font-size: 1.3rem; }
+      /* Progress Bars */
+      .progress-bar { @apply bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden h-6 mb-2; }
+      .progress-fill { @apply h-full flex items-center justify-center text-xs text-white font-semibold rounded-lg transition-all duration-300; }
+      .progress-calories .progress-fill { background: #6366F1; }
+      .progress-protein .progress-fill { background: #10B981; }
+      .progress-carbs .progress-fill { background: #F59E0B; }
+      .progress-fat .progress-fill { background: #EF4444; }
+      .progress-fiber .progress-fill { background: #8B5CF6; }
+      .progress-sugar .progress-fill { background: #EC4899; }
+      .progress-sodium .progress-fill { background: #6B7280; }
+      .progress-iron .progress-fill { background: #92400E; }
+      .progress-calcium .progress-fill { background: #9CA3AF; }
+      .progress-vitaminD .progress-fill { background: #F59E0B; }
+      .progress-potassium .progress-fill { background: #059669; }
+      .progress-vitaminC .progress-fill { background: #EA580C; }
+
+      /* Badges */
+      .badge { @apply inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold; }
+      .badge-success { @apply bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300; }
+      .badge-warning { @apply bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300; }
+      .badge-danger { @apply bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300; }
+
+      /* Tags */
+      .tag { @apply inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600; }
+
+      /* Modal */
+      .modal-tabs { @apply flex border-b-2 border-gray-200 dark:border-gray-700 mb-4; }
+      .modal-tab { @apply px-4 py-2 cursor-pointer border-none bg-transparent font-semibold text-gray-500 dark:text-gray-400 border-b-2 border-transparent -mb-0.5 text-sm transition-colors; }
+      .modal-tab.active { @apply text-primary border-primary dark:text-primary-light dark:border-primary-light; }
+      .tab-content { display: none; }
+      .tab-content.active { display: block; }
+      .search-results { @apply list-none p-0 my-2 max-h-48 overflow-y-auto; }
+      .search-result { @apply px-3 py-2 cursor-pointer border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors; }
+      .search-result .food-name { @apply font-semibold text-gray-900 dark:text-gray-100; }
+      .search-result .food-nutrients { @apply text-xs text-gray-500 dark:text-gray-400; }
+      .nutrition-preview { @apply bg-gray-50 dark:bg-gray-700 p-3 rounded-lg mt-3; }
+      .nutrition-preview .preview-grid { @apply grid grid-cols-3 gap-1 text-sm; }
+      .nutrition-preview .preview-grid span { @apply whitespace-nowrap text-gray-700 dark:text-gray-300; }
+
+      /* Barcode Scanner */
+      #reader { @apply w-full max-w-lg mx-auto; }
+      #reader video { @apply w-full rounded-lg; }
+
+      /* Tables */
+      .data-table { @apply w-full text-sm text-left; }
+      .data-table thead th { @apply px-4 py-3 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 font-semibold text-xs uppercase tracking-wider border-b border-gray-200 dark:border-gray-700; }
+      .data-table tbody td { @apply px-4 py-3 border-b border-gray-100 dark:border-gray-700/50 text-gray-700 dark:text-gray-300; }
+      .data-table tbody tr:hover { @apply bg-gray-50/50 dark:bg-gray-800/50; }
+
+      /* Form inputs */
+      .form-input { @apply w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary dark:focus:border-primary-light transition-colors; }
+      .form-label { @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1; }
+
+      /* Buttons */
+      .btn-primary { @apply inline-flex items-center justify-center px-4 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all active:scale-[0.98]; }
+      .btn-secondary { @apply inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all active:scale-[0.98]; }
+      .btn-danger { @apply inline-flex items-center justify-center px-4 py-2 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all active:scale-[0.98]; }
+      .btn-ghost { @apply inline-flex items-center justify-center px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium rounded-lg transition-all; }
+      .btn-ghost-danger { @apply inline-flex items-center justify-center px-3 py-1.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 font-medium rounded-lg transition-all; }
     }
   </style>
+  <script>
+    // Dark mode: check localStorage, then system preference
+    (function() {
+      var stored = localStorage.getItem('theme');
+      if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
 </head>
-<body>
-  <header class="container">
-    <nav>
-      <ul>
-        <li><strong><a href="/" class="contrast brand"><img src="/pantrybot.png" alt="Pantry Bot" style="height:1.25em;vertical-align:middle;margin-right:0.25em;"> Pantry Bot</a></strong></li>
-      </ul>
-      <button class="nav-toggle" aria-label="Toggle navigation" onclick="document.getElementById('nav-links').classList.toggle('open')">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
-      <ul id="nav-links">
-        <% if (typeof user !== 'undefined' && user) { %>
-          <li><a href="/">Dashboard</a></li>
-          <li><a href="/pantry">Pantry</a></li>
-          <li><a href="/recipes">Recipes</a></li>
-          <li><a href="/nutrition">Nutrition</a></li>
-          <li><a href="/preferences">Preferences</a></li>
-          <li>
-            <form method="POST" action="/logout" class="inline-form">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 font-sans min-h-screen flex flex-col">
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-14">
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-1.5 text-gray-900 dark:text-white font-bold text-lg hover:text-primary dark:hover:text-primary-light transition-colors">
+          <img src="/pantrybot.png" alt="Pantry Bot" class="h-6 w-6">
+          <span>Pantry Bot</span>
+        </a>
+
+        <!-- Desktop Nav Links -->
+        <div class="hidden md:flex items-center gap-1">
+          <% if (typeof user !== 'undefined' && user) { %>
+            <a href="/" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-primary/5 transition-colors">Dashboard</a>
+            <a href="/pantry" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-primary/5 transition-colors">Pantry</a>
+            <a href="/recipes" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-primary/5 transition-colors">Recipes</a>
+            <a href="/nutrition" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-primary/5 transition-colors">Nutrition</a>
+            <a href="/preferences" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-primary/5 transition-colors">Preferences</a>
+          <% } else { %>
+            <a href="/login" class="px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light hover:bg-primary/5 transition-colors">Login</a>
+            <a href="/register" class="btn-primary text-sm">Register</a>
+          <% } %>
+        </div>
+
+        <!-- Right side: dark mode toggle + logout/mobile menu -->
+        <div class="flex items-center gap-2">
+          <!-- Dark Mode Toggle -->
+          <button id="themeToggle" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle dark mode">
+            <!-- Sun icon (shown in dark mode) -->
+            <svg class="hidden dark:block w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+            </svg>
+            <!-- Moon icon (shown in light mode) -->
+            <svg class="block dark:hidden w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+          </button>
+
+          <% if (typeof user !== 'undefined' && user) { %>
+            <!-- Logout (desktop) -->
+            <form method="POST" action="/logout" class="hidden md:block">
               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <button type="submit" class="outline secondary btn-sm">Logout</button>
+              <button type="submit" class="btn-ghost text-sm">Logout</button>
             </form>
-          </li>
+          <% } %>
+
+          <!-- Mobile Menu Toggle -->
+          <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle navigation">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden pb-3 border-t border-gray-100 dark:border-gray-700 mt-1">
+        <% if (typeof user !== 'undefined' && user) { %>
+          <a href="/" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-primary/5 transition-colors">Dashboard</a>
+          <a href="/pantry" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-primary/5 transition-colors">Pantry</a>
+          <a href="/recipes" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-primary/5 transition-colors">Recipes</a>
+          <a href="/nutrition" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-primary/5 transition-colors">Nutrition</a>
+          <a href="/preferences" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-primary/5 transition-colors">Preferences</a>
+          <form method="POST" action="/logout" class="mt-1">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">Logout</button>
+          </form>
         <% } else { %>
-          <li><a href="/login">Login</a></li>
-          <li><a href="/register">Register</a></li>
+          <a href="/login" class="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-primary/5 transition-colors">Login</a>
+          <a href="/register" class="block px-3 py-2 rounded-lg text-sm font-medium text-primary dark:text-primary-light hover:bg-primary/5 transition-colors">Register</a>
         <% } %>
-      </ul>
-    </nav>
-  </header>
-  <main class="container">
+      </div>
+    </div>
+  </nav>
+
+  <script>
+    // Mobile menu toggle
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    });
+    // Dark mode toggle
+    document.getElementById('themeToggle').addEventListener('click', function() {
+      var html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+  </script>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-8">
     <% if (typeof flash !== 'undefined' && flash && flash.length > 0) { %>
       <% flash.forEach(function(msg) { %>
         <div class="flash flash-<%= msg.type %>"><%= msg.message %></div>

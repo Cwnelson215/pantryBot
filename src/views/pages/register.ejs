@@ -1,30 +1,42 @@
 <%- include('../partials/header') %>
 
-<section class="auth-card">
-  <h1>Register</h1>
+<div class="flex items-center justify-center min-h-[60vh]">
+  <div class="w-full max-w-md">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Register</h1>
 
-  <form method="POST" action="/register" id="registerForm">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <form method="POST" action="/register" id="registerForm" class="space-y-4">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus>
+        <div>
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus class="form-input">
+        </div>
 
-    <label for="displayName">Display Name</label>
-    <input type="text" id="displayName" name="displayName" placeholder="Your name" required>
+        <div>
+          <label for="displayName" class="form-label">Display Name</label>
+          <input type="text" id="displayName" name="displayName" placeholder="Your name" required class="form-input">
+        </div>
 
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" placeholder="Choose a password" required minlength="8">
+        <div>
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" name="password" placeholder="Choose a password" required minlength="8" class="form-input">
+        </div>
 
-    <label for="confirmPassword">Confirm Password</label>
-    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required minlength="8">
+        <div>
+          <label for="confirmPassword" class="form-label">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required minlength="8" class="form-input">
+        </div>
 
-    <p id="passwordError" class="danger" style="display: none;">Passwords do not match.</p>
+        <p id="passwordError" class="text-red-600 dark:text-red-400 text-sm" style="display: none;">Passwords do not match.</p>
 
-    <button type="submit">Register</button>
-  </form>
+        <button type="submit" class="btn-primary w-full">Register</button>
+      </form>
 
-  <p class="text-muted">Already have an account? <a href="/login">Login here</a></p>
-</section>
+      <p class="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">Already have an account? <a href="/login" class="text-primary dark:text-primary-light hover:underline">Login here</a></p>
+    </div>
+  </div>
+</div>
 
 <script>
   document.getElementById('registerForm').addEventListener('submit', function(e) {
@@ -35,10 +47,10 @@
     if (password !== confirm) {
       e.preventDefault();
       errorEl.style.display = 'block';
-      document.getElementById('confirmPassword').setAttribute('aria-invalid', 'true');
+      document.getElementById('confirmPassword').classList.add('border-red-500', 'ring-red-500');
     } else {
       errorEl.style.display = 'none';
-      document.getElementById('confirmPassword').removeAttribute('aria-invalid');
+      document.getElementById('confirmPassword').classList.remove('border-red-500', 'ring-red-500');
     }
   });
 </script>

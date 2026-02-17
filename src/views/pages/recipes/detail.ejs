@@ -1,93 +1,149 @@
 <%- include('../../partials/header') %>
 
-<h1><%= recipe.title %></h1>
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4"><%= recipe.title %></h1>
 
 <% if (recipe.image || recipe.imageUrl) { %>
-  <img src="<%= recipe.image || recipe.imageUrl %>" alt="<%= recipe.title %>" class="recipe-image mb-1" style="max-width: 600px;">
+  <img src="<%= recipe.image || recipe.imageUrl %>" alt="<%= recipe.title %>" class="w-full max-w-2xl h-64 object-cover rounded-xl mb-6">
 <% } %>
 
-<div class="grid">
-  <% if (recipe.servings) { %>
-    <p><strong>Servings:</strong> <%= recipe.servings %></p>
-  <% } %>
-  <% if (recipe.readyInMinutes) { %>
-    <p><strong>Ready in:</strong> <%= recipe.readyInMinutes %> minutes</p>
-  <% } %>
-</div>
+<% if (recipe.servings || recipe.readyInMinutes) { %>
+  <div class="flex flex-wrap gap-4 mb-6">
+    <% if (recipe.servings) { %>
+      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span><strong>Servings:</strong> <%= recipe.servings %></span>
+      </div>
+    <% } %>
+    <% if (recipe.readyInMinutes) { %>
+      <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span><strong>Ready in:</strong> <%= recipe.readyInMinutes %> minutes</span>
+      </div>
+    <% } %>
+  </div>
+<% } %>
 
 <!-- Personalization -->
 <% if (typeof personalization !== 'undefined' && personalization) { %>
-  <article class="ai-callout">
-    <h4>Personalized for You</h4>
-    <p><%- personalization.replace(/\n/g, '<br>') %></p>
-  </article>
+  <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6">
+    <div class="flex items-start gap-3">
+      <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      <div>
+        <h4 class="font-semibold text-blue-800 dark:text-blue-300 mb-1">Personalized for You</h4>
+        <p class="text-sm text-blue-700 dark:text-blue-400"><%- personalization.replace(/\n/g, '<br>') %></p>
+      </div>
+    </div>
+  </div>
 <% } %>
 
 <!-- Ingredients -->
-<section>
-  <h2>Ingredients</h2>
-  <ul>
-    <% if (recipe.extendedIngredients) { %>
-      <% recipe.extendedIngredients.forEach(function(ing) { %>
-        <li><%= ing.original || (ing.amount + ' ' + ing.unit + ' ' + ing.name) %></li>
-      <% }); %>
-    <% } else if (recipe.ingredients) { %>
-      <% recipe.ingredients.forEach(function(ing) { %>
-        <li><%= typeof ing === 'string' ? ing : (ing.original || ing.name) %></li>
-      <% }); %>
-    <% } %>
-  </ul>
+<section class="mb-6">
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Ingredients</h2>
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
+    <ul class="space-y-1.5 text-sm text-gray-700 dark:text-gray-300">
+      <% if (recipe.extendedIngredients) { %>
+        <% recipe.extendedIngredients.forEach(function(ing) { %>
+          <li class="flex items-start gap-2">
+            <span class="text-primary dark:text-primary-light mt-1">&#8226;</span>
+            <span><%= ing.original || (ing.amount + ' ' + ing.unit + ' ' + ing.name) %></span>
+          </li>
+        <% }); %>
+      <% } else if (recipe.ingredients) { %>
+        <% recipe.ingredients.forEach(function(ing) { %>
+          <li class="flex items-start gap-2">
+            <span class="text-primary dark:text-primary-light mt-1">&#8226;</span>
+            <span><%= typeof ing === 'string' ? ing : (ing.original || ing.name) %></span>
+          </li>
+        <% }); %>
+      <% } %>
+    </ul>
+  </div>
 </section>
 
 <!-- Instructions -->
-<section>
-  <h2>Instructions</h2>
-  <% if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) { %>
-    <ol>
-      <% recipe.analyzedInstructions.forEach(function(group) { %>
-        <% if (group.steps) { %>
-          <% group.steps.forEach(function(step) { %>
-            <li><%= step.step %></li>
-          <% }); %>
-        <% } %>
-      <% }); %>
-    </ol>
-  <% } else if (recipe.instructions) { %>
-    <% if (Array.isArray(recipe.instructions)) { %>
-      <ol>
-        <% recipe.instructions.forEach(function(step) { %>
-          <li><%= typeof step === 'string' ? step : step.step %></li>
+<section class="mb-6">
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Instructions</h2>
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
+    <% if (recipe.analyzedInstructions && recipe.analyzedInstructions.length > 0) { %>
+      <ol class="space-y-3 text-sm text-gray-700 dark:text-gray-300 list-decimal list-inside">
+        <% recipe.analyzedInstructions.forEach(function(group) { %>
+          <% if (group.steps) { %>
+            <% group.steps.forEach(function(step) { %>
+              <li class="leading-relaxed"><%= step.step %></li>
+            <% }); %>
+          <% } %>
         <% }); %>
       </ol>
-    <% } else { %>
-      <p><%- recipe.instructions %></p>
+    <% } else if (recipe.instructions) { %>
+      <% if (Array.isArray(recipe.instructions)) { %>
+        <ol class="space-y-3 text-sm text-gray-700 dark:text-gray-300 list-decimal list-inside">
+          <% recipe.instructions.forEach(function(step) { %>
+            <li class="leading-relaxed"><%= typeof step === 'string' ? step : step.step %></li>
+          <% }); %>
+        </ol>
+      <% } else { %>
+        <div class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed"><%- recipe.instructions %></div>
+      <% } %>
     <% } %>
-  <% } %>
+  </div>
 </section>
 
 <!-- Nutrition Info -->
 <% if (typeof nutrition !== 'undefined' && nutrition) { %>
-  <section>
-    <h2>Nutrition Information</h2>
-    <figure>
-      <table>
-        <tbody>
-          <% if (nutrition.calories) { %><tr><td>Calories</td><td><%= nutrition.calories %></td></tr><% } %>
-          <% if (nutrition.protein) { %><tr><td>Protein</td><td><%= nutrition.protein %></td></tr><% } %>
-          <% if (nutrition.carbs) { %><tr><td>Carbs</td><td><%= nutrition.carbs %></td></tr><% } %>
-          <% if (nutrition.fat) { %><tr><td>Fat</td><td><%= nutrition.fat %></td></tr><% } %>
-          <% if (nutrition.fiber) { %><tr><td>Fiber</td><td><%= nutrition.fiber %></td></tr><% } %>
-          <% if (nutrition.sugar) { %><tr><td>Sugar</td><td><%= nutrition.sugar %></td></tr><% } %>
-          <% if (nutrition.sodium) { %><tr><td>Sodium</td><td><%= nutrition.sodium %></td></tr><% } %>
-        </tbody>
-      </table>
-    </figure>
+  <section class="mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Nutrition Information</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-gray-200 dark:bg-gray-700">
+        <% if (nutrition.calories) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrition.calories %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Calories</p>
+          </div>
+        <% } %>
+        <% if (nutrition.protein) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrition.protein %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Protein</p>
+          </div>
+        <% } %>
+        <% if (nutrition.carbs) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrition.carbs %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Carbs</p>
+          </div>
+        <% } %>
+        <% if (nutrition.fat) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrition.fat %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Fat</p>
+          </div>
+        <% } %>
+        <% if (nutrition.fiber) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrition.fiber %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Fiber</p>
+          </div>
+        <% } %>
+        <% if (nutrition.sugar) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrition.sugar %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Sugar</p>
+          </div>
+        <% } %>
+        <% if (nutrition.sodium) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrition.sodium %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Sodium</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
   </section>
 <% } %>
 
 <!-- Action Buttons -->
 <section>
-  <div class="grid action-buttons">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
     <!-- Save Recipe -->
     <form method="POST" action="/recipes/save">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
@@ -101,14 +157,20 @@
       <input type="hidden" name="readyInMinutes" value="<%= recipe.readyInMinutes || '' %>">
       <input type="hidden" name="imageUrl" value="<%= recipe.image || recipe.imageUrl || '' %>">
       <input type="hidden" name="nutritionJson" value="<%= typeof nutrition !== 'undefined' ? JSON.stringify(nutrition) : '{}' %>">
-      <button type="submit" class="full-width">Save Recipe</button>
+      <button type="submit" class="btn-primary w-full">
+        <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+        Save Recipe
+      </button>
     </form>
 
     <% if (recipe.source === 'spoonacular' || (!recipe.source && recipe.id)) { %>
       <!-- Personalize -->
       <form method="POST" action="/recipes/<%= recipe.id %>/personalize">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <button type="submit" class="secondary full-width">Personalize with AI</button>
+        <button type="submit" class="btn-secondary w-full">
+          <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Personalize with AI
+        </button>
       </form>
     <% } %>
 
@@ -125,7 +187,10 @@
         <input type="hidden" name="sugar" value="<%= nutrition.sugar || 0 %>">
         <input type="hidden" name="sodium" value="<%= nutrition.sodium || 0 %>">
         <input type="hidden" name="servings" value="1">
-        <button type="submit" class="contrast full-width">Log as Meal</button>
+        <button type="submit" class="btn-secondary w-full">
+          <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Log as Meal
+        </button>
       </form>
     <% } %>
   </div>

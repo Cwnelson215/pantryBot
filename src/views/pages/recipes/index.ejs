@@ -1,28 +1,34 @@
 <%- include('../../partials/header') %>
 
-<h1>Recipes</h1>
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Recipes</h1>
 
-<div class="grid-cards">
-  <article class="recipe-hub-card">
-    <span class="hub-icon">&#x1F50D;</span>
-    <h3>Search by Pantry</h3>
-    <p>Find recipes using ingredients you already have.</p>
-    <a href="/recipes/search" role="button" class="outline">Search Recipes</a>
-  </article>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 text-center hover:shadow-md hover:-translate-y-0.5 transition-all">
+    <div class="w-12 h-12 mx-auto mb-3 bg-primary/10 dark:bg-primary-light/10 rounded-xl flex items-center justify-center">
+      <svg class="w-6 h-6 text-primary dark:text-primary-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Search by Pantry</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Find recipes using ingredients you already have.</p>
+    <a href="/recipes/search" class="btn-secondary text-sm w-full">Search Recipes</a>
+  </div>
 
-  <article class="recipe-hub-card">
-    <span class="hub-icon">&#x2728;</span>
-    <h3>Generate with AI</h3>
-    <p>Create a custom recipe from your pantry items.</p>
-    <a href="/recipes/generate" role="button" class="outline">Generate Recipe</a>
-  </article>
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 text-center hover:shadow-md hover:-translate-y-0.5 transition-all">
+    <div class="w-12 h-12 mx-auto mb-3 bg-amber-500/10 rounded-xl flex items-center justify-center">
+      <svg class="w-6 h-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Generate with AI</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Create a custom recipe from your pantry items.</p>
+    <a href="/recipes/generate" class="btn-secondary text-sm w-full">Generate Recipe</a>
+  </div>
 
-  <article class="recipe-hub-card">
-    <span class="hub-icon">&#x1F4D6;</span>
-    <h3>Saved Recipes</h3>
-    <p>View your saved recipe collection.</p>
-    <a href="/recipes/saved" role="button" class="outline">View Saved</a>
-  </article>
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 text-center hover:shadow-md hover:-translate-y-0.5 transition-all">
+    <div class="w-12 h-12 mx-auto mb-3 bg-emerald-500/10 rounded-xl flex items-center justify-center">
+      <svg class="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Saved Recipes</h3>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">View your saved recipe collection.</p>
+    <a href="/recipes/saved" class="btn-secondary text-sm w-full">View Saved</a>
+  </div>
 </div>
 
 <%- include('../../partials/footer') %>

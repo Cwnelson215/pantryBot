@@ -1,92 +1,111 @@
 <%- include('../partials/header') %>
 
-<h1>Welcome, <%= user.displayName %>!</h1>
+<div class="mb-8">
+  <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Welcome, <%= user.displayName %>!</h1>
+</div>
 
 <!-- Stats Row -->
-<div class="grid">
-  <article class="stat-card">
-    <hgroup>
-      <h3><%= typeof pantryCount !== 'undefined' ? pantryCount : 0 %></h3>
-      <p>Pantry Items</p>
-    </hgroup>
-  </article>
-  <article class="stat-card">
-    <hgroup>
-      <h3><%= typeof savedRecipeCount !== 'undefined' ? savedRecipeCount : (typeof recentRecipes !== 'undefined' ? recentRecipes.length : 0) %></h3>
-      <p>Saved Recipes</p>
-    </hgroup>
-  </article>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 flex items-center gap-4">
+    <div class="flex-shrink-0 w-12 h-12 bg-primary/10 dark:bg-primary-light/10 rounded-xl flex items-center justify-center">
+      <svg class="w-6 h-6 text-primary dark:text-primary-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+    </div>
+    <div>
+      <p class="text-3xl font-bold text-gray-900 dark:text-white"><%= typeof pantryCount !== 'undefined' ? pantryCount : 0 %></p>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Pantry Items</p>
+    </div>
+  </div>
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 flex items-center gap-4">
+    <div class="flex-shrink-0 w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center">
+      <svg class="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    </div>
+    <div>
+      <p class="text-3xl font-bold text-gray-900 dark:text-white"><%= typeof savedRecipeCount !== 'undefined' ? savedRecipeCount : (typeof recentRecipes !== 'undefined' ? recentRecipes.length : 0) %></p>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Saved Recipes</p>
+    </div>
+  </div>
 </div>
 
 <!-- Expiring Soon -->
-<section>
-  <h2>Expiring Soon</h2>
+<section class="mb-8">
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Expiring Soon</h2>
   <% if (typeof expiringItems !== 'undefined' && expiringItems.length > 0) { %>
-    <figure>
-      <table>
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th>Expiration Date</th>
-            <th>Quantity</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% expiringItems.forEach(function(item) {
-            var now = new Date();
-            var exp = new Date(item.expirationDate);
-            var diffDays = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
-            var badgeClass = 'badge-success';
-            var badgeLabel = diffDays + ' days';
-            if (diffDays <= 2) {
-              badgeClass = 'badge-danger';
-              badgeLabel = diffDays <= 0 ? 'Expired' : diffDays + ' day' + (diffDays === 1 ? '' : 's');
-            } else if (diffDays <= 5) {
-              badgeClass = 'badge-warning';
-              badgeLabel = diffDays + ' days';
-            }
-          %>
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="data-table">
+          <thead>
             <tr>
-              <td><%= item.name %></td>
-              <td><%= new Date(item.expirationDate).toLocaleDateString() %></td>
-              <td><%= item.quantity %> <%= item.unit %></td>
-              <td><span class="badge <%= badgeClass %>"><%= badgeLabel %></span></td>
+              <th>Item</th>
+              <th>Expiration Date</th>
+              <th>Quantity</th>
+              <th>Status</th>
             </tr>
-          <% }); %>
-        </tbody>
-      </table>
-    </figure>
+          </thead>
+          <tbody>
+            <% expiringItems.forEach(function(item) {
+              var now = new Date();
+              var exp = new Date(item.expirationDate);
+              var diffDays = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+              var badgeClass = 'badge-success';
+              var badgeLabel = diffDays + ' days';
+              if (diffDays <= 2) {
+                badgeClass = 'badge-danger';
+                badgeLabel = diffDays <= 0 ? 'Expired' : diffDays + ' day' + (diffDays === 1 ? '' : 's');
+              } else if (diffDays <= 5) {
+                badgeClass = 'badge-warning';
+                badgeLabel = diffDays + ' days';
+              }
+            %>
+              <tr>
+                <td class="font-medium text-gray-900 dark:text-white"><%= item.name %></td>
+                <td><%= new Date(item.expirationDate).toLocaleDateString() %></td>
+                <td><%= item.quantity %> <%= item.unit %></td>
+                <td><span class="badge <%= badgeClass %>"><%= badgeLabel %></span></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
   <% } else { %>
-    <p class="text-muted">No items expiring soon.</p>
+    <p class="text-sm text-gray-500 dark:text-gray-400">No items expiring soon.</p>
   <% } %>
 </section>
 
 <!-- Recent Saved Recipes -->
-<section>
-  <h2>Recent Saved Recipes</h2>
+<section class="mb-8">
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Saved Recipes</h2>
   <% if (typeof recentRecipes !== 'undefined' && recentRecipes.length > 0) { %>
-    <div class="grid-cards">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <% recentRecipes.forEach(function(recipe) { %>
-        <article>
-          <h4 class="mb-0"><%= recipe.title %></h4>
-          <p class="text-muted"><small>Source: <%= recipe.source %></small></p>
-        </article>
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-1"><%= recipe.title %></h4>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Source: <%= recipe.source %></p>
+        </div>
       <% }); %>
     </div>
-    <p class="mt-1"><a href="/recipes/saved">View all saved recipes</a></p>
+    <p class="mt-3"><a href="/recipes/saved" class="text-sm text-primary dark:text-primary-light hover:underline">View all saved recipes &rarr;</a></p>
   <% } else { %>
-    <p class="text-muted">No saved recipes yet. <a href="/recipes">Find some recipes!</a></p>
+    <p class="text-sm text-gray-500 dark:text-gray-400">No saved recipes yet. <a href="/recipes" class="text-primary dark:text-primary-light hover:underline">Find some recipes!</a></p>
   <% } %>
 </section>
 
 <!-- Quick Actions -->
 <section>
-  <h2>Quick Actions</h2>
-  <div class="grid">
-    <a href="/pantry/add" role="button">Add Pantry Item</a>
-    <a href="/recipes/search" role="button" class="secondary">Search Recipes</a>
-    <a href="/recipes/generate" role="button" class="contrast">Generate Recipe</a>
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <a href="/pantry/add" class="btn-primary text-center">
+      <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      Add Pantry Item
+    </a>
+    <a href="/recipes/search" class="btn-secondary text-center">
+      <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      Search Recipes
+    </a>
+    <a href="/recipes/generate" class="btn-secondary text-center">
+      <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Generate Recipe
+    </a>
   </div>
 </section>
 

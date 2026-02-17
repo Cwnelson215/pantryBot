@@ -1,85 +1,87 @@
 <%- include('../../partials/header') %>
 
-<h1>Nutrition Tracking</h1>
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Nutrition Tracking</h1>
 
 <!-- Nutrition Goals -->
-<section>
-  <h2>Nutrition Goals</h2>
+<section class="mb-8">
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Nutrition Goals</h2>
   <%
     var p = (typeof userPreferences !== 'undefined' && userPreferences) ? userPreferences : {};
   %>
-  <form method="POST" action="/nutrition/goals">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+    <form method="POST" action="/nutrition/goals" class="space-y-6">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-    <fieldset>
-      <legend><strong>Macronutrients</strong></legend>
-      <div class="grid">
-        <div>
-          <label for="calorieTarget">Calories</label>
-          <input type="number" id="calorieTarget" name="calorieTarget" min="0" step="50" placeholder="e.g. 2000" value="<%= p.calorieTarget || '' %>">
+      <fieldset class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <legend class="text-sm font-semibold text-gray-700 dark:text-gray-300 px-2">Macronutrients</legend>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div>
+            <label for="calorieTarget" class="form-label">Calories</label>
+            <input type="number" id="calorieTarget" name="calorieTarget" min="0" step="50" placeholder="e.g. 2000" value="<%= p.calorieTarget || '' %>" class="form-input">
+          </div>
+          <div>
+            <label for="proteinTarget" class="form-label">Protein (g)</label>
+            <input type="number" id="proteinTarget" name="proteinTarget" min="0" step="1" placeholder="e.g. 50" value="<%= p.proteinTarget || '' %>" class="form-input">
+          </div>
+          <div>
+            <label for="fatTarget" class="form-label">Fat (g)</label>
+            <input type="number" id="fatTarget" name="fatTarget" min="0" step="1" placeholder="e.g. 65" value="<%= p.fatTarget || '' %>" class="form-input">
+          </div>
+          <div>
+            <label for="carbsTarget" class="form-label">Carbs (g)</label>
+            <input type="number" id="carbsTarget" name="carbsTarget" min="0" step="1" placeholder="e.g. 300" value="<%= p.carbsTarget || '' %>" class="form-input">
+          </div>
         </div>
-        <div>
-          <label for="proteinTarget">Protein (g)</label>
-          <input type="number" id="proteinTarget" name="proteinTarget" min="0" step="1" placeholder="e.g. 50" value="<%= p.proteinTarget || '' %>">
-        </div>
-        <div>
-          <label for="fatTarget">Fat (g)</label>
-          <input type="number" id="fatTarget" name="fatTarget" min="0" step="1" placeholder="e.g. 65" value="<%= p.fatTarget || '' %>">
-        </div>
-        <div>
-          <label for="carbsTarget">Carbs (g)</label>
-          <input type="number" id="carbsTarget" name="carbsTarget" min="0" step="1" placeholder="e.g. 300" value="<%= p.carbsTarget || '' %>">
-        </div>
-      </div>
-    </fieldset>
+      </fieldset>
 
-    <fieldset>
-      <legend><strong>Micronutrients</strong></legend>
-      <div class="grid">
-        <div>
-          <label for="fiberTarget">Fiber (g)</label>
-          <input type="number" id="fiberTarget" name="fiberTarget" min="0" step="1" placeholder="e.g. 25" value="<%= p.fiberTarget || '' %>">
+      <fieldset class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <legend class="text-sm font-semibold text-gray-700 dark:text-gray-300 px-2">Micronutrients</legend>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+          <div>
+            <label for="fiberTarget" class="form-label">Fiber (g)</label>
+            <input type="number" id="fiberTarget" name="fiberTarget" min="0" step="1" placeholder="e.g. 25" value="<%= p.fiberTarget || '' %>" class="form-input">
+          </div>
+          <div>
+            <label for="sugarTarget" class="form-label">Sugar (g)</label>
+            <input type="number" id="sugarTarget" name="sugarTarget" min="0" step="1" placeholder="e.g. 50" value="<%= p.sugarTarget || '' %>" class="form-input">
+          </div>
+          <div>
+            <label for="sodiumTarget" class="form-label">Sodium (mg)</label>
+            <input type="number" id="sodiumTarget" name="sodiumTarget" min="0" step="10" placeholder="e.g. 2300" value="<%= p.sodiumTarget || '' %>" class="form-input">
+          </div>
+          <div>
+            <label for="ironTarget" class="form-label">Iron (mg)</label>
+            <input type="number" id="ironTarget" name="ironTarget" min="0" step="1" placeholder="e.g. 18" value="<%= p.ironTarget || '' %>" class="form-input">
+          </div>
         </div>
-        <div>
-          <label for="sugarTarget">Sugar (g)</label>
-          <input type="number" id="sugarTarget" name="sugarTarget" min="0" step="1" placeholder="e.g. 50" value="<%= p.sugarTarget || '' %>">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div>
+            <label for="calciumTarget" class="form-label">Calcium (mg)</label>
+            <input type="number" id="calciumTarget" name="calciumTarget" min="0" step="10" placeholder="e.g. 1000" value="<%= p.calciumTarget || '' %>" class="form-input">
+          </div>
+          <div>
+            <label for="vitaminDTarget" class="form-label">Vitamin D (mcg)</label>
+            <input type="number" id="vitaminDTarget" name="vitaminDTarget" min="0" step="1" placeholder="e.g. 15" value="<%= p.vitaminDTarget || '' %>" class="form-input">
+          </div>
+          <div>
+            <label for="potassiumTarget" class="form-label">Potassium (mg)</label>
+            <input type="number" id="potassiumTarget" name="potassiumTarget" min="0" step="10" placeholder="e.g. 2600" value="<%= p.potassiumTarget || '' %>" class="form-input">
+          </div>
+          <div>
+            <label for="vitaminCTarget" class="form-label">Vitamin C (mg)</label>
+            <input type="number" id="vitaminCTarget" name="vitaminCTarget" min="0" step="1" placeholder="e.g. 90" value="<%= p.vitaminCTarget || '' %>" class="form-input">
+          </div>
         </div>
-        <div>
-          <label for="sodiumTarget">Sodium (mg)</label>
-          <input type="number" id="sodiumTarget" name="sodiumTarget" min="0" step="10" placeholder="e.g. 2300" value="<%= p.sodiumTarget || '' %>">
-        </div>
-        <div>
-          <label for="ironTarget">Iron (mg)</label>
-          <input type="number" id="ironTarget" name="ironTarget" min="0" step="1" placeholder="e.g. 18" value="<%= p.ironTarget || '' %>">
-        </div>
-      </div>
-      <div class="grid">
-        <div>
-          <label for="calciumTarget">Calcium (mg)</label>
-          <input type="number" id="calciumTarget" name="calciumTarget" min="0" step="10" placeholder="e.g. 1000" value="<%= p.calciumTarget || '' %>">
-        </div>
-        <div>
-          <label for="vitaminDTarget">Vitamin D (mcg)</label>
-          <input type="number" id="vitaminDTarget" name="vitaminDTarget" min="0" step="1" placeholder="e.g. 15" value="<%= p.vitaminDTarget || '' %>">
-        </div>
-        <div>
-          <label for="potassiumTarget">Potassium (mg)</label>
-          <input type="number" id="potassiumTarget" name="potassiumTarget" min="0" step="10" placeholder="e.g. 2600" value="<%= p.potassiumTarget || '' %>">
-        </div>
-        <div>
-          <label for="vitaminCTarget">Vitamin C (mg)</label>
-          <input type="number" id="vitaminCTarget" name="vitaminCTarget" min="0" step="1" placeholder="e.g. 90" value="<%= p.vitaminCTarget || '' %>">
-        </div>
-      </div>
-    </fieldset>
+      </fieldset>
 
-    <button type="submit">Save Goals</button>
-  </form>
+      <button type="submit" class="btn-primary">Save Goals</button>
+    </form>
+  </div>
 </section>
 
 <!-- Weekly Summary -->
 <section>
-  <h2>Weekly Summary</h2>
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Weekly Summary</h2>
   <% if (typeof weeklySummary !== 'undefined' && weeklySummary.length > 0) { %>
     <%
       var goals = [];
@@ -102,42 +104,44 @@
         goals.push({ key: 'proteinG', label: 'Protein', unit: 'g', target: 50, css: 'protein' });
       }
     %>
-    <figure>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <% goals.forEach(function(g) { %>
-              <th><%= g.label %><% if (g.unit) { %> (<%= g.unit %>)<% } %></th>
-            <% }); %>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% weeklySummary.forEach(function(day) { %>
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="data-table">
+          <thead>
             <tr>
-              <td>
-                <a href="/nutrition/daily?date=<%= day.date %>"><%= new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %></a>
-              </td>
+              <th>Date</th>
               <% goals.forEach(function(g) { %>
-                <td>
-                  <div class="progress-bar progress-<%= g.css %>">
-                    <div class="progress-fill" style="width: <%= Math.min((day.totals[g.key] / g.target) * 100, 100) %>%;">
-                      <%= Math.round(day.totals[g.key]) %><%= g.unit %>
-                    </div>
-                  </div>
-                </td>
+                <th><%= g.label %><% if (g.unit) { %> (<%= g.unit %>)<% } %></th>
               <% }); %>
-              <td>
-                <a href="/nutrition/daily?date=<%= day.date %>">Details</a>
-              </td>
+              <th></th>
             </tr>
-          <% }); %>
-        </tbody>
-      </table>
-    </figure>
+          </thead>
+          <tbody>
+            <% weeklySummary.forEach(function(day) { %>
+              <tr>
+                <td>
+                  <a href="/nutrition/daily?date=<%= day.date %>" class="text-primary dark:text-primary-light hover:underline font-medium"><%= new Date(day.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) %></a>
+                </td>
+                <% goals.forEach(function(g) { %>
+                  <td>
+                    <div class="progress-bar progress-<%= g.css %>">
+                      <div class="progress-fill" style="width: <%= Math.min((day.totals[g.key] / g.target) * 100, 100) %>%;">
+                        <%= Math.round(day.totals[g.key]) %><%= g.unit %>
+                      </div>
+                    </div>
+                  </td>
+                <% }); %>
+                <td>
+                  <a href="/nutrition/daily?date=<%= day.date %>" class="text-sm text-primary dark:text-primary-light hover:underline">Details</a>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
   <% } else { %>
-    <p class="text-muted">No nutrition data logged this week. Go to <a href="/nutrition/daily">today's log</a> to start tracking!</p>
+    <p class="text-sm text-gray-500 dark:text-gray-400">No nutrition data logged this week. Go to <a href="/nutrition/daily" class="text-primary dark:text-primary-light hover:underline">today's log</a> to start tracking!</p>
   <% } %>
 </section>
 

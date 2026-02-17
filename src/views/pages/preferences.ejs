@@ -1,6 +1,6 @@
 <%- include('../partials/header') %>
 
-<h1>Dietary Preferences</h1>
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Dietary Preferences</h1>
 
 <%
   var currentDietaryTags = (typeof preferences !== 'undefined' && preferences && preferences.dietaryTags) ? preferences.dietaryTags : [];
@@ -9,62 +9,71 @@
   var currentServingSize = (typeof preferences !== 'undefined' && preferences && preferences.servingSize) ? preferences.servingSize : 2;
 %>
 
-<form method="POST" action="/preferences">
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 max-w-3xl">
+  <form method="POST" action="/preferences" class="space-y-6">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-  <!-- Dietary Tags -->
-  <fieldset>
-    <legend><strong>Dietary Tags</strong></legend>
-    <% if (typeof dietaryOptions !== 'undefined') { %>
-      <% dietaryOptions.forEach(function(option) { %>
-        <label>
-          <input type="checkbox" name="dietaryTags" value="<%= option %>"
-            <%= currentDietaryTags.indexOf(option) !== -1 ? 'checked' : '' %>>
-          <%= option %>
-        </label>
-      <% }); %>
-    <% } %>
-  </fieldset>
+    <!-- Dietary Tags -->
+    <fieldset class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <legend class="text-sm font-semibold text-gray-700 dark:text-gray-300 px-2">Dietary Tags</legend>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <% if (typeof dietaryOptions !== 'undefined') { %>
+          <% dietaryOptions.forEach(function(option) { %>
+            <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-2 py-1.5 transition-colors">
+              <input type="checkbox" name="dietaryTags" value="<%= option %>"
+                <%= currentDietaryTags.indexOf(option) !== -1 ? 'checked' : '' %>
+                class="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary dark:bg-gray-700">
+              <%= option %>
+            </label>
+          <% }); %>
+        <% } %>
+      </div>
+    </fieldset>
 
-  <!-- Allergies -->
-  <fieldset>
-    <legend><strong>Allergies</strong></legend>
-    <% if (typeof allergyOptions !== 'undefined') { %>
-      <% allergyOptions.forEach(function(option) { %>
-        <label>
-          <input type="checkbox" name="allergies" value="<%= option %>"
-            <%= currentAllergies.indexOf(option) !== -1 ? 'checked' : '' %>>
-          <%= option %>
-        </label>
-      <% }); %>
-    <% } %>
-  </fieldset>
+    <!-- Allergies -->
+    <fieldset class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <legend class="text-sm font-semibold text-gray-700 dark:text-gray-300 px-2">Allergies</legend>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <% if (typeof allergyOptions !== 'undefined') { %>
+          <% allergyOptions.forEach(function(option) { %>
+            <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-2 py-1.5 transition-colors">
+              <input type="checkbox" name="allergies" value="<%= option %>"
+                <%= currentAllergies.indexOf(option) !== -1 ? 'checked' : '' %>
+                class="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary dark:bg-gray-700">
+              <%= option %>
+            </label>
+          <% }); %>
+        <% } %>
+      </div>
+    </fieldset>
 
-  <!-- Cuisine Preferences -->
-  <fieldset>
-    <legend><strong>Cuisine Preferences</strong></legend>
-    <% if (typeof cuisineOptions !== 'undefined') { %>
-      <% cuisineOptions.forEach(function(option) { %>
-        <label>
-          <input type="checkbox" name="cuisinePrefs" value="<%= option %>"
-            <%= currentCuisines.indexOf(option) !== -1 ? 'checked' : '' %>>
-          <%= option %>
-        </label>
-      <% }); %>
-    <% } %>
-  </fieldset>
+    <!-- Cuisine Preferences -->
+    <fieldset class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <legend class="text-sm font-semibold text-gray-700 dark:text-gray-300 px-2">Cuisine Preferences</legend>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <% if (typeof cuisineOptions !== 'undefined') { %>
+          <% cuisineOptions.forEach(function(option) { %>
+            <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg px-2 py-1.5 transition-colors">
+              <input type="checkbox" name="cuisinePrefs" value="<%= option %>"
+                <%= currentCuisines.indexOf(option) !== -1 ? 'checked' : '' %>
+                class="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary dark:bg-gray-700">
+              <%= option %>
+            </label>
+          <% }); %>
+        <% } %>
+      </div>
+    </fieldset>
 
-  <!-- Numeric Targets -->
-  <div class="grid">
-    <div>
-      <label for="servingSize">Serving Size (people)</label>
-      <input type="number" id="servingSize" name="servingSize" min="1" max="20" value="<%= currentServingSize %>">
+    <!-- Numeric Targets -->
+    <div class="max-w-xs">
+      <label for="servingSize" class="form-label">Serving Size (people)</label>
+      <input type="number" id="servingSize" name="servingSize" min="1" max="20" value="<%= currentServingSize %>" class="form-input">
     </div>
-  </div>
 
-  <p class="text-muted">Set nutrition targets (calories, protein, etc.) on the <a href="/nutrition">Nutrition</a> page.</p>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Set nutrition targets (calories, protein, etc.) on the <a href="/nutrition" class="text-primary dark:text-primary-light hover:underline">Nutrition</a> page.</p>
 
-  <button type="submit">Save Preferences</button>
-</form>
+    <button type="submit" class="btn-primary">Save Preferences</button>
+  </form>
+</div>
 
 <%- include('../partials/footer') %>

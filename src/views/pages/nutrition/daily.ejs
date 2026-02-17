@@ -32,105 +32,96 @@
   }
 %>
 
-<div class="flex-between day-nav">
-  <h1>Nutrition - <%= displayDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></h1>
-  <div class="day-nav-links">
-    <a href="/nutrition/daily?date=<%= prevStr %>" role="button" class="outline">&larr; Previous Day</a>
-    <a href="/nutrition/daily?date=<%= nextStr %>" role="button" class="outline">Next Day &rarr;</a>
+<!-- Day Navigation -->
+<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 mb-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <h1 class="text-xl font-bold text-gray-900 dark:text-white text-center sm:text-left">
+      <%= displayDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+    </h1>
+    <div class="flex items-center justify-center gap-2">
+      <a href="/nutrition/daily?date=<%= prevStr %>" class="btn-secondary text-sm">&larr; Previous</a>
+      <a href="/nutrition/daily?date=<%= nextStr %>" class="btn-secondary text-sm">Next &rarr;</a>
+    </div>
   </div>
 </div>
 
 <!-- Daily Totals -->
-<section>
-  <h2>Daily Totals</h2>
-  <div class="grid">
-    <% goals.slice(0, 2).forEach(function(g) { %>
-      <div>
-        <p class="mb-0"><strong><%= g.label %>:</strong> <%= g.unit ? Number(totals[g.key]).toFixed(1) + g.unit : Math.round(totals[g.key]) %> / <%= g.target %><%= g.unit %></p>
-        <div class="progress-bar progress-<%= g.css %>">
-          <div class="progress-fill" style="width: <%= Math.min((totals[g.key] / g.target) * 100, 100) %>%;"><%= g.unit ? Number(totals[g.key]).toFixed(1) + g.unit : Math.round(totals[g.key]) %></div>
+<section class="mb-8">
+  <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Daily Totals</h2>
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <% goals.forEach(function(g) { %>
+        <div>
+          <div class="flex justify-between text-sm mb-1">
+            <span class="font-medium text-gray-700 dark:text-gray-300"><%= g.label %></span>
+            <span class="text-gray-500 dark:text-gray-400"><%= g.unit ? Number(totals[g.key]).toFixed(1) + g.unit : Math.round(totals[g.key]) %> / <%= g.target %><%= g.unit %></span>
+          </div>
+          <div class="progress-bar progress-<%= g.css %>">
+            <div class="progress-fill" style="width: <%= Math.min((totals[g.key] / g.target) * 100, 100) %>%;"><%= g.unit ? Number(totals[g.key]).toFixed(1) + g.unit : Math.round(totals[g.key]) %></div>
+          </div>
         </div>
-      </div>
-    <% }); %>
+      <% }); %>
+    </div>
   </div>
-  <% if (goals.length > 2) { %>
-    <div class="grid">
-      <% goals.slice(2, 4).forEach(function(g) { %>
-        <div>
-          <p class="mb-0"><strong><%= g.label %>:</strong> <%= Number(totals[g.key]).toFixed(1) %><%= g.unit %> / <%= g.target %><%= g.unit %></p>
-          <div class="progress-bar progress-<%= g.css %>">
-            <div class="progress-fill" style="width: <%= Math.min((totals[g.key] / g.target) * 100, 100) %>%;"><%= Number(totals[g.key]).toFixed(1) %><%= g.unit %></div>
-          </div>
-        </div>
-      <% }); %>
-    </div>
-  <% } %>
-  <% if (goals.length > 4) { %>
-    <div class="grid">
-      <% goals.slice(4).forEach(function(g) { %>
-        <div>
-          <p class="mb-0"><strong><%= g.label %>:</strong> <%= Number(totals[g.key]).toFixed(1) %><%= g.unit %> / <%= g.target %><%= g.unit %></p>
-          <div class="progress-bar progress-<%= g.css %>">
-            <div class="progress-fill" style="width: <%= Math.min((totals[g.key] / g.target) * 100, 100) %>%;"><%= Number(totals[g.key]).toFixed(1) %><%= g.unit %></div>
-          </div>
-        </div>
-      <% }); %>
-    </div>
-  <% } %>
 </section>
 
 <!-- Individual Entries -->
 <section>
-  <div class="flex-between mb-1">
-    <h2 style="margin-bottom:0">Meal Log</h2>
-    <button onclick="document.getElementById('mealModal').showModal()" class="outline">Log a Meal</button>
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Meal Log</h2>
+    <button onclick="document.getElementById('mealModal').showModal()" class="btn-primary text-sm">
+      <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+      Log a Meal
+    </button>
   </div>
   <% if (typeof entries !== 'undefined' && entries.length > 0) { %>
-    <figure>
-      <table>
-        <thead>
-          <tr>
-            <th>Food</th>
-            <th>Servings</th>
-            <th>Calories</th>
-            <th>Protein</th>
-            <th>Carbs</th>
-            <th>Fat</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <% entries.forEach(function(entry) { %>
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="data-table">
+          <thead>
             <tr>
-              <td><%= entry.foodName %></td>
-              <td><%= entry.servings || 1 %></td>
-              <td><%= entry.calories || 0 %></td>
-              <td><%= entry.proteinG || 0 %>g</td>
-              <td><%= entry.carbsG || 0 %>g</td>
-              <td><%= entry.fatG || 0 %>g</td>
-              <td>
-                <form method="POST" action="/nutrition/log/<%= entry.id %>/delete" class="inline-form">
-                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                  <button type="submit" class="outline btn-delete">Delete</button>
-                </form>
-              </td>
+              <th>Food</th>
+              <th>Servings</th>
+              <th>Calories</th>
+              <th>Protein</th>
+              <th>Carbs</th>
+              <th>Fat</th>
+              <th></th>
             </tr>
-          <% }); %>
-        </tbody>
-      </table>
-    </figure>
+          </thead>
+          <tbody>
+            <% entries.forEach(function(entry) { %>
+              <tr>
+                <td class="font-medium text-gray-900 dark:text-white"><%= entry.foodName %></td>
+                <td><%= entry.servings || 1 %></td>
+                <td><%= entry.calories || 0 %></td>
+                <td><%= entry.proteinG || 0 %>g</td>
+                <td><%= entry.carbsG || 0 %>g</td>
+                <td><%= entry.fatG || 0 %>g</td>
+                <td>
+                  <form method="POST" action="/nutrition/log/<%= entry.id %>/delete" class="inline">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="btn-ghost-danger text-xs">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
   <% } else { %>
-    <p class="text-muted">No meals logged for this day.</p>
+    <p class="text-sm text-gray-500 dark:text-gray-400">No meals logged for this day.</p>
   <% } %>
 </section>
 
 <!-- Log a Meal Modal -->
-<dialog id="mealModal">
-  <div class="modal-header">
-    <h3>Log a Meal</h3>
-    <button class="modal-close" onclick="document.getElementById('mealModal').close()">&times;</button>
+<dialog id="mealModal" class="rounded-xl border border-gray-200 dark:border-gray-700 shadow-xl p-0 max-w-xl w-[90%] bg-white dark:bg-gray-800 backdrop:bg-gray-900/50">
+  <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Log a Meal</h3>
+    <button onclick="document.getElementById('mealModal').close()" class="p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xl leading-none">&times;</button>
   </div>
-  <div class="modal-body">
+  <div class="p-4 max-h-[70vh] overflow-y-auto">
     <div class="modal-tabs">
       <button class="modal-tab active" data-tab="search" onclick="switchTab('search')">Search Food</button>
       <button class="modal-tab" data-tab="recipe" onclick="switchTab('recipe')">From Saved Recipe</button>
@@ -138,16 +129,16 @@
 
     <!-- Tab: Search Food -->
     <div id="tab-search" class="tab-content active">
-      <label for="usdaSearch">Search USDA Database</label>
-      <input type="text" id="usdaSearch" placeholder="e.g. chicken breast" autocomplete="off">
+      <label for="usdaSearch" class="form-label">Search USDA Database</label>
+      <input type="text" id="usdaSearch" placeholder="e.g. chicken breast" autocomplete="off" class="form-input mb-2">
       <ul class="search-results" id="searchResults"></ul>
 
       <div id="searchSelected" style="display:none;">
-        <p><strong id="selectedFoodName"></strong></p>
-        <label for="gramsInput">Amount (grams)</label>
-        <input type="number" id="gramsInput" value="100" min="1" step="1">
+        <p class="font-semibold text-gray-900 dark:text-white mb-2" id="selectedFoodName"></p>
+        <label for="gramsInput" class="form-label">Amount (grams)</label>
+        <input type="number" id="gramsInput" value="100" min="1" step="1" class="form-input mb-2">
         <div class="nutrition-preview" id="searchPreview">
-          <strong>Nutrition:</strong>
+          <strong class="text-sm text-gray-700 dark:text-gray-300">Nutrition:</strong>
           <div class="preview-grid" id="searchPreviewGrid"></div>
         </div>
       </div>
@@ -155,23 +146,23 @@
 
     <!-- Tab: From Saved Recipe -->
     <div id="tab-recipe" class="tab-content">
-      <label for="recipeSelect">Select a Saved Recipe</label>
-      <select id="recipeSelect">
+      <label for="recipeSelect" class="form-label">Select a Saved Recipe</label>
+      <select id="recipeSelect" class="form-input mb-2">
         <option value="">-- Choose a recipe --</option>
       </select>
 
       <div id="recipeSelected" style="display:none;">
-        <label for="recipeServingsInput">Servings Eaten</label>
-        <input type="number" id="recipeServingsInput" value="1" min="0.25" step="0.25">
+        <label for="recipeServingsInput" class="form-label">Servings Eaten</label>
+        <input type="number" id="recipeServingsInput" value="1" min="0.25" step="0.25" class="form-input mb-2">
         <div class="nutrition-preview" id="recipePreview">
-          <strong>Nutrition:</strong>
+          <strong class="text-sm text-gray-700 dark:text-gray-300">Nutrition:</strong>
           <div class="preview-grid" id="recipePreviewGrid"></div>
         </div>
       </div>
     </div>
 
     <!-- Hidden Form -->
-    <form method="POST" action="/nutrition/log" id="mealForm" style="margin-top:1rem;">
+    <form method="POST" action="/nutrition/log" id="mealForm" class="mt-4">
       <input type="hidden" name="_csrf" value="<%= csrfToken %>">
       <input type="hidden" name="logDate" value="<%= date %>">
       <input type="hidden" name="foodName" id="hFoodName">
@@ -189,7 +180,7 @@
       <input type="hidden" name="potassiumMg" id="hPotassiumMg">
       <input type="hidden" name="vitaminCMg" id="hVitaminCMg">
       <input type="hidden" name="recipeId" id="hRecipeId">
-      <button type="submit" id="submitMeal" disabled>Log Meal</button>
+      <button type="submit" id="submitMeal" disabled class="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed">Log Meal</button>
     </form>
   </div>
 </dialog>
@@ -231,7 +222,7 @@
             html += '<div class="food-nutrients">' + cal + ' cal, ' + pro + 'g protein (per 100g)</div>';
             html += '</li>';
           });
-          if (foods.length === 0) html = '<li style="padding:0.5rem;color:#8C7E6D;">No results found</li>';
+          if (foods.length === 0) html = '<li class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">No results found</li>';
           document.getElementById('searchResults').innerHTML = html;
 
           document.querySelectorAll('.search-result[data-food]').forEach(function(el) {
