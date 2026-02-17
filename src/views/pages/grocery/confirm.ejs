@@ -1,0 +1,76 @@
+<%- include('../../partials/header') %>
+
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Confirm Grocery List</h1>
+
+<form method="POST" action="/grocery/confirm">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" name="listName" value="<%= listName %>">
+  <input type="hidden" name="missingItems" value="<%= JSON.stringify(missing) %>">
+  <input type="hidden" name="partialItems" value="<%= JSON.stringify(partial) %>">
+
+  <!-- Definitely Needed -->
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Definitely Needed</h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">These ingredients will be added to your grocery list automatically.</p>
+    <% if (missing.length === 0) { %>
+      <p class="text-sm text-gray-500 dark:text-gray-400 italic">No clearly missing ingredients found.</p>
+    <% } else { %>
+      <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4">
+        <ul class="space-y-1.5 text-sm text-gray-700 dark:text-gray-300">
+          <% missing.forEach(function(item) { %>
+            <li class="flex items-start gap-2">
+              <span class="text-primary dark:text-primary-light mt-0.5">&#10003;</span>
+              <span>
+                <strong><%= item.name %></strong>
+                <% if (item.amount || item.unit) { %>
+                  <span class="text-gray-500 dark:text-gray-400">(<%= item.amount || '' %> <%= item.unit || '' %>)</span>
+                <% } %>
+                <% if (item.sourceRecipeTitle) { %>
+                  <span class="text-xs text-gray-400 dark:text-gray-500"> &mdash; <%= item.sourceRecipeTitle %></span>
+                <% } %>
+              </span>
+            </li>
+          <% }); %>
+        </ul>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- Partial Matches -->
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">You Might Already Have These</h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">These ingredients partially match items in your pantry. Uncheck any you don't need.</p>
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4">
+      <ul class="space-y-3">
+        <% partial.forEach(function(item) { %>
+          <li>
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" name="confirmedPartials" value="<%= item.ingredientName %>" checked class="mt-1 rounded border-gray-300 text-primary focus:ring-primary">
+              <div>
+                <span class="text-sm font-medium text-gray-900 dark:text-white">
+                  Recipe needs <strong><%= item.ingredientName %></strong>
+                </span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">
+                  &mdash; you have <strong><%= item.pantryItemName %></strong> in your pantry
+                </span>
+                <% if (item.sourceRecipeTitle) { %>
+                  <span class="text-xs text-gray-400 dark:text-gray-500 block"><%= item.sourceRecipeTitle %></span>
+                <% } %>
+              </div>
+            </label>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  </section>
+
+  <div class="flex gap-3">
+    <button type="submit" class="btn-primary">
+      <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      Create Grocery List
+    </button>
+    <a href="/grocery/new" class="btn-secondary">Back</a>
+  </div>
+</form>
+
+<%- include('../../partials/footer') %>
