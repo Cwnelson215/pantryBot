@@ -61,11 +61,6 @@ vi.mock("../../services/barcode-lookup.service", () => ({
   lookupBarcode: vi.fn(),
 }));
 
-vi.mock("../../routes/grocery", () => {
-  const { Router } = require("express");
-  return { default: Router() };
-});
-
 import app from "../../app";
 import * as authService from "../../services/auth.service";
 import * as pantryService from "../../services/pantry.service";

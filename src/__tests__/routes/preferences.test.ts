@@ -53,11 +53,6 @@ vi.mock("../../services/pantry.service", () => ({
   getItemsByCategory: vi.fn().mockResolvedValue({}),
 }));
 
-vi.mock("../../routes/grocery", () => {
-  const { Router } = require("express");
-  return { default: Router() };
-});
-
 import app from "../../app";
 import * as authService from "../../services/auth.service";
 

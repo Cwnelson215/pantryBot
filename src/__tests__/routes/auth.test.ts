@@ -30,11 +30,6 @@ vi.mock("../../services/auth.service", () => ({
   getUserById: vi.fn(),
 }));
 
-vi.mock("../../routes/grocery", () => {
-  const { Router } = require("express");
-  return { default: Router() };
-});
-
 import app from "../../app";
 import * as authService from "../../services/auth.service";
 

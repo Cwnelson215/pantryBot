@@ -24,11 +24,6 @@ vi.mock("../../db/client", () => ({
   pool: { connect: vi.fn(), end: vi.fn(), on: vi.fn() },
 }));
 
-vi.mock("../../routes/grocery", () => {
-  const { Router } = require("express");
-  return { default: Router() };
-});
-
 import app from "../../app";
 
 describe("GET /health", () => {
