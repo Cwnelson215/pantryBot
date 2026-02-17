@@ -64,6 +64,11 @@ vi.mock("../../services/claude.service", () => ({
   personalizeRecipe: vi.fn(),
 }));
 
+vi.mock("../../services/cooking.service", () => ({
+  previewCook: vi.fn(),
+  confirmCook: vi.fn(),
+}));
+
 vi.mock("../../services/grocery.service", () => ({
   getLists: vi.fn().mockResolvedValue([]),
   getList: vi.fn(),
@@ -83,6 +88,7 @@ import * as authService from "../../services/auth.service";
 import * as pantryService from "../../services/pantry.service";
 import * as spoonacularService from "../../services/spoonacular.service";
 import * as claudeService from "../../services/claude.service";
+import * as cookingService from "../../services/cooking.service";
 
 async function loginAgent() {
   const agent = request.agent(app);
@@ -341,6 +347,120 @@ describe("recipes routes", () => {
 
       expect(res.status).toBe(302);
       expect(res.headers.location).toBe("/recipes/123");
+    });
+
+    // ── Cook routes ───────────────────────────────────────────────────
+
+    it("POST /recipes/saved/:id/cook renders cook-preview page on success", async () => {
+      const { agent, csrfToken } = await loginAgent();
+
+      (cookingService.previewCook as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        recipe: { id: 1, title: "Pasta Carbonara", servings: 4 },
+        requestedServings: 4,
+        deductions: [
+          { pantryItemId: 10, pantryItemName: "pasta", ingredientName: "pasta", amountDeducted: 400, unit: "g", oldQuantity: 500, newQuantity: 100 },
+        ],
+        skipped: [],
+        replenishItems: [],
+      });
+
+      const res = await agent
+        .post("/recipes/saved/1/cook")
+        .send(`_csrf=${csrfToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.text).toContain("Pasta Carbonara");
+      expect(cookingService.previewCook).toHaveBeenCalledWith(1, 1, undefined);
+    });
+
+    it("POST /recipes/saved/:id/cook redirects when preview returns null", async () => {
+      const { agent, csrfToken } = await loginAgent();
+
+      (cookingService.previewCook as ReturnType<typeof vi.fn>).mockResolvedValueOnce(null);
+
+      const res = await agent
+        .post("/recipes/saved/1/cook")
+        .send(`_csrf=${csrfToken}`);
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
+    });
+
+    it("POST /recipes/saved/:id/cook redirects with NaN id", async () => {
+      const { agent, csrfToken } = await loginAgent();
+
+      const res = await agent
+        .post("/recipes/saved/notanumber/cook")
+        .send(`_csrf=${csrfToken}`);
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
+    });
+
+    it("POST /recipes/saved/:id/cook redirects on error", async () => {
+      const { agent, csrfToken } = await loginAgent();
+
+      (cookingService.previewCook as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new Error("Database error")
+      );
+
+      const res = await agent
+        .post("/recipes/saved/1/cook")
+        .send(`_csrf=${csrfToken}`);
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
+    });
+
+    it("POST /recipes/saved/:id/cook/confirm renders cook-result page on success", async () => {
+      const { agent, csrfToken } = await loginAgent();
+
+      (cookingService.confirmCook as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        recipe: { id: 1, title: "Pasta Carbonara", servings: 4 },
+        requestedServings: 4,
+        deductions: [
+          { pantryItemId: 10, pantryItemName: "pasta", ingredientName: "pasta", amountDeducted: 400, unit: "g", oldQuantity: 500, newQuantity: 100 },
+        ],
+        skipped: [],
+        replenishItems: [],
+        autoReplenishListId: null,
+      });
+
+      const res = await agent
+        .post("/recipes/saved/1/cook/confirm")
+        .send(`_csrf=${csrfToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.text).toContain("Pasta Carbonara");
+      expect(cookingService.confirmCook).toHaveBeenCalledWith(1, 1, undefined);
+    });
+
+    it("POST /recipes/saved/:id/cook/confirm redirects when confirmCook returns null", async () => {
+      const { agent, csrfToken } = await loginAgent();
+
+      (cookingService.confirmCook as ReturnType<typeof vi.fn>).mockResolvedValueOnce(null);
+
+      const res = await agent
+        .post("/recipes/saved/1/cook/confirm")
+        .send(`_csrf=${csrfToken}`);
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
+    });
+
+    it("POST /recipes/saved/:id/cook/confirm redirects on error", async () => {
+      const { agent, csrfToken } = await loginAgent();
+
+      (cookingService.confirmCook as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new Error("Database error")
+      );
+
+      const res = await agent
+        .post("/recipes/saved/1/cook/confirm")
+        .send(`_csrf=${csrfToken}`);
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
     });
   });
 });

@@ -19,6 +19,7 @@ vi.mock("../../db/client", () => ({
 import {
   classifyIngredients,
   deduplicateItems,
+  getOrCreateAutoReplenishList,
   createList,
   getLists,
   getList,
@@ -178,6 +179,29 @@ describe("grocery.service", () => {
         { name: "chicken" },
       ]);
       expect(result).toHaveLength(1);
+    });
+  });
+
+  // ── getOrCreateAutoReplenishList ────────────────────────────────────
+
+  describe("getOrCreateAutoReplenishList", () => {
+    it("returns existing Auto-Replenish list when one exists", async () => {
+      const autoList = { ...mockList, name: "Auto-Replenish" };
+      mockDb.where.mockResolvedValueOnce([autoList]);
+
+      const result = await getOrCreateAutoReplenishList(1);
+      expect(result).toEqual(autoList);
+      expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
+    it("creates and returns a new Auto-Replenish list when none exists", async () => {
+      const newList = { ...mockList, id: 5, name: "Auto-Replenish" };
+      mockDb.where.mockResolvedValueOnce([]); // no existing list
+      mockDb.returning.mockResolvedValueOnce([newList]);
+
+      const result = await getOrCreateAutoReplenishList(1);
+      expect(result).toEqual(newList);
+      expect(mockDb.insert).toHaveBeenCalled();
     });
   });
 

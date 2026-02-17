@@ -24,6 +24,7 @@ import {
   deleteItem,
   getExpiringItems,
   getItemsByCategory,
+  deductQuantity,
 } from "../../services/pantry.service";
 
 const mockItem = {
@@ -90,6 +91,47 @@ describe("pantry.service", () => {
       expect(result).toEqual(mockItem);
       expect(mockDb.insert).toHaveBeenCalled();
     });
+
+    it("auto-marks default staples with isStaple: 1", async () => {
+      const stapleItem = { ...mockItem, isStaple: 1, originalQuantity: "12" };
+      mockDb.returning.mockResolvedValueOnce([stapleItem]);
+
+      await addItem(1, { name: "eggs", quantity: "12" });
+
+      expect(mockDb.values).toHaveBeenCalledWith(
+        expect.objectContaining({ isStaple: 1, originalQuantity: "12" })
+      );
+    });
+
+    it("does not auto-mark non-staple names", async () => {
+      mockDb.returning.mockResolvedValueOnce([{ ...mockItem, name: "saffron", isStaple: 0 }]);
+
+      await addItem(1, { name: "saffron", quantity: "5" });
+
+      expect(mockDb.values).toHaveBeenCalledWith(
+        expect.objectContaining({ isStaple: 0 })
+      );
+    });
+
+    it("respects explicit isStaple override from user", async () => {
+      mockDb.returning.mockResolvedValueOnce([{ ...mockItem, name: "saffron", isStaple: 1 }]);
+
+      await addItem(1, { name: "saffron", quantity: "5", isStaple: 1 });
+
+      expect(mockDb.values).toHaveBeenCalledWith(
+        expect.objectContaining({ isStaple: 1 })
+      );
+    });
+
+    it("sets originalQuantity equal to provided quantity", async () => {
+      mockDb.returning.mockResolvedValueOnce([mockItem]);
+
+      await addItem(1, { name: "Chicken", quantity: "2" });
+
+      expect(mockDb.values).toHaveBeenCalledWith(
+        expect.objectContaining({ originalQuantity: "2" })
+      );
+    });
   });
 
   describe("updateItem", () => {
@@ -106,6 +148,43 @@ describe("pantry.service", () => {
 
       const result = await updateItem(999, 1, { name: "test" });
       expect(result).toBeNull();
+    });
+
+    it("updates originalQuantity when quantity increases (restock)", async () => {
+      const existing = { ...mockItem, quantity: "5", originalQuantity: "10" };
+      mockDb.where.mockResolvedValueOnce([existing]);
+      mockDb.returning.mockResolvedValueOnce([{ ...existing, quantity: "15", originalQuantity: "15" }]);
+
+      const result = await updateItem(1, 1, { quantity: "15" });
+
+      expect(mockDb.set).toHaveBeenCalledWith(
+        expect.objectContaining({ quantity: "15", originalQuantity: "15" })
+      );
+      expect(result).toHaveProperty("quantity", "15");
+    });
+
+    it("does NOT update originalQuantity when quantity decreases", async () => {
+      const existing = { ...mockItem, quantity: "10", originalQuantity: "10" };
+      mockDb.where.mockResolvedValueOnce([existing]);
+      mockDb.returning.mockResolvedValueOnce([{ ...existing, quantity: "5" }]);
+
+      await updateItem(1, 1, { quantity: "5" });
+
+      expect(mockDb.set).toHaveBeenCalledWith(
+        expect.not.objectContaining({ originalQuantity: "5" })
+      );
+    });
+
+    it("accepts and persists isStaple field", async () => {
+      mockDb.where.mockResolvedValueOnce([mockItem]);
+      mockDb.returning.mockResolvedValueOnce([{ ...mockItem, isStaple: 1 }]);
+
+      const result = await updateItem(1, 1, { isStaple: 1 });
+
+      expect(mockDb.set).toHaveBeenCalledWith(
+        expect.objectContaining({ isStaple: 1 })
+      );
+      expect(result).toHaveProperty("isStaple", 1);
     });
   });
 
@@ -166,6 +245,67 @@ describe("pantry.service", () => {
 
       const result = await getItemsByCategory(1);
       expect(result).toEqual({});
+    });
+  });
+
+  describe("deductQuantity", () => {
+    it("returns null when item not found (ownership check)", async () => {
+      mockDb.where.mockResolvedValueOnce([]);
+
+      const result = await deductQuantity(999, 1, 5);
+      expect(result).toBeNull();
+    });
+
+    it("deducts amount and returns old/new/original quantities", async () => {
+      const item = { ...mockItem, id: 10, quantity: "10", originalQuantity: "10" };
+      mockDb.where.mockResolvedValueOnce([item]);
+      // update chain resolves
+      mockDb.where.mockResolvedValueOnce(undefined);
+
+      const result = await deductQuantity(10, 1, 3);
+
+      expect(result).toEqual({
+        item,
+        oldQuantity: 10,
+        newQuantity: 7,
+        originalQuantity: 10,
+      });
+    });
+
+    it("clamps newQuantity to 0 (no negatives)", async () => {
+      const item = { ...mockItem, id: 10, quantity: "2", originalQuantity: "10" };
+      mockDb.where.mockResolvedValueOnce([item]);
+      mockDb.where.mockResolvedValueOnce(undefined);
+
+      const result = await deductQuantity(10, 1, 5);
+
+      expect(result!.newQuantity).toBe(0);
+    });
+
+    it("snapshots originalQuantity from current quantity on first deduction if not previously set", async () => {
+      const item = { ...mockItem, id: 10, quantity: "8", originalQuantity: null };
+      mockDb.where.mockResolvedValueOnce([item]);
+      mockDb.where.mockResolvedValueOnce(undefined);
+
+      const result = await deductQuantity(10, 1, 3);
+
+      expect(mockDb.set).toHaveBeenCalledWith(
+        expect.objectContaining({ originalQuantity: "8" })
+      );
+      expect(result!.originalQuantity).toBe(8);
+    });
+
+    it("uses existing originalQuantity if already set", async () => {
+      const item = { ...mockItem, id: 10, quantity: "5", originalQuantity: "10" };
+      mockDb.where.mockResolvedValueOnce([item]);
+      mockDb.where.mockResolvedValueOnce(undefined);
+
+      const result = await deductQuantity(10, 1, 2);
+
+      expect(mockDb.set).toHaveBeenCalledWith(
+        expect.not.objectContaining({ originalQuantity: expect.any(String) })
+      );
+      expect(result!.originalQuantity).toBe(10);
     });
   });
 });
