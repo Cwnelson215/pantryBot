@@ -1,6 +1,8 @@
 import path from "path";
 import express from "express";
 import session from "express-session";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import connectPgSimple from "connect-pg-simple";
 import { config } from "./config";
 import { pool } from "./db/client";
@@ -28,6 +30,20 @@ app.set("trust proxy", 1);
 app.set("view engine", "ejs");
 app.set("views", config.viewsPath);
 
+// Security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  })
+);
+
 // Health check (before session/auth middleware to avoid DB dependency for ALB)
 app.use("/health", healthRouter);
 
@@ -35,8 +51,8 @@ app.use("/health", healthRouter);
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 // Body parsing
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(express.json({ limit: "1mb" }));
 
 // Sessions
 app.use(
@@ -49,8 +65,9 @@ app.use(
     secret: config.session.secret,
     resave: false,
     saveUninitialized: false,
+    rolling: true,
     cookie: {
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       httpOnly: true,
       secure: config.nodeEnv === "production",
       sameSite: "lax",
@@ -62,6 +79,29 @@ app.use(
 app.use(flashMiddleware);
 app.use(loadUser);
 app.use(csrfMiddleware);
+
+// Rate limiting (disabled in test to avoid flaky test failures)
+if (config.nodeEnv !== "test") {
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10,
+    message: "Too many attempts, please try again later",
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  app.use("/login", authLimiter);
+  app.use("/register", authLimiter);
+  app.use("/nutrition/api", apiLimiter);
+  app.use("/recipes/search", apiLimiter);
+}
 
 // Routes
 app.use("/", authRouter);

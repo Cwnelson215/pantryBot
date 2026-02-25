@@ -46,6 +46,11 @@ router.post("/register", guestOnly, async (req, res) => {
     return res.redirect("/register");
   }
 
+  if (password.length < 8) {
+    setFlash(req, "error", "Password must be at least 8 characters long");
+    return res.redirect("/register");
+  }
+
   try {
     const user = await authService.registerUser(email, password, displayName);
     req.session.userId = user.id;

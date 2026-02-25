@@ -43,8 +43,12 @@ router.get("/", async (req, res) => {
 router.get("/daily", async (req, res) => {
   const userId = req.session.userId!;
 
+  const dateParam = req.query.date as string;
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
   const date =
-    (req.query.date as string) || new Date().toISOString().split("T")[0];
+    dateParam && dateRegex.test(dateParam)
+      ? dateParam
+      : new Date().toISOString().split("T")[0];
 
   const dailyLog = await nutritionService.getDailyLog(userId, date);
 
@@ -179,6 +183,14 @@ router.post("/log", async (req, res) => {
     sourceData,
   } = req.body;
 
+  let parsedSourceData: any;
+  try {
+    parsedSourceData = sourceData ? JSON.parse(sourceData) : undefined;
+  } catch {
+    setFlash(req, "error", "Invalid source data");
+    return res.redirect("/nutrition/daily");
+  }
+
   await nutritionService.logMeal(userId, {
     logDate,
     foodName,
@@ -196,7 +208,7 @@ router.post("/log", async (req, res) => {
     potassiumMg,
     vitaminCMg,
     recipeId: recipeId ? parseInt(recipeId) : undefined,
-    sourceData: sourceData ? JSON.parse(sourceData) : undefined,
+    sourceData: parsedSourceData,
   });
 
   setFlash(req, "success", "Meal logged successfully");
@@ -211,8 +223,12 @@ router.post("/log/:id/delete", async (req, res) => {
 
   setFlash(req, "success", "Nutrition log entry deleted");
 
-  const referrer = req.get("Referer") || "/nutrition/daily";
-  res.redirect(referrer);
+  const referrer = req.get("Referer");
+  const safeRedirect =
+    referrer && referrer.startsWith("/") && !referrer.startsWith("//")
+      ? referrer
+      : "/nutrition/daily";
+  res.redirect(safeRedirect);
 });
 
 export default router;

@@ -3,11 +3,11 @@ import { config } from "../config";
 
 export function errorHandler(
   err: any,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) {
-  console.error(err);
+  console.error(err.message || err);
 
   const status = err.status || 500;
   const message =

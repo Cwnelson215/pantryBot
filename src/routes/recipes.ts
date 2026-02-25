@@ -170,22 +170,27 @@ router.post("/save", async (req: Request, res: Response) => {
     nutritionJson,
   } = req.body;
 
-  await db.insert(savedRecipes).values({
-    userId,
-    title,
-    spoonacularId: spoonacularId ? parseInt(spoonacularId) : null,
-    source: source || null,
-    ingredientsJson: ingredientsJson ? JSON.parse(ingredientsJson) : null,
-    instructionsJson: instructionsJson ? JSON.parse(instructionsJson) : null,
-    personalization: personalization || null,
-    servings: servings ? parseInt(servings) : null,
-    readyInMinutes: readyInMinutes ? parseInt(readyInMinutes) : null,
-    imageUrl: imageUrl || null,
-    nutritionJson: nutritionJson ? JSON.parse(nutritionJson) : null,
-  });
+  try {
+    await db.insert(savedRecipes).values({
+      userId,
+      title,
+      spoonacularId: spoonacularId ? parseInt(spoonacularId) : null,
+      source: source || null,
+      ingredientsJson: ingredientsJson ? JSON.parse(ingredientsJson) : null,
+      instructionsJson: instructionsJson ? JSON.parse(instructionsJson) : null,
+      personalization: personalization || null,
+      servings: servings ? parseInt(servings) : null,
+      readyInMinutes: readyInMinutes ? parseInt(readyInMinutes) : null,
+      imageUrl: imageUrl || null,
+      nutritionJson: nutritionJson ? JSON.parse(nutritionJson) : null,
+    });
 
-  setFlash(req, "success", "Recipe saved!");
-  res.redirect("/recipes/saved");
+    setFlash(req, "success", "Recipe saved!");
+    res.redirect("/recipes/saved");
+  } catch {
+    setFlash(req, "error", "Failed to save recipe — invalid data");
+    res.redirect("/recipes");
+  }
 });
 
 // ── Cook Recipe ─────────────────────────────────────────────────────────────

@@ -84,7 +84,7 @@
                         </ol>
                       <% } %>
                     <% } else { %>
-                      <div class="text-gray-600 dark:text-gray-400"><%- instructions %></div>
+                      <div class="text-gray-600 dark:text-gray-400 whitespace-pre-line"><%= instructions %></div>
                     <% } %>
                   </div>
                 <% } %>
@@ -93,7 +93,7 @@
               <% if (recipe.personalization) { %>
                 <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
                   <h5 class="font-semibold text-blue-800 dark:text-blue-300 mb-1 text-sm">Personalization Notes</h5>
-                  <p class="text-xs text-blue-700 dark:text-blue-400"><%- recipe.personalization.replace(/\n/g, '<br>') %></p>
+                  <p class="text-xs text-blue-700 dark:text-blue-400 whitespace-pre-line"><%= recipe.personalization %></p>
                 </div>
               <% } %>
             </div>

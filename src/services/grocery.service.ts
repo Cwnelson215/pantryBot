@@ -111,12 +111,24 @@ export async function getOrCreateAutoReplenishList(userId: number) {
 
   if (lists.length > 0) return lists[0];
 
-  const result = await db
-    .insert(groceryLists)
-    .values({ userId, name: "Auto-Replenish" })
-    .returning();
+  try {
+    const result = await db
+      .insert(groceryLists)
+      .values({ userId, name: "Auto-Replenish" })
+      .returning();
 
-  return result[0];
+    return result[0];
+  } catch {
+    // Race condition: another request created the list concurrently — re-select
+    const retryLists = await db
+      .select()
+      .from(groceryLists)
+      .where(
+        and(eq(groceryLists.userId, userId), eq(groceryLists.name, "Auto-Replenish"))
+      );
+
+    return retryLists[0];
+  }
 }
 
 // ── CRUD Operations ──────────────────────────────────────────────────────────

@@ -83,6 +83,6 @@ describe("error middleware", () => {
 
     errorHandler(err, req as any, res as any, next);
 
-    expect(console.error).toHaveBeenCalledWith(err);
+    expect(console.error).toHaveBeenCalledWith("Test error");
   });
 });

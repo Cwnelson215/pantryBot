@@ -76,23 +76,27 @@ router.post("/", async (req, res) => {
     servingSize,
   } = req.body;
 
-  const parsedDietaryTags = Array.isArray(dietaryTags)
+  const rawDietaryTags = Array.isArray(dietaryTags)
     ? dietaryTags
     : dietaryTags
       ? dietaryTags.split(",").map((s: string) => s.trim()).filter(Boolean)
       : [];
 
-  const parsedAllergies = Array.isArray(allergies)
+  const rawAllergies = Array.isArray(allergies)
     ? allergies
     : allergies
       ? allergies.split(",").map((s: string) => s.trim()).filter(Boolean)
       : [];
 
-  const parsedCuisinePrefs = Array.isArray(cuisinePrefs)
+  const rawCuisinePrefs = Array.isArray(cuisinePrefs)
     ? cuisinePrefs
     : cuisinePrefs
       ? cuisinePrefs.split(",").map((s: string) => s.trim()).filter(Boolean)
       : [];
+
+  const parsedDietaryTags = rawDietaryTags.filter((t: string) => DIETARY_OPTIONS.includes(t));
+  const parsedAllergies = rawAllergies.filter((a: string) => ALLERGY_OPTIONS.includes(a));
+  const parsedCuisinePrefs = rawCuisinePrefs.filter((c: string) => CUISINE_OPTIONS.includes(c));
 
   const parsedServingSize = servingSize ? parseInt(servingSize) : null;
 
