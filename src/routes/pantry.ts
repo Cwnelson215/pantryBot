@@ -3,6 +3,7 @@ import { requireAuth } from "../middleware/auth";
 import { setFlash } from "../middleware/flash";
 import * as pantryService from "../services/pantry.service";
 import * as barcodeLookup from "../services/barcode-lookup.service";
+import * as usdaService from "../services/usda.service";
 
 const CATEGORIES = [
   "Produce",
@@ -86,6 +87,43 @@ router.get("/lookup-barcode/:barcode", async (req, res) => {
   } finally {
     clearTimeout(routeTimeout);
   }
+});
+
+router.get("/:id", async (req, res) => {
+  const userId = req.session.userId!;
+  const id = parseInt(req.params.id);
+
+  if (isNaN(id)) {
+    setFlash(req, "error", "Invalid item ID");
+    return res.redirect("/pantry");
+  }
+
+  const item = await pantryService.getItem(id, userId);
+
+  if (!item) {
+    setFlash(req, "error", "Item not found");
+    return res.redirect("/pantry");
+  }
+
+  let nutrients: usdaService.NutrientInfo | null = null;
+  try {
+    if (item.usdaFdcId) {
+      nutrients = await usdaService.getNutrients(item.usdaFdcId);
+    } else {
+      const results = await usdaService.searchFoods(item.name, 1);
+      if (results && results.length > 0) {
+        nutrients = usdaService.extractNutrientsFromSearchResult(results[0]);
+      }
+    }
+  } catch {
+    // Nutrition lookup failed — page will render without nutrition data
+  }
+
+  res.render("pages/pantry/show", {
+    title: item.name,
+    item,
+    nutrients,
+  });
 });
 
 router.post("/add", async (req, res) => {

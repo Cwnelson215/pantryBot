@@ -27,7 +27,17 @@
     <section class="mb-8">
       <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 pb-2 border-b border-gray-200 dark:border-gray-700"><%= category %></h2>
       <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-        <div class="overflow-x-auto">
+        <!-- Mobile list -->
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700 sm:hidden">
+          <% categories[category].forEach(function(item) { %>
+            <li class="px-4 py-3 flex items-center justify-between">
+              <a href="/pantry/<%= item.id %>" class="font-medium text-blue-600 dark:text-blue-400 hover:underline"><%= item.name %></a>
+              <span class="text-sm text-gray-500 dark:text-gray-400"><%= item.quantity %> <%= item.unit %></span>
+            </li>
+          <% }); %>
+        </ul>
+        <!-- Desktop table -->
+        <div class="hidden sm:block overflow-x-auto">
           <table class="data-table">
             <thead>
               <tr>
@@ -50,7 +60,7 @@
                 }
               %>
                 <tr>
-                  <td class="font-medium text-gray-900 dark:text-white"><%= item.name %></td>
+                  <td class="font-medium"><a href="/pantry/<%= item.id %>" class="text-blue-600 dark:text-blue-400 hover:underline"><%= item.name %></a></td>
                   <td><%= item.quantity %> <%= item.unit %></td>
                   <td>
                     <% if (item.expirationDate) { %>

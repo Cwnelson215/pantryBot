@@ -61,6 +61,12 @@ vi.mock("../../services/barcode-lookup.service", () => ({
   lookupBarcode: vi.fn(),
 }));
 
+vi.mock("../../services/usda.service", () => ({
+  getNutrients: vi.fn(),
+  searchFoods: vi.fn(),
+  extractNutrientsFromSearchResult: vi.fn(),
+}));
+
 vi.mock("../../services/grocery.service", () => ({
   getLists: vi.fn().mockResolvedValue([]),
   getList: vi.fn(),
@@ -79,6 +85,7 @@ import app from "../../app";
 import * as authService from "../../services/auth.service";
 import * as pantryService from "../../services/pantry.service";
 import * as barcodeLookup from "../../services/barcode-lookup.service";
+import * as usdaService from "../../services/usda.service";
 
 async function loginAgent() {
   const agent = request.agent(app);
@@ -257,6 +264,90 @@ describe("pantry routes", () => {
       const res = await agent.get("/pantry/lookup-barcode/3270190207924");
       expect(res.status).toBe(500);
       expect(res.body.error).toContain("Failed to look up barcode");
+    });
+
+    it("GET /pantry/:id renders food profile with nutrition from fdcId", async () => {
+      const { agent } = await loginAgent();
+
+      (pantryService.getItem as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        id: 1, userId: 1, name: "Milk", quantity: "1", unit: "L",
+        category: "Dairy", expirationDate: null, notes: null,
+        usdaFdcId: "12345", barcode: null, isStaple: 0,
+      });
+
+      (usdaService.getNutrients as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        calories: 42, proteinG: 3.4, carbsG: 5, fatG: 1, fiberG: null,
+        sugarG: 5, sodiumMg: 44, ironMg: null, calciumMg: 125,
+        vitaminDMcg: 1.3, potassiumMg: 150, vitaminCMg: null,
+      });
+
+      const res = await agent.get("/pantry/1");
+      expect(res.status).toBe(200);
+      expect(res.text).toContain("Milk");
+      expect(res.text).toContain("Nutrition Information");
+      expect(res.text).toContain("42");
+      expect(usdaService.getNutrients).toHaveBeenCalledWith("12345");
+    });
+
+    it("GET /pantry/:id falls back to search when no fdcId", async () => {
+      const { agent } = await loginAgent();
+
+      (pantryService.getItem as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        id: 2, userId: 1, name: "Apple", quantity: "3", unit: "piece",
+        category: "Produce", expirationDate: null, notes: null,
+        usdaFdcId: null, barcode: null, isStaple: 0,
+      });
+
+      const mockFood = { fdcId: 999, foodNutrients: [] };
+      (usdaService.searchFoods as ReturnType<typeof vi.fn>).mockResolvedValueOnce([mockFood]);
+      (usdaService.extractNutrientsFromSearchResult as ReturnType<typeof vi.fn>).mockReturnValueOnce({
+        calories: 52, proteinG: 0.3, carbsG: 14, fatG: 0.2, fiberG: 2.4,
+        sugarG: 10, sodiumMg: 1, ironMg: 0.1, calciumMg: 6,
+        vitaminDMcg: null, potassiumMg: 107, vitaminCMg: 4.6,
+      });
+
+      const res = await agent.get("/pantry/2");
+      expect(res.status).toBe(200);
+      expect(res.text).toContain("Apple");
+      expect(res.text).toContain("52");
+      expect(usdaService.searchFoods).toHaveBeenCalledWith("Apple", 1);
+    });
+
+    it("GET /pantry/:id redirects when item not found", async () => {
+      const { agent } = await loginAgent();
+
+      (pantryService.getItem as ReturnType<typeof vi.fn>).mockResolvedValueOnce(null);
+
+      const res = await agent.get("/pantry/999");
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/pantry");
+    });
+
+    it("GET /pantry/:id redirects on non-numeric id", async () => {
+      const { agent } = await loginAgent();
+
+      const res = await agent.get("/pantry/abc");
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/pantry");
+    });
+
+    it("GET /pantry/:id renders without nutrition when USDA throws", async () => {
+      const { agent } = await loginAgent();
+
+      (pantryService.getItem as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        id: 1, userId: 1, name: "Milk", quantity: "1", unit: "L",
+        category: "Dairy", expirationDate: null, notes: null,
+        usdaFdcId: "12345", barcode: null, isStaple: 0,
+      });
+
+      (usdaService.getNutrients as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new Error("USDA API error")
+      );
+
+      const res = await agent.get("/pantry/1");
+      expect(res.status).toBe(200);
+      expect(res.text).toContain("Milk");
+      expect(res.text).toContain("Nutritional information not available");
     });
 
     it("GET /pantry/lookup-barcode returns 504 when service never resolves", async () => {

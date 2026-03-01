@@ -16,3 +16,5 @@ config:
     secure: AAABAOf7UJy6/EA00mwUF7R6WWZUDczHzi8eGjaTJsQBbElXM7991JbPFb7LWhyH4mmjMisgIui6b/P97r3yRyql6bb3ruvAkEv/wiVNmX/xK7W7f/A0W2XeAbvuluPl
   pantry-bot:usdaApiKey:
     secure: AAABAAeJAJOpAVDChr/+wC9kRekA6BqH1UEuOijrGTZRmSM3JDRJQMS7m2oqFOjQHAFNzNZLglqBbUhOMeAe8d61I2SmMbgEeA==
+  pantry-bot:dbPassword:
+    secure: AAABAI3zzyGrjI1HDL0oaoT2/tHRd1GHbRd3AZzbWlUDEHu3oh+ve0laeCDHcw==

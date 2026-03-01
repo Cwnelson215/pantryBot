@@ -1,0 +1,157 @@
+<%- include('../../partials/header') %>
+
+<a href="/pantry" class="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:underline mb-4">
+  <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+  Back to Pantry
+</a>
+
+<h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6"><%= item.name %></h1>
+
+<!-- Details Card -->
+<section class="mb-6">
+  <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Category</p>
+        <p class="text-sm font-medium text-gray-900 dark:text-white"><%= item.category || 'Uncategorized' %></p>
+      </div>
+      <div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Quantity</p>
+        <p class="text-sm font-medium text-gray-900 dark:text-white"><%= item.quantity %> <%= item.unit %></p>
+      </div>
+      <div>
+        <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Expiration</p>
+        <% if (item.expirationDate) {
+          var now = new Date();
+          var exp = new Date(item.expirationDate);
+          var diffDays = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+          var expClass = '';
+          if (diffDays <= 2) expClass = 'text-red-600 dark:text-red-400 font-medium';
+          else if (diffDays <= 5) expClass = 'text-amber-600 dark:text-amber-400 font-medium';
+        %>
+          <p class="text-sm <%= expClass %>"><%= exp.toLocaleDateString() %></p>
+        <% } else { %>
+          <p class="text-sm text-gray-400 dark:text-gray-500">--</p>
+        <% } %>
+      </div>
+      <% if (item.notes) { %>
+        <div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Notes</p>
+          <p class="text-sm text-gray-700 dark:text-gray-300"><%= item.notes %></p>
+        </div>
+      <% } %>
+      <% if (item.barcode) { %>
+        <div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Barcode</p>
+          <p class="text-sm font-mono text-gray-700 dark:text-gray-300"><%= item.barcode %></p>
+        </div>
+      <% } %>
+      <% if (item.isStaple) { %>
+        <div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Staple</span>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- Nutrition Info -->
+<% if (typeof nutrients !== 'undefined' && nutrients) { %>
+  <section class="mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Nutrition Information <span class="text-xs font-normal text-gray-500 dark:text-gray-400">(per 100g serving)</span></h2>
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-gray-200 dark:bg-gray-700">
+        <% if (nutrients.calories != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.calories %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Calories (kcal)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.proteinG != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.proteinG %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Protein (g)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.carbsG != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.carbsG %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Carbs (g)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.fatG != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.fatG %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Fat (g)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.fiberG != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.fiberG %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Fiber (g)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.sugarG != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.sugarG %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Sugar (g)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.sodiumMg != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.sodiumMg %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Sodium (mg)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.ironMg != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.ironMg %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Iron (mg)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.calciumMg != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.calciumMg %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Calcium (mg)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.vitaminDMcg != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.vitaminDMcg %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Vitamin D (mcg)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.potassiumMg != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.potassiumMg %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Potassium (mg)</p>
+          </div>
+        <% } %>
+        <% if (nutrients.vitaminCMg != null) { %>
+          <div class="bg-white dark:bg-gray-800 p-4 text-center">
+            <p class="text-lg font-bold text-gray-900 dark:text-white"><%= nutrients.vitaminCMg %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Vitamin C (mg)</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+<% } else { %>
+  <section class="mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Nutrition Information</h2>
+    <p class="text-sm text-gray-500 dark:text-gray-400">Nutritional information not available.</p>
+  </section>
+<% } %>
+
+<!-- Actions -->
+<section>
+  <div class="flex items-center gap-3">
+    <a href="/pantry/<%= item.id %>/edit" class="btn-primary">Edit</a>
+    <form method="POST" action="/pantry/<%= item.id %>/delete" class="inline">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <button type="submit" class="btn-ghost-danger">Delete</button>
+    </form>
+  </div>
+</section>
+
+<%- include('../../partials/footer') %>
