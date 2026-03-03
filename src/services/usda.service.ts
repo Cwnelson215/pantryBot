@@ -1,4 +1,8 @@
 import { config } from "../config";
+import { createCache, TTL } from "./cache";
+
+const searchFoodsCache = createCache<any[]>({ max: 200, ttl: TTL.MEDIUM });
+const foodDetailsCache = createCache<any>({ max: 500, ttl: TTL.VERY_LONG });
 
 function ensureApiKey() {
   if (!config.usda.apiKey) {
@@ -8,6 +12,10 @@ function ensureApiKey() {
 
 export async function searchFoods(query: string, pageSize: number = 10) {
   ensureApiKey();
+
+  const cacheKey = `${query}:${pageSize}`;
+  const cached = searchFoodsCache.get(cacheKey);
+  if (cached) return cached;
 
   const url = `${config.usda.baseUrl}/foods/search?api_key=${config.usda.apiKey}&query=${encodeURIComponent(query)}&pageSize=${pageSize}&dataType=Foundation,SR%20Legacy`;
 
@@ -20,11 +28,15 @@ export async function searchFoods(query: string, pageSize: number = 10) {
   }
 
   const data = await response.json();
+  searchFoodsCache.set(cacheKey, data.foods);
   return data.foods;
 }
 
 export async function getFoodDetails(fdcId: string) {
   ensureApiKey();
+
+  const cached = foodDetailsCache.get(fdcId);
+  if (cached) return cached;
 
   const url = `${config.usda.baseUrl}/food/${fdcId}?api_key=${config.usda.apiKey}`;
 
@@ -36,7 +48,9 @@ export async function getFoodDetails(fdcId: string) {
     );
   }
 
-  return response.json();
+  const data = await response.json();
+  foodDetailsCache.set(fdcId, data);
+  return data;
 }
 
 export interface NutrientInfo {

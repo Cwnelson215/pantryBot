@@ -1,4 +1,8 @@
+import { createCache, TTL } from "./cache";
+
 const BASE_URL = "https://world.openfoodfacts.org/api/v2/product";
+
+const barcodeCache = createCache<BarcodeResult>({ max: 500, ttl: TTL.LONG });
 
 interface OFFProduct {
   product_name?: string;
@@ -140,6 +144,9 @@ const FETCH_TIMEOUT_MS = 8000;
 const HARD_DEADLINE_MS = 10000;
 
 export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
+  const cached = barcodeCache.get(barcode);
+  if (cached) return cached;
+
   let hardDeadlineTimer: ReturnType<typeof setTimeout> | undefined;
   try {
     const result = await Promise.race([
@@ -148,6 +155,9 @@ export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
         hardDeadlineTimer = setTimeout(() => reject(new Error("Hard deadline exceeded")), HARD_DEADLINE_MS);
       }),
     ]);
+    if (result.found) {
+      barcodeCache.set(barcode, result);
+    }
     return result;
   } catch (err) {
     console.error("Barcode lookup failed:", err);

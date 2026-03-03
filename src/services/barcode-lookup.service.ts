@@ -1,15 +1,22 @@
 import * as openfoodfacts from "./openfoodfacts.service";
 import { BarcodeResult, mapToAppCategory, parseQuantity } from "./openfoodfacts.service";
 import { lookupByBarcode as usdaLookupByBarcode, USDABrandedFood } from "./usda.service";
+import { createCache, TTL } from "./cache";
+
+const unifiedBarcodeCache = createCache<BarcodeResult>({ max: 500, ttl: TTL.LONG });
 
 const HARD_DEADLINE_MS = 10000;
 
 export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
+  const cached = unifiedBarcodeCache.get(barcode);
+  if (cached) return cached;
+
   const start = Date.now();
 
   try {
     const offResult = await openfoodfacts.lookupBarcode(barcode);
     if (offResult.found) {
+      unifiedBarcodeCache.set(barcode, offResult);
       return offResult;
     }
 
@@ -22,7 +29,9 @@ export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
 
     const usdaFood = await usdaLookupByBarcode(barcode, remaining);
     if (usdaFood) {
-      return mapUSDAToResult(usdaFood);
+      const result = mapUSDAToResult(usdaFood);
+      unifiedBarcodeCache.set(barcode, result);
+      return result;
     }
 
     return { found: false };

@@ -1,4 +1,8 @@
 import { config } from "../config";
+import { createCache, TTL } from "./cache";
+
+const findByIngredientsCache = createCache<any>({ max: 200, ttl: TTL.SHORT });
+const recipeDetailsCache = createCache<any>({ max: 500, ttl: TTL.LONG });
 
 function ensureApiKey() {
   if (!config.spoonacular.apiKey) {
@@ -12,6 +16,10 @@ export async function findByIngredients(
 ) {
   ensureApiKey();
 
+  const cacheKey = `${ingredients.sort().join(",")}:${number}`;
+  const cached = findByIngredientsCache.get(cacheKey);
+  if (cached) return cached;
+
   const joined = ingredients.join(",");
   const url = `${config.spoonacular.baseUrl}/recipes/findByIngredients?apiKey=${config.spoonacular.apiKey}&ingredients=${encodeURIComponent(joined)}&number=${number}&ranking=1&ignorePantry=false`;
 
@@ -23,11 +31,17 @@ export async function findByIngredients(
     );
   }
 
-  return response.json();
+  const data = await response.json();
+  findByIngredientsCache.set(cacheKey, data);
+  return data;
 }
 
 export async function getRecipeDetails(id: number) {
   ensureApiKey();
+
+  const cacheKey = String(id);
+  const cached = recipeDetailsCache.get(cacheKey);
+  if (cached) return cached;
 
   const url = `${config.spoonacular.baseUrl}/recipes/${id}/information?apiKey=${config.spoonacular.apiKey}&includeNutrition=true`;
 
@@ -39,7 +53,9 @@ export async function getRecipeDetails(id: number) {
     );
   }
 
-  return response.json();
+  const data = await response.json();
+  recipeDetailsCache.set(cacheKey, data);
+  return data;
 }
 
 export async function searchRecipes(

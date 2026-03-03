@@ -1,5 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { createHash } from "crypto";
 import { config } from "../config";
+import { createCache, TTL } from "./cache";
+
+const generateRecipeCache = createCache<GeneratedRecipe>({ max: 100, ttl: TTL.SHORT });
 
 function getClient(): Anthropic {
   if (!config.anthropic.apiKey) {
@@ -80,6 +84,12 @@ export async function generateRecipe(
   ingredients: string[],
   preferences: UserPreferences
 ): Promise<GeneratedRecipe> {
+  const cacheKey = createHash("sha256")
+    .update(JSON.stringify({ ingredients: ingredients.sort(), preferences }))
+    .digest("hex");
+  const cached = generateRecipeCache.get(cacheKey);
+  if (cached) return cached;
+
   const client = getClient();
 
   const prompt = `You are a creative chef. Create an original recipe using the following ingredients and respecting the user's preferences.
@@ -132,7 +142,7 @@ Use only valid JSON. Do not include any text before or after the JSON.`;
 
   const parsed = JSON.parse(jsonStr);
 
-  return {
+  const result: GeneratedRecipe = {
     title: parsed.title,
     servings: parsed.servings,
     readyInMinutes: parsed.readyInMinutes,
@@ -140,4 +150,6 @@ Use only valid JSON. Do not include any text before or after the JSON.`;
     instructions: parsed.instructions,
     rawResponse,
   };
+  generateRecipeCache.set(cacheKey, result);
+  return result;
 }

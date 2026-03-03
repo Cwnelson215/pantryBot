@@ -4,7 +4,7 @@ config:
   pantry-bot:subdomain: pantrybot
   pantry-bot:platformStack: Cwnelson215-org/portfolio-platform/dev
   pantry-bot:cpu: "256"
-  pantry-bot:memory: "512"
+  pantry-bot:memory: "256"
   pantry-bot:desiredCount: "1"
   pantry-bot:containerPort: "3000"
   pantry-bot:useFargateSpot: "true"

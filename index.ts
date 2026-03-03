@@ -253,7 +253,7 @@ const taskDefinition = new aws.ecs.TaskDefinition(`${appName}-task`, {
             },
           },
           healthCheck: {
-            command: ["CMD-SHELL", `wget --spider -q http://localhost:${containerPort}/health || exit 1`],
+            command: ["CMD-SHELL", `node -e "require('http').get('http://localhost:${containerPort}/health', r => r.statusCode === 200 ? process.exit(0) : process.exit(1))"`],
             interval: 30,
             timeout: 5,
             retries: 3,
@@ -280,12 +280,12 @@ const service = new aws.ecs.Service(`${appName}-service`, {
         {
           capacityProvider: "FARGATE_SPOT",
           weight: 1,
-          base: 0,
+          base: 1,
         },
         {
           capacityProvider: "FARGATE",
           weight: 0,
-          base: 1,
+          base: 0,
         },
       ]
     : undefined,

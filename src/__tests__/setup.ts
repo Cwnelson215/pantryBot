@@ -1,3 +1,6 @@
+import { beforeEach } from "vitest";
+import { clearAllCaches } from "../services/cache";
+
 process.env.NODE_ENV = "test";
 process.env.PORT = "3000";
 process.env.DB_HOST = "localhost";
@@ -9,3 +12,7 @@ process.env.SESSION_SECRET = "test-secret";
 process.env.SPOONACULAR_API_KEY = "test-spoonacular-key";
 process.env.ANTHROPIC_API_KEY = "test-anthropic-key";
 process.env.USDA_API_KEY = "test-usda-key";
+
+beforeEach(() => {
+  clearAllCaches();
+});
