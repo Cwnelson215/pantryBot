@@ -16,6 +16,12 @@ const desiredCount = parseInt(config.get("desiredCount") || "1");
 const containerPort = parseInt(config.get("containerPort") || "3000");
 const useFargateSpot = config.getBoolean("useFargateSpot") ?? true;
 
+// Scheduled scaling (optional)
+const enableScheduledScaling = config.getBoolean("enableScheduledScaling") ?? false;
+const scaleUpHour = parseInt(config.get("scaleUpHour") || "6");
+const scaleDownHour = parseInt(config.get("scaleDownHour") || "22");
+const scheduleTimezone = config.get("scheduleTimezone") || "America/Denver";
+
 // App secrets (set with: pulumi config set --secret <key> <value>)
 const sessionSecret = config.getSecret("sessionSecret");
 const spoonacularApiKey = config.getSecret("spoonacularApiKey");
@@ -307,6 +313,49 @@ const service = new aws.ecs.Service(`${appName}-service`, {
   healthCheckGracePeriodSeconds: 60,
   tags,
 });
+
+// =============================================================================
+// Scheduled Scaling (optional)
+// =============================================================================
+
+if (enableScheduledScaling) {
+  // Auto Scaling target
+  const scalingTarget = new aws.appautoscaling.Target(`${appName}-scaling-target`, {
+    maxCapacity: desiredCount,
+    minCapacity: 0,
+    resourceId: pulumi.interpolate`service/${clusterArn.apply(arn => arn.split('/').pop())}/${service.name}`,
+    scalableDimension: "ecs:service:DesiredCount",
+    serviceNamespace: "ecs",
+  });
+
+  // Scale up in the morning
+  new aws.appautoscaling.ScheduledAction(`${appName}-scale-up`, {
+    name: `${appName}-scale-up`,
+    serviceNamespace: scalingTarget.serviceNamespace,
+    resourceId: scalingTarget.resourceId,
+    scalableDimension: scalingTarget.scalableDimension,
+    schedule: `cron(0 ${scaleUpHour} * * ? *)`,
+    timezone: scheduleTimezone,
+    scalableTargetAction: {
+      minCapacity: desiredCount,
+      maxCapacity: desiredCount,
+    },
+  });
+
+  // Scale down at night
+  new aws.appautoscaling.ScheduledAction(`${appName}-scale-down`, {
+    name: `${appName}-scale-down`,
+    serviceNamespace: scalingTarget.serviceNamespace,
+    resourceId: scalingTarget.resourceId,
+    scalableDimension: scalingTarget.scalableDimension,
+    schedule: `cron(0 ${scaleDownHour} * * ? *)`,
+    timezone: scheduleTimezone,
+    scalableTargetAction: {
+      minCapacity: 0,
+      maxCapacity: 0,
+    },
+  });
+}
 
 // =============================================================================
 // Outputs

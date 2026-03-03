@@ -8,6 +8,10 @@ config:
   pantry-bot:desiredCount: "1"
   pantry-bot:containerPort: "3000"
   pantry-bot:useFargateSpot: "true"
+  pantry-bot:enableScheduledScaling: "true"
+  pantry-bot:scaleUpHour: "6"
+  pantry-bot:scaleDownHour: "22"
+  pantry-bot:scheduleTimezone: America/Denver
   pantry-bot:spoonacularApiKey:
     secure: AAABAIuQSQnte8vtSS4wYVgAfDVb7Iaoplxg+rX1GSu69lYFkBiw0AB6gl9V4SeKtX6WUnDvc6f3U490y7v2mg==
   pantry-bot:anthropicApiKey:
