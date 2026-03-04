@@ -181,6 +181,55 @@ router.get("/saved/:id", async (req: Request, res: Response) => {
   }
 });
 
+router.get("/random", async (req: Request, res: Response) => {
+  const userId = req.session.userId!;
+
+  try {
+    const [prefs, userSavedRecipes] = await Promise.all([
+      db.select().from(userPreferences).where(eq(userPreferences.userId, userId)),
+      db
+        .select({ spoonacularId: savedRecipes.spoonacularId })
+        .from(savedRecipes)
+        .where(eq(savedRecipes.userId, userId)),
+    ]);
+
+    const tags: string[] = [];
+    if (prefs.length > 0) {
+      const p = prefs[0];
+      if (p.dietaryTags) {
+        const dietTags = typeof p.dietaryTags === "string" ? JSON.parse(p.dietaryTags) : p.dietaryTags;
+        if (Array.isArray(dietTags)) tags.push(...dietTags);
+      }
+      if (p.cuisinePrefs) {
+        const cuisineTags = typeof p.cuisinePrefs === "string" ? JSON.parse(p.cuisinePrefs) : p.cuisinePrefs;
+        if (Array.isArray(cuisineTags)) tags.push(...cuisineTags);
+      }
+    }
+
+    const recipes = await spoonacularService.getRandomRecipes(tags.length > 0 ? tags : undefined, 10);
+
+    const savedIds = new Set(
+      userSavedRecipes
+        .map((r) => r.spoonacularId)
+        .filter((id): id is number => id !== null)
+    );
+    const filtered = recipes.filter((r: any) => !savedIds.has(r.id));
+
+    res.render("pages/recipes/random", {
+      title: "Random Recipes",
+      recipes: filtered,
+      tags,
+    });
+  } catch {
+    setFlash(req, "error", "Random recipes are unavailable. Please check API configuration.");
+    res.render("pages/recipes/random", {
+      title: "Random Recipes",
+      recipes: [],
+      tags: [],
+    });
+  }
+});
+
 router.get("/:id", async (req: Request, res: Response) => {
   const id = parseInt(req.params.id as string);
   if (isNaN(id)) return res.redirect("/recipes");

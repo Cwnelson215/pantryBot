@@ -56,6 +56,7 @@ vi.mock("../../services/pantry.service", () => ({
 vi.mock("../../services/spoonacular.service", () => ({
   findByIngredients: vi.fn(),
   getRecipeDetails: vi.fn(),
+  getRandomRecipes: vi.fn(),
   searchRecipes: vi.fn(),
 }));
 
@@ -347,6 +348,93 @@ describe("recipes routes", () => {
 
       expect(res.status).toBe(302);
       expect(res.headers.location).toBe("/recipes/123");
+    });
+
+    // ── Random routes ─────────────────────────────────────────────────
+
+    it("redirects to /login for /recipes/random when unauthenticated", async () => {
+      const res = await request(app).get("/recipes/random");
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/login");
+    });
+
+    it("GET /recipes/random renders random recipes", async () => {
+      const { agent } = await loginAgent();
+
+      // db.select().from(userPreferences).where(...) → prefs
+      // db.select({...}).from(savedRecipes).where(...) → saved recipes
+      mockDb.where
+        .mockResolvedValueOnce([]) // no prefs
+        .mockResolvedValueOnce([]); // no saved recipes
+
+      (spoonacularService.getRandomRecipes as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
+        { id: 1, title: "Random Tacos", image: "tacos.jpg", readyInMinutes: 30, servings: 4 },
+        { id: 2, title: "Random Soup", image: "soup.jpg", readyInMinutes: 45, servings: 6 },
+      ]);
+
+      const res = await agent.get("/recipes/random");
+      expect(res.status).toBe(200);
+      expect(res.text).toContain("Random Recipes");
+      expect(res.text).toContain("Random Tacos");
+      expect(res.text).toContain("Random Soup");
+      expect(spoonacularService.getRandomRecipes).toHaveBeenCalledWith(undefined, 10);
+    });
+
+    it("GET /recipes/random passes preference tags to API", async () => {
+      const { agent } = await loginAgent();
+
+      mockDb.where
+        .mockResolvedValueOnce([{
+          id: 1,
+          userId: 1,
+          dietaryTags: ["vegetarian"],
+          cuisinePrefs: ["italian", "mexican"],
+        }])
+        .mockResolvedValueOnce([]); // no saved recipes
+
+      (spoonacularService.getRandomRecipes as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
+
+      const res = await agent.get("/recipes/random");
+      expect(res.status).toBe(200);
+      expect(spoonacularService.getRandomRecipes).toHaveBeenCalledWith(
+        ["vegetarian", "italian", "mexican"],
+        10
+      );
+    });
+
+    it("GET /recipes/random filters out saved recipes", async () => {
+      const { agent } = await loginAgent();
+
+      mockDb.where
+        .mockResolvedValueOnce([]) // no prefs
+        .mockResolvedValueOnce([{ spoonacularId: 1 }]); // recipe 1 is saved
+
+      (spoonacularService.getRandomRecipes as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
+        { id: 1, title: "Already Saved" },
+        { id: 2, title: "Not Saved" },
+      ]);
+
+      const res = await agent.get("/recipes/random");
+      expect(res.status).toBe(200);
+      expect(res.text).not.toContain("Already Saved");
+      expect(res.text).toContain("Not Saved");
+    });
+
+    it("GET /recipes/random renders empty state on API error", async () => {
+      const { agent } = await loginAgent();
+
+      mockDb.where
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([]);
+
+      (spoonacularService.getRandomRecipes as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new Error("API error")
+      );
+
+      const res = await agent.get("/recipes/random");
+      expect(res.status).toBe(200);
+      expect(res.text).toContain("Random Recipes");
+      expect(res.text).toContain("No recipes found");
     });
 
     // ── Cook routes ───────────────────────────────────────────────────

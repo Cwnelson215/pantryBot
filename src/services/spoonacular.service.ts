@@ -58,6 +58,30 @@ export async function getRecipeDetails(id: number) {
   return data;
 }
 
+export async function getRandomRecipes(
+  tags?: string[],
+  number: number = 10
+) {
+  ensureApiKey();
+
+  let url = `${config.spoonacular.baseUrl}/recipes/random?apiKey=${config.spoonacular.apiKey}&number=${number}`;
+
+  if (tags && tags.length > 0) {
+    url += `&tags=${encodeURIComponent(tags.join(","))}`;
+  }
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(
+      `Spoonacular API error: ${response.status} ${response.statusText}`
+    );
+  }
+
+  const data = await response.json();
+  return data.recipes;
+}
+
 export async function searchRecipes(
   query: string,
   options?: { diet?: string; cuisine?: string; number?: number }

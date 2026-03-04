@@ -1,0 +1,54 @@
+<%- include('../../partials/header') %>
+
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Random Recipes</h1>
+  <a href="/recipes/random" class="btn-secondary text-sm">Get Another 10</a>
+</div>
+
+<% if (typeof tags !== 'undefined' && tags.length > 0) { %>
+  <div class="mb-6">
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Filtered by your preferences:</p>
+    <div class="flex flex-wrap gap-1.5">
+      <% tags.forEach(function(tag) { %>
+        <span class="tag"><%= tag %></span>
+      <% }); %>
+    </div>
+  </div>
+<% } %>
+
+<% if (typeof recipes !== 'undefined' && recipes.length > 0) { %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <% recipes.forEach(function(recipe) { %>
+      <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow">
+        <% if (recipe.image) { %>
+          <img src="<%= recipe.image %>" alt="<%= recipe.title %>" class="w-full h-48 object-cover">
+        <% } %>
+        <div class="p-5 flex-1 flex flex-col">
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-2">
+            <a href="/recipes/<%= recipe.id %>" class="hover:text-primary dark:hover:text-primary-light transition-colors"><%= recipe.title %></a>
+          </h4>
+          <div class="flex flex-wrap gap-1.5 mb-4">
+            <% if (recipe.readyInMinutes) { %>
+              <span class="badge badge-info"><%= recipe.readyInMinutes %> min</span>
+            <% } %>
+            <% if (recipe.servings) { %>
+              <span class="badge badge-info"><%= recipe.servings %> servings</span>
+            <% } %>
+          </div>
+          <a href="/recipes/<%= recipe.id %>" class="btn-secondary text-sm w-full mt-auto text-center">View Details</a>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+  <div class="mt-6 text-center">
+    <a href="/recipes/random" class="btn-secondary">Get Another 10</a>
+  </div>
+<% } else { %>
+  <div class="text-center py-12">
+    <p class="text-gray-500 dark:text-gray-400 mb-4">No recipes found. Try adjusting your preferences.</p>
+    <a href="/recipes/random" class="btn-secondary">Try Again</a>
+  </div>
+<% } %>
+
+<%- include('../../partials/footer') %>

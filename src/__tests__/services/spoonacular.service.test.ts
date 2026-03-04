@@ -9,7 +9,7 @@ vi.mock("../../config", () => ({
   },
 }));
 
-import { findByIngredients, getRecipeDetails, searchRecipes } from "../../services/spoonacular.service";
+import { findByIngredients, getRecipeDetails, getRandomRecipes, searchRecipes } from "../../services/spoonacular.service";
 
 describe("spoonacular.service", () => {
   beforeEach(() => {
@@ -87,6 +87,60 @@ describe("spoonacular.service", () => {
 
       await expect(getRecipeDetails(999)).rejects.toThrow(
         "Spoonacular API error: 404 Not Found"
+      );
+    });
+  });
+
+  describe("getRandomRecipes", () => {
+    it("calls API with correct URL and returns unwrapped recipes", async () => {
+      const mockRecipes = [{ id: 1, title: "Random Pasta" }];
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ recipes: mockRecipes }),
+      });
+
+      const result = await getRandomRecipes();
+      expect(result).toEqual(mockRecipes);
+
+      const url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+      expect(url).toContain("/recipes/random");
+      expect(url).toContain("number=10");
+    });
+
+    it("includes tags when provided", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ recipes: [] }),
+      });
+
+      await getRandomRecipes(["vegetarian", "italian"], 5);
+
+      const url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+      expect(url).toContain("tags=vegetarian%2Citalian");
+      expect(url).toContain("number=5");
+    });
+
+    it("omits tags param when no tags provided", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve({ recipes: [] }),
+      });
+
+      await getRandomRecipes(undefined, 10);
+
+      const url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
+      expect(url).not.toContain("tags=");
+    });
+
+    it("throws on API error", async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        ok: false,
+        status: 402,
+        statusText: "Payment Required",
+      });
+
+      await expect(getRandomRecipes()).rejects.toThrow(
+        "Spoonacular API error: 402 Payment Required"
       );
     });
   });
