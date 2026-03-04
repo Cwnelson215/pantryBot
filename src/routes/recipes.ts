@@ -23,7 +23,20 @@ router.get("/search", async (req: Request, res: Response) => {
   try {
     const pantryItems = await pantryService.getItems(userId);
     const ingredientNames = pantryItems.map((item) => item.name);
-    const recipes = await spoonacularService.findByIngredients(ingredientNames);
+    const [allRecipes, userSavedRecipes] = await Promise.all([
+      spoonacularService.findByIngredients(ingredientNames),
+      db
+        .select({ spoonacularId: savedRecipes.spoonacularId })
+        .from(savedRecipes)
+        .where(eq(savedRecipes.userId, userId)),
+    ]);
+
+    const savedIds = new Set(
+      userSavedRecipes
+        .map((r) => r.spoonacularId)
+        .filter((id): id is number => id !== null)
+    );
+    const recipes = allRecipes.filter((r) => !savedIds.has(r.id));
 
     res.render("pages/recipes/search", {
       title: "Recipe Search",
