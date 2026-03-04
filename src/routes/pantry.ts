@@ -44,14 +44,18 @@ const router = Router();
 
 router.use(requireAuth);
 
-router.get("/", async (req, res) => {
-  const userId = req.session.userId!;
-  const items = await pantryService.getItems(userId);
+router.get("/", async (req, res, next) => {
+  try {
+    const userId = req.session.userId!;
+    const items = await pantryService.getItems(userId);
 
-  res.render("pages/pantry/index", {
-    title: "My Pantry",
-    items,
-  });
+    res.render("pages/pantry/index", {
+      title: "My Pantry",
+      items,
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.get("/add", (_req, res) => {
@@ -89,41 +93,45 @@ router.get("/lookup-barcode/:barcode", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
-  const userId = req.session.userId!;
-  const id = parseInt(req.params.id);
-
-  if (isNaN(id)) {
-    setFlash(req, "error", "Invalid item ID");
-    return res.redirect("/pantry");
-  }
-
-  const item = await pantryService.getItem(id, userId);
-
-  if (!item) {
-    setFlash(req, "error", "Item not found");
-    return res.redirect("/pantry");
-  }
-
-  let nutrients: usdaService.NutrientInfo | null = null;
+router.get("/:id", async (req, res, next) => {
   try {
-    if (item.usdaFdcId) {
-      nutrients = await usdaService.getNutrients(item.usdaFdcId);
-    } else {
-      const results = await usdaService.searchFoods(item.name, 1);
-      if (results && results.length > 0) {
-        nutrients = usdaService.extractNutrientsFromSearchResult(results[0]);
-      }
-    }
-  } catch {
-    // Nutrition lookup failed — page will render without nutrition data
-  }
+    const userId = req.session.userId!;
+    const id = parseInt(req.params.id);
 
-  res.render("pages/pantry/show", {
-    title: item.name,
-    item,
-    nutrients,
-  });
+    if (isNaN(id)) {
+      setFlash(req, "error", "Invalid item ID");
+      return res.redirect("/pantry");
+    }
+
+    const item = await pantryService.getItem(id, userId);
+
+    if (!item) {
+      setFlash(req, "error", "Item not found");
+      return res.redirect("/pantry");
+    }
+
+    let nutrients: usdaService.NutrientInfo | null = null;
+    try {
+      if (item.usdaFdcId) {
+        nutrients = await usdaService.getNutrients(item.usdaFdcId);
+      } else {
+        const results = await usdaService.searchFoods(item.name, 1);
+        if (results && results.length > 0) {
+          nutrients = usdaService.extractNutrientsFromSearchResult(results[0]);
+        }
+      }
+    } catch {
+      // Nutrition lookup failed — page will render without nutrition data
+    }
+
+    res.render("pages/pantry/show", {
+      title: item.name,
+      item,
+      nutrients,
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 function validatePantryItem(body: Record<string, string>): string | null {
@@ -154,83 +162,99 @@ function validatePantryItem(body: Record<string, string>): string | null {
   return null;
 }
 
-router.post("/add", async (req, res) => {
-  const userId = req.session.userId!;
-  const { name, quantity, unit, category, expirationDate, notes, barcode, isStaple } = req.body;
+router.post("/add", async (req, res, next) => {
+  try {
+    const userId = req.session.userId!;
+    const { name, quantity, unit, category, expirationDate, notes, barcode, isStaple } = req.body;
 
-  const validationError = validatePantryItem(req.body);
-  if (validationError) {
-    setFlash(req, "error", validationError);
-    return res.redirect("/pantry/add");
+    const validationError = validatePantryItem(req.body);
+    if (validationError) {
+      setFlash(req, "error", validationError);
+      return res.redirect("/pantry/add");
+    }
+
+    await pantryService.addItem(userId, {
+      name,
+      quantity,
+      unit,
+      category,
+      expirationDate,
+      notes,
+      barcode,
+      isStaple: isStaple ? 1 : 0,
+    });
+
+    setFlash(req, "success", "Item added to pantry");
+    res.redirect("/pantry");
+  } catch (err) {
+    next(err);
   }
-
-  await pantryService.addItem(userId, {
-    name,
-    quantity,
-    unit,
-    category,
-    expirationDate,
-    notes,
-    barcode,
-    isStaple: isStaple ? 1 : 0,
-  });
-
-  setFlash(req, "success", "Item added to pantry");
-  res.redirect("/pantry");
 });
 
-router.get("/:id/edit", async (req, res) => {
-  const userId = req.session.userId!;
-  const id = parseInt(req.params.id);
+router.get("/:id/edit", async (req, res, next) => {
+  try {
+    const userId = req.session.userId!;
+    const id = parseInt(req.params.id);
 
-  const item = await pantryService.getItem(id, userId);
+    const item = await pantryService.getItem(id, userId);
 
-  if (!item) {
-    setFlash(req, "error", "Item not found");
-    return res.redirect("/pantry");
+    if (!item) {
+      setFlash(req, "error", "Item not found");
+      return res.redirect("/pantry");
+    }
+
+    res.render("pages/pantry/edit", {
+      title: "Edit Item",
+      item,
+      categories: CATEGORIES,
+      units: UNITS,
+    });
+  } catch (err) {
+    next(err);
   }
-
-  res.render("pages/pantry/edit", {
-    title: "Edit Item",
-    item,
-    categories: CATEGORIES,
-    units: UNITS,
-  });
 });
 
-router.post("/:id/edit", async (req, res) => {
-  const userId = req.session.userId!;
-  const id = parseInt(req.params.id);
-  const { name, quantity, unit, category, expirationDate, notes, isStaple } = req.body;
+router.post("/:id/edit", async (req, res, next) => {
+  try {
+    const userId = req.session.userId!;
+    const id = parseInt(req.params.id);
+    const { name, quantity, unit, category, expirationDate, notes, isStaple } = req.body;
 
-  const validationError = validatePantryItem(req.body);
-  if (validationError) {
-    setFlash(req, "error", validationError);
-    return res.redirect(`/pantry/${id}/edit`);
+    const validationError = validatePantryItem(req.body);
+    if (validationError) {
+      setFlash(req, "error", validationError);
+      return res.redirect(`/pantry/${id}/edit`);
+    }
+
+    await pantryService.updateItem(id, userId, {
+      name,
+      quantity,
+      unit,
+      category,
+      expirationDate,
+      notes,
+      isStaple: isStaple ? 1 : 0,
+    });
+
+    setFlash(req, "success", "Item updated");
+    res.redirect("/pantry");
+  } catch (err) {
+    next(err);
   }
-
-  await pantryService.updateItem(id, userId, {
-    name,
-    quantity,
-    unit,
-    category,
-    expirationDate,
-    notes,
-    isStaple: isStaple ? 1 : 0,
-  });
-
-  setFlash(req, "success", "Item updated");
-  res.redirect("/pantry");
 });
 
-router.post("/:id/delete", async (req, res) => {
-  const userId = req.session.userId!;
-  const id = parseInt(req.params.id);
+router.post("/:id/delete", async (req, res, next) => {
+  try {
+    const userId = req.session.userId!;
+    const id = parseInt(req.params.id);
 
-  await pantryService.deleteItem(id, userId);
+    await pantryService.deleteItem(id, userId);
 
-  setFlash(req, "success", "Item removed from pantry");
-  res.redirect("/pantry");
+    setFlash(req, "success", "Item removed from pantry");
+    res.redirect("/pantry");
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;

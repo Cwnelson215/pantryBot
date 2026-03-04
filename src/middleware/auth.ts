@@ -23,22 +23,26 @@ export async function loadUser(
   res: Response,
   next: NextFunction
 ) {
-  res.locals.user = null;
+  try {
+    res.locals.user = null;
 
-  if (req.session.userId) {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, req.session.userId))
-      .limit(1);
+    if (req.session.userId) {
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, req.session.userId))
+        .limit(1);
 
-    if (user) {
-      res.locals.user = user;
-    } else {
-      req.session.destroy(() => {});
-      return res.redirect("/login");
+      if (user) {
+        res.locals.user = user;
+      } else {
+        req.session.destroy(() => {});
+        return res.redirect("/login");
+      }
     }
-  }
 
-  next();
+    next();
+  } catch (err) {
+    next(err);
+  }
 }
