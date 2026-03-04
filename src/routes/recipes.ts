@@ -3,7 +3,7 @@ import { requireAuth } from "../middleware/auth";
 import { setFlash } from "../middleware/flash";
 import { db } from "../db/client";
 import { savedRecipes, userPreferences } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import * as pantryService from "../services/pantry.service";
 import * as spoonacularService from "../services/spoonacular.service";
 import * as claudeService from "../services/claude.service";
@@ -94,6 +94,67 @@ router.post("/generate", async (req: Request, res: Response) => {
       err instanceof Error ? err.message : "Failed to generate recipe";
     setFlash(req, "error", message);
     res.redirect("/recipes/generate");
+  }
+});
+
+router.get("/saved/:id", async (req: Request, res: Response) => {
+  const userId = req.session.userId!;
+  const id = parseInt(req.params.id as string);
+  if (isNaN(id)) return res.redirect("/recipes/saved");
+
+  try {
+    const results = await db
+      .select()
+      .from(savedRecipes)
+      .where(and(eq(savedRecipes.id, id), eq(savedRecipes.userId, userId)));
+
+    if (results.length === 0) {
+      setFlash(req, "error", "Recipe not found");
+      return res.redirect("/recipes/saved");
+    }
+
+    const recipe = results[0];
+
+    const ingredients = recipe.ingredientsJson
+      ? typeof recipe.ingredientsJson === "string"
+        ? JSON.parse(recipe.ingredientsJson)
+        : recipe.ingredientsJson
+      : [];
+
+    const instructions = recipe.instructionsJson
+      ? typeof recipe.instructionsJson === "string"
+        ? JSON.parse(recipe.instructionsJson)
+        : recipe.instructionsJson
+      : null;
+
+    const nutrition = recipe.nutritionJson
+      ? typeof recipe.nutritionJson === "string"
+        ? JSON.parse(recipe.nutritionJson)
+        : recipe.nutritionJson
+      : null;
+
+    const servings = recipe.servings || 1;
+    let perServing = null;
+    if (nutrition) {
+      perServing = {} as Record<string, number>;
+      for (const [key, val] of Object.entries(nutrition)) {
+        perServing[key] =
+          typeof val === "number" ? Math.round(val / servings) : (val as number);
+      }
+    }
+
+    res.render("pages/recipes/saved-detail", {
+      title: recipe.title,
+      recipe,
+      ingredients,
+      instructions,
+      nutrition: perServing,
+    });
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to load recipe";
+    setFlash(req, "error", message);
+    res.redirect("/recipes/saved");
   }
 });
 
@@ -242,6 +303,26 @@ router.post("/saved/:id/cook/confirm", async (req: Request, res: Response) => {
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Failed to cook recipe";
+    setFlash(req, "error", message);
+    res.redirect("/recipes/saved");
+  }
+});
+
+router.post("/saved/:id/delete", async (req: Request, res: Response) => {
+  const userId = req.session.userId!;
+  const id = parseInt(req.params.id as string);
+  if (isNaN(id)) return res.redirect("/recipes/saved");
+
+  try {
+    await db
+      .delete(savedRecipes)
+      .where(and(eq(savedRecipes.id, id), eq(savedRecipes.userId, userId)));
+
+    setFlash(req, "success", "Recipe deleted");
+    res.redirect("/recipes/saved");
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Failed to delete recipe";
     setFlash(req, "error", message);
     res.redirect("/recipes/saved");
   }

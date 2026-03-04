@@ -15,7 +15,7 @@
       <% preview.deductions.forEach(function(d) { %>
         <div class="flex items-center justify-between text-sm">
           <div>
-            <span class="font-medium text-gray-900 dark:text-white"><%= d.pantryItemName %></span>
+            <a href="/pantry/<%= d.pantryItemId %>" class="font-medium text-primary dark:text-primary-light hover:underline"><%= d.pantryItemName %></a>
             <span class="text-gray-500 dark:text-gray-400">(for <%= d.ingredientName %>)</span>
           </div>
           <div class="text-right">

@@ -462,5 +462,96 @@ describe("recipes routes", () => {
       expect(res.status).toBe(302);
       expect(res.headers.location).toBe("/recipes/saved");
     });
+
+    // ── Saved detail routes ──────────────────────────────────────────
+
+    it("GET /recipes/saved/:id renders saved-detail page with full recipe data", async () => {
+      const { agent } = await loginAgent();
+
+      mockDb.where.mockResolvedValueOnce([
+        {
+          id: 1,
+          title: "Pasta Carbonara",
+          source: "spoonacular",
+          servings: 4,
+          ingredientsJson: JSON.stringify([
+            { name: "pasta", amount: "400", unit: "g" },
+          ]),
+          instructionsJson: JSON.stringify(["Boil pasta", "Add sauce"]),
+          nutritionJson: JSON.stringify({ calories: 800, protein: 30 }),
+        },
+      ]);
+
+      const res = await agent.get("/recipes/saved/1");
+      expect(res.status).toBe(200);
+      expect(res.text).toContain("Pasta Carbonara");
+      expect(res.text).toContain("pasta");
+    });
+
+    it("GET /recipes/saved/:id redirects when recipe not found", async () => {
+      const { agent } = await loginAgent();
+
+      mockDb.where.mockResolvedValueOnce([]);
+
+      const res = await agent.get("/recipes/saved/999");
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
+    });
+
+    it("GET /recipes/saved/:id redirects with NaN id", async () => {
+      const { agent } = await loginAgent();
+
+      const res = await agent.get("/recipes/saved/notanumber");
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
+    });
+
+    it("GET /recipes/saved/:id redirects on DB error", async () => {
+      const { agent } = await loginAgent();
+
+      mockDb.where.mockRejectedValueOnce(new Error("Database error"));
+
+      const res = await agent.get("/recipes/saved/1");
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
+    });
+
+    // ── Delete saved recipe ──────────────────────────────────────────
+
+    it("POST /recipes/saved/:id/delete deletes recipe and redirects", async () => {
+      const { agent, csrfToken } = await loginAgent();
+
+      const res = await agent
+        .post("/recipes/saved/1/delete")
+        .send(`_csrf=${csrfToken}`);
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
+      expect(mockDb.delete).toHaveBeenCalled();
+    });
+
+    it("POST /recipes/saved/:id/delete redirects with NaN id", async () => {
+      const { agent, csrfToken } = await loginAgent();
+
+      const res = await agent
+        .post("/recipes/saved/notanumber/delete")
+        .send(`_csrf=${csrfToken}`);
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
+    });
+
+    it("POST /recipes/saved/:id/delete redirects on DB error", async () => {
+      const { agent, csrfToken } = await loginAgent();
+
+      mockDb.where.mockRejectedValueOnce(new Error("Database error"));
+
+      const res = await agent
+        .post("/recipes/saved/1/delete")
+        .send(`_csrf=${csrfToken}`);
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toBe("/recipes/saved");
+    });
   });
 });

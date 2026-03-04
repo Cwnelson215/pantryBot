@@ -11,7 +11,7 @@
     <div class="space-y-2">
       <% result.deductions.forEach(function(d) { %>
         <div class="flex items-center justify-between text-sm">
-          <span class="font-medium text-green-800 dark:text-green-300"><%= d.pantryItemName %></span>
+          <a href="/pantry/<%= d.pantryItemId %>" class="font-medium text-green-800 dark:text-green-300 hover:underline"><%= d.pantryItemName %></a>
           <div class="text-right">
             <span class="text-red-600 dark:text-red-400">-<%= d.amountDeducted %> <%= d.unit %></span>
             <span class="text-gray-500 dark:text-gray-400 ml-2">now <%= d.newQuantity %> <%= d.unit %></span>

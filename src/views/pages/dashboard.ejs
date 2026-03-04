@@ -57,7 +57,7 @@
               }
             %>
               <tr>
-                <td class="font-medium text-gray-900 dark:text-white"><%= item.name %></td>
+                <td class="font-medium text-gray-900 dark:text-white"><a href="/pantry/<%= item.id %>" class="hover:underline text-primary dark:text-primary-light"><%= item.name %></a></td>
                 <td><%= new Date(item.expirationDate).toLocaleDateString() %></td>
                 <td><%= item.quantity %> <%= item.unit %></td>
                 <td><span class="badge <%= badgeClass %>"><%= badgeLabel %></span></td>
@@ -79,7 +79,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <% recentRecipes.forEach(function(recipe) { %>
         <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-5">
-          <h4 class="font-semibold text-gray-900 dark:text-white mb-1"><%= recipe.title %></h4>
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-1"><a href="/recipes/saved/<%= recipe.id %>" class="hover:underline"><%= recipe.title %></a></h4>
           <p class="text-sm text-gray-500 dark:text-gray-400">Source: <%= recipe.source %></p>
         </div>
       <% }); %>
