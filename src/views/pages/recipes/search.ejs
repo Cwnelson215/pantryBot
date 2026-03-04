@@ -37,6 +37,12 @@
       </div>
     <% }); %>
   </div>
+
+  <div class="mt-6 text-center">
+    <a href="/recipes/search?page=<%= nextPage %>" class="btn-secondary">
+      <%= nextPage === 0 && page !== 0 ? 'Back to First Results' : 'Search Again' %>
+    </a>
+  </div>
 <% } else { %>
   <div class="text-center py-12">
     <p class="text-gray-500 dark:text-gray-400 mb-4">No recipes found.</p>

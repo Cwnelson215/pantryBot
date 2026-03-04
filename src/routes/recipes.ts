@@ -19,6 +19,8 @@ router.get("/", (_req: Request, res: Response) => {
 
 router.get("/search", async (req: Request, res: Response) => {
   const userId = req.session.userId!;
+  const page = parseInt(req.query.page as string) || 0;
+  const pageSize = 10;
 
   try {
     const pantryItems = await pantryService.getItems(userId);
@@ -36,12 +38,18 @@ router.get("/search", async (req: Request, res: Response) => {
         .map((r) => r.spoonacularId)
         .filter((id): id is number => id !== null)
     );
-    const recipes = allRecipes.filter((r: any) => !savedIds.has(r.id));
+    const filtered = allRecipes.filter((r: any) => !savedIds.has(r.id));
+
+    const start = page * pageSize;
+    const recipes = filtered.slice(start, start + pageSize);
+    const nextPage = start + pageSize < filtered.length ? page + 1 : 0;
 
     res.render("pages/recipes/search", {
       title: "Recipe Search",
       recipes,
       pantryItems,
+      page,
+      nextPage,
     });
   } catch {
     setFlash(req, "error", "Recipe search is unavailable. Please check API configuration.");
@@ -49,6 +57,8 @@ router.get("/search", async (req: Request, res: Response) => {
       title: "Recipe Search",
       recipes: [],
       pantryItems: [],
+      page: 0,
+      nextPage: 0,
     });
   }
 });

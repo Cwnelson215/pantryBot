@@ -12,7 +12,7 @@ function ensureApiKey() {
 
 export async function findByIngredients(
   ingredients: string[],
-  number: number = 10
+  number: number = 50
 ) {
   ensureApiKey();
 

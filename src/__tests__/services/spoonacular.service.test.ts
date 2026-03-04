@@ -34,7 +34,7 @@ describe("spoonacular.service", () => {
       const url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
       expect(url).toContain("findByIngredients");
       expect(url).toContain("pasta%2Ctomatoes");
-      expect(url).toContain("number=10");
+      expect(url).toContain("number=50");
     });
 
     it("uses custom number parameter", async () => {
