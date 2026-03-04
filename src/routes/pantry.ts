@@ -126,12 +126,41 @@ router.get("/:id", async (req, res) => {
   });
 });
 
+function validatePantryItem(body: Record<string, string>): string | null {
+  const { name, quantity, unit, expirationDate, notes } = body;
+
+  if (!name || !name.trim()) return "Item name is required";
+  if (name.length > 200) return "Item name must be 200 characters or less";
+
+  if (quantity !== undefined && quantity !== "") {
+    const qty = parseFloat(quantity);
+    if (isNaN(qty) || qty < 0) return "Quantity must be a non-negative number";
+  }
+
+  if (unit !== undefined && unit !== "" && !UNITS.includes(unit)) {
+    return "Invalid unit";
+  }
+
+  if (expirationDate !== undefined && expirationDate !== "") {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(expirationDate) || isNaN(Date.parse(expirationDate))) {
+      return "Invalid date format (expected YYYY-MM-DD)";
+    }
+  }
+
+  if (notes !== undefined && notes.length > 500) {
+    return "Notes must be 500 characters or less";
+  }
+
+  return null;
+}
+
 router.post("/add", async (req, res) => {
   const userId = req.session.userId!;
   const { name, quantity, unit, category, expirationDate, notes, barcode, isStaple } = req.body;
 
-  if (!name) {
-    setFlash(req, "error", "Item name is required");
+  const validationError = validatePantryItem(req.body);
+  if (validationError) {
+    setFlash(req, "error", validationError);
     return res.redirect("/pantry/add");
   }
 
@@ -173,6 +202,12 @@ router.post("/:id/edit", async (req, res) => {
   const userId = req.session.userId!;
   const id = parseInt(req.params.id);
   const { name, quantity, unit, category, expirationDate, notes, isStaple } = req.body;
+
+  const validationError = validatePantryItem(req.body);
+  if (validationError) {
+    setFlash(req, "error", validationError);
+    return res.redirect(`/pantry/${id}/edit`);
+  }
 
   await pantryService.updateItem(id, userId, {
     name,

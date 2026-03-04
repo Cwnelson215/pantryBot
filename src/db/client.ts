@@ -11,7 +11,9 @@ export const pool = new Pool({
   password: config.db.password,
   ssl: config.nodeEnv === "production"
     ? { rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false" }
-    : false,
+    : config.nodeEnv === "test"
+    ? false
+    : undefined,
 });
 
 export const db = drizzle(pool, { schema });

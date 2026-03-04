@@ -41,9 +41,17 @@ export async function personalizeRecipe(
 ): Promise<string> {
   const client = getClient();
 
-  const prompt = `You are a helpful cooking assistant. Please personalize the following recipe based on the user's available ingredients and preferences.
+  const systemPrompt = `You are a helpful cooking assistant. Please personalize recipes based on the user's available ingredients and preferences.
 
-**Original Recipe:**
+Adapt recipes to:
+1. Use available pantry items where possible as substitutions
+2. Respect all dietary restrictions and allergies
+3. Adjust serving size if specified
+4. Suggest any helpful modifications or tips
+
+Provide the personalized recipe with updated ingredients and instructions.`;
+
+  const userPrompt = `**Original Recipe:**
 - Title: ${recipe.title}
 - Ingredients: ${recipe.ingredients.join(", ")}
 - Instructions: ${recipe.instructions}
@@ -55,23 +63,16 @@ ${pantryItems.join(", ")}
 ${preferences.dietaryTags?.length ? `- Dietary restrictions: ${preferences.dietaryTags.join(", ")}` : ""}
 ${preferences.allergies?.length ? `- Allergies: ${preferences.allergies.join(", ")}` : ""}
 ${preferences.cuisinePrefs?.length ? `- Cuisine preferences: ${preferences.cuisinePrefs.join(", ")}` : ""}
-${preferences.servingSize ? `- Serving size: ${preferences.servingSize}` : ""}
-
-Please adapt this recipe to:
-1. Use available pantry items where possible as substitutions
-2. Respect all dietary restrictions and allergies
-3. Adjust serving size if specified
-4. Suggest any helpful modifications or tips
-
-Provide the personalized recipe with updated ingredients and instructions.`;
+${preferences.servingSize ? `- Serving size: ${preferences.servingSize}` : ""}`;
 
   const message = await client.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 2000,
+    system: systemPrompt,
     messages: [
       {
         role: "user",
-        content: prompt,
+        content: userPrompt,
       },
     ],
   });
@@ -92,18 +93,9 @@ export async function generateRecipe(
 
   const client = getClient();
 
-  const prompt = `You are a creative chef. Create an original recipe using the following ingredients and respecting the user's preferences.
+  const systemPrompt = `You are a creative chef. Create original recipes using the provided ingredients and respecting user preferences.
 
-**Available Ingredients:**
-${ingredients.join(", ")}
-
-**User Preferences:**
-${preferences.dietaryTags?.length ? `- Dietary restrictions: ${preferences.dietaryTags.join(", ")}` : ""}
-${preferences.allergies?.length ? `- Allergies: ${preferences.allergies.join(", ")}` : ""}
-${preferences.cuisinePrefs?.length ? `- Cuisine preferences: ${preferences.cuisinePrefs.join(", ")}` : ""}
-${preferences.servingSize ? `- Serving size: ${preferences.servingSize}` : ""}
-
-Please return the recipe in the following JSON format (and nothing else outside the JSON):
+Return the recipe in the following JSON format (and nothing else outside the JSON):
 {
   "title": "Recipe Title",
   "servings": 4,
@@ -119,13 +111,23 @@ Please return the recipe in the following JSON format (and nothing else outside 
 
 Use only valid JSON. Do not include any text before or after the JSON.`;
 
+  const userPrompt = `**Available Ingredients:**
+${ingredients.join(", ")}
+
+**User Preferences:**
+${preferences.dietaryTags?.length ? `- Dietary restrictions: ${preferences.dietaryTags.join(", ")}` : ""}
+${preferences.allergies?.length ? `- Allergies: ${preferences.allergies.join(", ")}` : ""}
+${preferences.cuisinePrefs?.length ? `- Cuisine preferences: ${preferences.cuisinePrefs.join(", ")}` : ""}
+${preferences.servingSize ? `- Serving size: ${preferences.servingSize}` : ""}`;
+
   const message = await client.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 2000,
+    system: systemPrompt,
     messages: [
       {
         role: "user",
-        content: prompt,
+        content: userPrompt,
       },
     ],
   });

@@ -148,7 +148,7 @@ export async function getExpiringItems(userId: number, days: number = 7) {
         eq(pantryItems.userId, userId),
         sql`${pantryItems.expirationDate} IS NOT NULL`,
         sql`${pantryItems.expirationDate} >= CURRENT_DATE`,
-        sql`${pantryItems.expirationDate} <= CURRENT_DATE + interval '${sql.raw(days.toString())} days'`
+        sql`${pantryItems.expirationDate} <= CURRENT_DATE + make_interval(days => ${days})`
       )
     )
     .orderBy(asc(pantryItems.expirationDate));

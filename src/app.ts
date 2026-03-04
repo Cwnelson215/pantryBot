@@ -44,6 +44,7 @@ app.use(
         scriptSrcElem: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"],
       },
     },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
   })
 );
 
@@ -104,6 +105,7 @@ if (config.nodeEnv !== "test") {
   app.use("/register", authLimiter);
   app.use("/nutrition/api", apiLimiter);
   app.use("/recipes/search", apiLimiter);
+  app.use("/pantry/lookup-barcode", apiLimiter);
 }
 
 // Routes

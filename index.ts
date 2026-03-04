@@ -217,7 +217,7 @@ const taskDefinition = new aws.ecs.TaskDefinition(`${appName}-task`, {
         env.push({ name: "DB_PORT", value: "5432" });
         env.push({ name: "DB_NAME", value: appName.replace(/-/g, "_") });
         env.push({ name: "DB_USER", value: "portfolio_admin" });
-        env.push({ name: "DB_SSL_REJECT_UNAUTHORIZED", value: "false" });
+        env.push({ name: "DB_SSL_REJECT_UNAUTHORIZED", value: "true" });
       }
       if (dbSecretArn) {
         secrets.push({ name: "DB_PASSWORD", valueFrom: dbSecretArn });

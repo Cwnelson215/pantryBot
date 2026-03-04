@@ -140,7 +140,7 @@ describe("auth routes", () => {
 
       const res = await agent
         .post("/register")
-        .send(`email=new@example.com&password=password123&displayName=New User&_csrf=${csrfToken}`);
+        .send(`email=new@example.com&password=password123&confirmPassword=password123&displayName=New User&_csrf=${csrfToken}`);
 
       expect(res.status).toBe(302);
       expect(res.headers.location).toBe("/");

@@ -39,10 +39,15 @@ router.get("/register", guestOnly, (_req, res) => {
 });
 
 router.post("/register", guestOnly, async (req, res) => {
-  const { email, password, displayName } = req.body;
+  const { email, password, confirmPassword, displayName } = req.body;
 
   if (!email || !password || !displayName) {
     setFlash(req, "error", "All fields are required");
+    return res.redirect("/register");
+  }
+
+  if (password !== confirmPassword) {
+    setFlash(req, "error", "Passwords do not match");
     return res.redirect("/register");
   }
 
