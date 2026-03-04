@@ -36,7 +36,7 @@ router.get("/search", async (req: Request, res: Response) => {
         .map((r) => r.spoonacularId)
         .filter((id): id is number => id !== null)
     );
-    const recipes = allRecipes.filter((r) => !savedIds.has(r.id));
+    const recipes = allRecipes.filter((r: any) => !savedIds.has(r.id));
 
     res.render("pages/recipes/search", {
       title: "Recipe Search",
