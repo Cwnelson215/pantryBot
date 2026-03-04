@@ -99,20 +99,22 @@ export async function updateItem(
 
   if (data.name !== undefined) updateData.name = data.name;
   if (data.quantity !== undefined) {
-    updateData.quantity = data.quantity;
+    updateData.quantity = data.quantity || null;
     // If quantity increases (restock), update originalQuantity
-    const newQty = parseFloat(data.quantity);
-    const oldQty = existing.quantity ? parseFloat(existing.quantity) : 0;
-    if (newQty > oldQty) {
-      updateData.originalQuantity = data.quantity;
+    if (data.quantity) {
+      const newQty = parseFloat(data.quantity);
+      const oldQty = existing.quantity ? parseFloat(existing.quantity) : 0;
+      if (newQty > oldQty) {
+        updateData.originalQuantity = data.quantity;
+      }
     }
   }
-  if (data.unit !== undefined) updateData.unit = data.unit;
-  if (data.category !== undefined) updateData.category = data.category;
+  if (data.unit !== undefined) updateData.unit = data.unit || null;
+  if (data.category !== undefined) updateData.category = data.category || null;
   if (data.expirationDate !== undefined)
     updateData.expirationDate = data.expirationDate || null;
-  if (data.notes !== undefined) updateData.notes = data.notes;
-  if (data.barcode !== undefined) updateData.barcode = data.barcode;
+  if (data.notes !== undefined) updateData.notes = data.notes || null;
+  if (data.barcode !== undefined) updateData.barcode = data.barcode || null;
   if (data.isStaple !== undefined && data.isStaple !== "")
     updateData.isStaple = Number(data.isStaple) ? 1 : 0;
 

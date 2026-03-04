@@ -30,7 +30,7 @@ export async function logMeal(
       userId,
       logDate: data.logDate,
       foodName: data.foodName,
-      servings: data.servings || undefined,
+      servings: data.servings || null,
       calories: data.calories || null,
       proteinG: data.proteinG || null,
       carbsG: data.carbsG || null,
