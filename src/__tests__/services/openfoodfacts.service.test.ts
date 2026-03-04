@@ -81,6 +81,10 @@ describe("openfoodfacts.service", () => {
     it("returns undefined for empty array", () => {
       expect(mapToAppCategory([])).toBeUndefined();
     });
+
+    it("prefers specific grain tag over broad beverage umbrella tag", () => {
+      expect(mapToAppCategory(["en:plant-based-foods-and-beverages", "en:breads"])).toBe("Grains & Bread");
+    });
   });
 
   describe("lookupBarcode", () => {

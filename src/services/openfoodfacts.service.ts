@@ -168,15 +168,21 @@ export async function lookupBarcode(barcode: string): Promise<BarcodeResult> {
 }
 
 export function mapToAppCategory(categories: string[]): string | undefined {
+  let best: { category: string; tagLength: number } | undefined;
+
   for (const tag of categories) {
     const lower = tag.replace(/^en:/, "").replace(/-/g, " ").toLowerCase();
     for (const [keyword, appCategory] of Object.entries(CATEGORY_MAP)) {
       if (lower.includes(keyword)) {
-        return appCategory;
+        if (!best || lower.length < best.tagLength) {
+          best = { category: appCategory, tagLength: lower.length };
+        }
+        break; // Only count the first keyword match per tag
       }
     }
   }
-  return undefined;
+
+  return best?.category;
 }
 
 export function parseQuantity(quantity: string): { quantity?: number; unit?: string } {
