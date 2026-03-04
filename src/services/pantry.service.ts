@@ -110,7 +110,7 @@ export async function updateItem(
   if (data.unit !== undefined) updateData.unit = data.unit;
   if (data.category !== undefined) updateData.category = data.category;
   if (data.expirationDate !== undefined)
-    updateData.expirationDate = data.expirationDate;
+    updateData.expirationDate = data.expirationDate || null;
   if (data.notes !== undefined) updateData.notes = data.notes;
   if (data.barcode !== undefined) updateData.barcode = data.barcode;
   if (data.isStaple !== undefined && data.isStaple !== "")
