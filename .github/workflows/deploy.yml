@@ -89,7 +89,7 @@ jobs:
         uses: pulumi/actions@v5
         with:
           command: preview
-          stack-name: dev
+          stack-name: Cwnelson215/pantry-bot/dev
           expect-no-changes: true
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
@@ -162,7 +162,7 @@ jobs:
         uses: pulumi/actions@v5
         with:
           command: up
-          stack-name: ${{ github.event.inputs.environment || 'dev' }}
+          stack-name: Cwnelson215/pantry-bot/${{ github.event.inputs.environment || 'dev' }}
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
 
