@@ -2,7 +2,7 @@ config:
   aws:region: us-east-1
   pantry-bot:appName: pantry-bot
   pantry-bot:subdomain: pantrybot
-  pantry-bot:platformStack: Cwnelson215-org/portfolio-platform/dev
+  pantry-bot:platformStack: Cwnelson215/portfolio-platform/dev
   pantry-bot:cpu: "256"
   pantry-bot:memory: "512"
   pantry-bot:desiredCount: "1"
