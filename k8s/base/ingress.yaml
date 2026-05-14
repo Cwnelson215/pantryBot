@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pantry-bot
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: pantrybot.cwnel.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pantry-bot
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - pantrybot.cwnel.com
+      secretName: pantrybot-tls
