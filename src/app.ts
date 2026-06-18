@@ -23,8 +23,22 @@ const PgSession = connectPgSimple(session);
 
 const app = express();
 
-// Trust ALB proxy for correct X-Forwarded-Proto handling
+// Behind the k3s edge (nginx → Traefik), trust the proxy so Express derives
+// the client protocol from X-Forwarded-Proto.
 app.set("trust proxy", 1);
+
+// The public edge proxy terminates TLS but does not forward X-Forwarded-Proto,
+// so Express would see the in-cluster hop as plaintext and express-session would
+// refuse to emit the Secure session cookie — breaking sessions and CSRF for
+// every request. The app is only reachable via that HTTPS-only edge, so in
+// production treat forwarded requests as secure. Runs before the session
+// middleware so the cookie is issued correctly.
+if (config.nodeEnv === "production") {
+  app.use((req, _res, next) => {
+    req.headers["x-forwarded-proto"] = "https";
+    next();
+  });
+}
 
 // View engine
 app.set("view engine", "ejs");
