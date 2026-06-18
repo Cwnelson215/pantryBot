@@ -5,6 +5,11 @@ import { eq } from "drizzle-orm";
 
 const SALT_ROUNDS = 10;
 
+// Pre-computed dummy hash used to equalize bcrypt timing when no user matches a
+// login attempt. Comparing against this on the "no such user" path keeps the
+// response time roughly constant, preventing email enumeration via timing.
+const DUMMY_HASH_PROMISE = bcrypt.hash("dummy-password-for-timing", SALT_ROUNDS);
+
 export async function registerUser(
   email: string,
   password: string,
@@ -42,14 +47,14 @@ export async function loginUser(email: string, password: string) {
     .from(users)
     .where(eq(users.email, email));
 
-  if (result.length === 0) {
-    return null;
-  }
-
   const user = result[0];
-  const isValid = await bcrypt.compare(password, user.passwordHash);
+  // Always run a bcrypt comparison — against the real hash if the user exists,
+  // otherwise against the dummy hash — so both the "unknown email" and "wrong
+  // password" paths take roughly the same time and return the same null result.
+  const hash = user ? user.passwordHash : await DUMMY_HASH_PROMISE;
+  const isValid = await bcrypt.compare(password, hash);
 
-  if (!isValid) {
+  if (!user || !isValid) {
     return null;
   }
 

@@ -120,8 +120,10 @@ USDA_API_KEY=                      # Required for nutrition/barcode lookup
 - **Security:** Helmet headers, CSRF tokens, rate limiting (auth: 10/15min, API: 100/15min), HTTPS-only cookies in production.
 - **Image registry:** Public GHCR at `ghcr.io/cwnelson215/pantry-bot`. Pulls work without an `imagePullSecret`. Tags: `latest` (rolling) and `:<git sha>` (immutable per deploy).
 - **Deploy trigger:** Push to `main`, or `workflow_dispatch`. Workflow runs tests first; failures halt before any image/cluster work.
-- **TLS:** cert-manager issues `pantrybot.cwnel.com` via Let's Encrypt DNS-01 (Cloudflare). Cert is `Pending` until the `letsencrypt-prod` ClusterIssuer is installed in the cluster.
+- **TLS:** cert-manager issues `pantrybot.cwnel.com` via Let's Encrypt DNS-01 (Cloudflare). The `letsencrypt-prod` ClusterIssuer is installed and `Certificate/pantrybot-tls` is `Ready`; the app is live and publicly reachable at `https://pantrybot.cwnel.com` (valid TLS, `/health` → 200).
 
 ## Historical Note
 
 This repo previously deployed to AWS via Pulumi (ECR/ECS/ALB). The Pulumi files (`index.ts`, `Pulumi.yaml`, `Pulumi.dev.yaml`) and AWS resources remain until the k3s deploy is verified; teardown is via `pulumi destroy` from this directory once cutover is complete.
+
+Note: the k3s database was provisioned fresh (empty) — registered accounts and all app data still live only in the AWS RDS instance; they were not migrated. Run a `pg_dump` from RDS → `pg_restore` into `platform-pg` before teardown if that data must be kept.
