@@ -29,7 +29,11 @@ router.post("/login", guestOnly, async (req, res) => {
     setFlash(req, "success", "Welcome back!");
     res.redirect("/");
   } catch (err) {
-    setFlash(req, "error", "Invalid email or password");
+    // A thrown error here is a genuine server fault (e.g. DB unreachable), not a
+    // bad credential — invalid logins return null and are handled above. Don't
+    // mislabel it as an auth failure; log it and show an honest generic message.
+    console.error("Login error:", err);
+    setFlash(req, "error", "Something went wrong. Please try again.");
     res.redirect("/login");
   }
 });
